@@ -1,0 +1,33 @@
+robot_framework
+|
+---config
+  |
+  ---environments : configuration for dev,test,prod environments
+  ---workflows : workflow specific configuration - steps, dependencies. One directory per workflow.
+     |
+     ---collection : Any subdirectories in workflow specify collections
+|
+---lib : ruby classes needed for your local robots
+|
+---robots
+  |
+  ---google_scanned_book : all of the robots for a particular workflow. One directory per workflow
+|
+---spec
+  |
+  ---google_scanned_book : specs for the workflow
+
+== Execution
+
+Run robots from the root directory of the project.  Set the environment as a shell variable:
+ROBOT_ENVIRONMENT=development ./robots/google_scanned_book/descriptive_metadata.rb
+
+Default is local
+
+TODO
+-maybe define a ROBOT_ROOT constant in boot.rb?
+	-lyber_core/workflow might need to read in workflow config directory relative from ROBOT_ROOT
+-maybe make all robots executable shell scripts?
+	-First line: #!/usr/bin/env ruby
+	-Remove .rb
+	-chmod 755
