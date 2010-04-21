@@ -1,27 +1,41 @@
-$:.unshift File.join(File.dirname(__FILE__), "..", "..", "lib")
-$:.unshift File.join(File.dirname(__FILE__), "..", "..", "robots")
-$:.unshift File.join(File.dirname(__FILE__), "..", "..", "models")
+#!/usr/bin/env ruby
+
+require File.expand_path(File.dirname(__FILE__) + '/../boot')
+
 require 'dor_service'
-require 'rubygems'
 require 'lyber_core'
+require 'active-fedora'
 
 
-# This is the equivalent of a java main method
-if __FILE__ == $0
-  dm_robot = PreIngest::RegisterSdr.new(
-          'depositWorkflow', 'register-object')
-  dm_robot.start
-end
 
-module PreIngest
+
+module Deposit
 
 # putting this code in a class method makes it easier to test
   class RegisterSdr < LyberCore::Robot
 
     def process_item(work_item)
+
+      Fedora::Repository.register(SEDORA_URI)
+
       # Identifiers
 
       druid = work_item.druid
+
+      obj = ActiveFedora::Base.new(:pid => druid)
+      obj.save
+
+      workflow_xml = File.join(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "deposit", 'depositWorkflow.xml'))
+      Dor::WorkflowService.create_workflow(druid, 'depositWF', workflow_xml)
+      
     end
   end
 end
+
+# This is the equivalent of a java main method
+if __FILE__ == $0
+  dm_robot = Deposit::RegisterSdr.new(
+          'deposit', 'register-sdr', :druid_ref => ARGV[0])
+  dm_robot.start
+end
+
