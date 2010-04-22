@@ -12,7 +12,7 @@ require 'active-fedora'
 module Deposit
 
 # putting this code in a class method makes it easier to test
-  class RegisterSdr < LyberCore::Robot
+  class VerifyAgreement < LyberCore::Robot
 
     def process_item(work_item)
 
@@ -20,6 +20,7 @@ module Deposit
 
       druid = work_item.druid
 
+      # testing
       LyberCore::Connection.get("http://sdr-fedora-dev.stanford.edu/fedora/objects/druid:456alpana", {})
       
     end
