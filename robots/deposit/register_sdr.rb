@@ -27,6 +27,7 @@ module Deposit
 
       workflow_xml = File.join(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "deposit", 'depositWorkflow.xml'))
       Dor::WorkflowService.create_workflow(druid, 'depositWF', workflow_xml)
+      
       work_item.set_success
     rescue Exception => e
       work_item.set_error(e)
