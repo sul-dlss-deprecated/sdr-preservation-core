@@ -20,7 +20,7 @@ module Deposit
 
       druid = work_item.druid
 
-      # testing
+      # testing for now
       LyberCore::Connection.get("http://sdr-fedora-dev.stanford.edu/fedora/objects/druid:456alpana", {})
       
     end
