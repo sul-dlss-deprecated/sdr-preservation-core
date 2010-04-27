@@ -1,4 +1,18 @@
-robot_framework
+= SDR Deposit Workflow Robots
+
+==An overview of the workflow
+You can see the steps of the workflow in <tt>config/workflows/deposit/depositWorkflow.xml</tt>
+
+You can see the dependencies and settings for each step in <tt>config/workflows/deposit/process-config.yaml</tt>
+
+==Execution
+
+Run robots from the root directory of the project.  Set the environment as a shell variable:
+ROBOT_ENVIRONMENT=development WORKFLOW_CONFIG_HOME=/path/to/robot_root_dir/config/workflows ./robots/google_scanned_book/descriptive_metadata.rb
+
+Default is local
+
+==robot_framework
 |
 ---config
   |
@@ -17,14 +31,9 @@ robot_framework
   |
   ---google_scanned_book : specs for the workflow
 
-== Execution
 
-Run robots from the root directory of the project.  Set the environment as a shell variable:
-ROBOT_ENVIRONMENT=development WORKFLOW_CONFIG_HOME=/path/to/robot_root_dir/config/workflows ./robots/google_scanned_book/descriptive_metadata.rb
 
-Default is local
-
-TODO
+==TODO
 -maybe define a ROBOT_ROOT constant in boot.rb?
 	-lyber_core/workflow might need to read in workflow config directory relative from ROBOT_ROOT
 -maybe make all robots executable shell scripts?
