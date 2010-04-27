@@ -20,7 +20,7 @@ robot_framework
 == Execution
 
 Run robots from the root directory of the project.  Set the environment as a shell variable:
-ROBOT_ENVIRONMENT=development ./robots/google_scanned_book/descriptive_metadata.rb
+ROBOT_ENVIRONMENT=development WORKFLOW_CONFIG_HOME=/path/to/robot_root_dir/config/workflows ./robots/google_scanned_book/descriptive_metadata.rb
 
 Default is local
 
