@@ -14,7 +14,7 @@ desc "Create RDoc documentation"
 # Rake RDocTask with all of the options stubbed out.
   Rake::RDocTask.new(:rdoc) do |rd|    
 #    rd.external # run the rdoc process as an external shell
-   rd.main = "Deposit" # 'name' will be the initial page displayed
+   rd.main = "README.rdoc" # 'name' will be the initial page displayed
    rd.rdoc_dir = "docs" # set the output directory
 #    rd.rdoc_file = [] # List of files to include in the rdoc generation
 #    rd.template = "html" # Name of the template to be used by rdoc
