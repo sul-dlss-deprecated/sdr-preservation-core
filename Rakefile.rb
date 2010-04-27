@@ -14,11 +14,11 @@ desc "Create RDoc documentation"
 # Rake RDocTask with all of the options stubbed out.
   Rake::RDocTask.new(:rdoc) do |rd|    
 #    rd.external # run the rdoc process as an external shell
-#    rd.main = "name" # 'name' will be the initial page displayed
-#    rd.rdoc_dir = "html" # set the output directory
+   rd.main = "Deposit" # 'name' will be the initial page displayed
+   rd.rdoc_dir = "docs" # set the output directory
 #    rd.rdoc_file = [] # List of files to include in the rdoc generation
 #    rd.template = "html" # Name of the template to be used by rdoc
-#    rd.title = "" # Title of the RDoc documentation
+   rd.title = "SDR Deposit Workflow Robots" # Title of the RDoc documentation
 #    rd.options << "--accessor accessorname[,..]" # comma separated list of additional class methods that should be treated like 'attr_reader' and friends.
 #    rd.options << "--all" # include all methods (not just public) in the output
 #    rd.options << "--charset charset" # specifies HTML character-set
