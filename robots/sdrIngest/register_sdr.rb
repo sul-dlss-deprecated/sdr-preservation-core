@@ -25,8 +25,8 @@ module Deposit
       obj = ActiveFedora::Base.new(:pid => druid)
       obj.save
 
-      workflow_xml = File.join(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "deposit", 'depositWorkflow.xml'))
-      Dor::WorkflowService.create_workflow(druid, 'depositWF', workflow_xml)
+      workflow_xml = File.join(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngest", 'sdrIngestWorkflow.xml'))
+      Dor::WorkflowService.create_workflow(druid, 'sdrIngestWF', workflow_xml)
       
       work_item.set_success
     rescue Exception => e
@@ -39,7 +39,7 @@ end
 # This is the equivalent of a java main method
 if __FILE__ == $0
   dm_robot = Deposit::RegisterSdr.new(
-          'deposit', 'register-sdr', :druid_ref => ARGV[0])
+          'sdrIngest', 'register-sdr', :druid_ref => ARGV[0])
   dm_robot.start
 end
 
