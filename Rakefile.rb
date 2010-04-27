@@ -9,7 +9,7 @@ require 'spec/rake/spectask'
 
 task :default  => :test
 
-desc  "Run all of the tests"
+desc  "Run all of the rspec examples and generate the rdocs"
 task "test" do
   Rake::Task["examples"].invoke
   Rake::Task["rdoc"].invoke
