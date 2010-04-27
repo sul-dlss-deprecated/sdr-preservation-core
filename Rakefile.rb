@@ -31,17 +31,8 @@ Spec::Rake::SpecTask.new('failing_examples_with_html') do |t|
 end
 
 desc "Generate code coverage with rcov"
-task :coverage do
-  coverage_dir = File.join(docs_dir,"/coverage")
-  coverage_data = File.join(coverage_dir,"/coverage.data")
-  rm_f coverage_data
-  rm_f coverage_dir
-  
-  # rm_f "docs/coverage"
-  # mkdir_p "docs/coverage"
-  mkdir_p coverage_dir
-  
-  rcov = %(rcov --aggregate #{coverage_data} --text-summary -Ilib --html -o #{coverage_dir} spec/**/*.rb)
+task :coverage do  
+  rcov = %(rcov --aggregate coverage.data --text-summary -Ilib --html -o coverage spec/**/*.rb)
   system rcov
 end
 
