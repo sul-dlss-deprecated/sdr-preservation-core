@@ -7,13 +7,15 @@ require 'rake/testtask'
 require 'hanna/rdoctask'
 require 'spec/rake/spectask'
 
+DOCS_DIR = "docs"
+
 task :default  => :test
 
-desc  "Run all of the rspec examples and generate the rdocs"
+desc  "Run all of the rspec examples and generate the rdocs and rcov report"
 task "test" do
   Rake::Task["examples"].invoke
   Rake::Task["rdoc"].invoke
-  # Rake::Task["package"].invoke
+  Rake::Task["coverage"].invoke
 end
 
 desc "Run all rspec examples"
@@ -26,6 +28,16 @@ Spec::Rake::SpecTask.new('failing_examples_with_html') do |t|
   t.spec_files = FileList['failing_examples/**/*.rb']
   t.spec_opts = ["--format", "html:doc/reports/tools/failing_examples.html", "--diff"]
   t.fail_on_error = false
+end
+
+desc "Generate code coverage with rcov"
+task :coverage do
+  rm_f "docs/coverage/coverage.data"
+  rm_f "docs/coverage"
+  mkdir "docs"
+  mkdir "docs/coverage"
+  rcov = %(rcov --aggregate docs/coverage/coverage.data --text-summary -Ilib --html -o docs/coverage spec/**/*.rb)
+  system rcov
 end
 
 desc "Create RDoc documentation"
