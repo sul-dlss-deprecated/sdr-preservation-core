@@ -7,7 +7,7 @@ require 'rake/testtask'
 require 'hanna/rdoctask'
 require 'spec/rake/spectask'
 
-DOCS_DIR = "docs"
+docs_dir = File.join(File.join(File.dirname(__FILE__), 'docs'))
 
 task :default  => :test
 
@@ -32,11 +32,16 @@ end
 
 desc "Generate code coverage with rcov"
 task :coverage do
-  rm_f "docs/coverage/coverage.data"
-  rm_f "docs/coverage"
-  mkdir "docs"
-  mkdir "docs/coverage"
-  rcov = %(rcov --aggregate docs/coverage/coverage.data --text-summary -Ilib --html -o docs/coverage spec/**/*.rb)
+  coverage_dir = File.join(docs_dir,"/coverage")
+  coverage_data = File.join(coverage_dir,"/coverage.data")
+  rm_f coverage_data
+  rm_f coverage_dir
+  
+  # rm_f "docs/coverage"
+  # mkdir_p "docs/coverage"
+  mkdir_p coverage_dir
+  
+  rcov = %(rcov --aggregate #{coverage_data} --text-summary -Ilib --html -o #{coverage_dir} spec/**/*.rb)
   system rcov
 end
 
