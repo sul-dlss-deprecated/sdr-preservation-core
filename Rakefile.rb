@@ -4,7 +4,7 @@
 # 
 require 'rake'
 require 'rake/testtask'
-require 'rake/rdoctask'
+require 'hanna/rdoctask'
 
 # task :default => :svn_commit
 
