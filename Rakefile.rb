@@ -31,8 +31,8 @@ Spec::Rake::SpecTask.new('failing_examples_with_html') do |t|
 end
 
 desc "Generate code coverage with rcov"
-task :coverage do  
-  rcov = %(rcov --aggregate coverage.data --text-summary -Ilib --html -o coverage spec/**/*.rb)
+task :coverage do
+  rcov = %(rcov --aggregate coverage.data --text-summary -Ilib --html -o coverage robots/**/*.rb)
   system rcov
 end
 
