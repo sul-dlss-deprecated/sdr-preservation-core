@@ -5,10 +5,12 @@
 require 'rake'
 require 'rake/testtask'
 require 'hanna/rdoctask'
+require 'spec/rake/spectask'
 
-# task :default => :svn_commit
-
-file_list = Dir.glob("lib/**/*.rb")
+desc "Run all rspec examples"
+Spec::Rake::SpecTask.new('examples') do |t|
+  t.spec_files = FileList['spec/**/*.rb']
+end
 
 desc "Create RDoc documentation"
 # Rake RDocTask with all of the options stubbed out.
