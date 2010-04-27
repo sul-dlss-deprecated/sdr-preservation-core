@@ -7,7 +7,14 @@ require 'rake/testtask'
 require 'hanna/rdoctask'
 require 'spec/rake/spectask'
 
-task :default  => :examples
+task :default  => :test
+
+desc  "Run all of the tests"
+task "test" do
+  Rake::Task["examples"].invoke
+  Rake::Task["rdoc"].invoke
+  # Rake::Task["package"].invoke
+end
 
 desc "Run all rspec examples"
 Spec::Rake::SpecTask.new('examples') do |t|
