@@ -11,9 +11,12 @@ require 'active-fedora'
 
 module Deposit
 
-# putting this code in a class method makes it easier to test
+# Creates +Sedora+ objects and bootstrapping the workflow.
   class RegisterSdr < LyberCore::Robot
 
+    # Override the robot LyberCore::Robot.process_item method.
+    # - Creates a *Sedora* object
+    # - Initializes the +Deposit+ workflow
     def process_item(work_item)
 
       Fedora::Repository.register(SEDORA_URI)

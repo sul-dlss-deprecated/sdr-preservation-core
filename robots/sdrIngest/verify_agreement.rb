@@ -9,8 +9,12 @@ require 'active-fedora'
 
 module Deposit
 
-# putting this code in a class method makes it easier to test
+# Verifies preservation agreement for objects
   class VerifyAgreement < LyberCore::Robot
+
+
+    # Override the robot LyberCore::Robot.process_item method.
+    # - Finds the object's agreement object in DOR
 
     def process_item(work_item)
 

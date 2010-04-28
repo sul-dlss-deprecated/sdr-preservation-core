@@ -1,3 +1,8 @@
 register-sdr:
    batch_limit: 1000
-   error_limit: 5
+   error_limit: 6
+
+transfer-object:
+  prerequisite: register-sdr  
+  batch_limit: 1000
+  error_limit: 6
