@@ -2,3 +2,5 @@
 sdr2.iml
 html/*
 docs/*
+coverage/*
+coverage.data
