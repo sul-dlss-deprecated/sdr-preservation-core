@@ -19,10 +19,12 @@ module Deposit
       druid = work_item.druid
 
       # get the agreement id for this object
+
+      agreement_id = work_item.identityMetadata.agreementId
       # check if it is in sedora
       
       # testing for now
-      LyberCore::Connection.get("http://sdr-fedora-dev.stanford.edu/fedora/objects/druid:456alpana", {})
+      LyberCore::Connection.get("http://sdr-fedora-dev.stanford.edu/fedora/objects/" + agreementId, {})
       
     end
   end
