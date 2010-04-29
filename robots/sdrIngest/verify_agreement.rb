@@ -7,7 +7,7 @@ require 'lyber_core'
 require 'active-fedora'
 
 
-module Deposit
+module SdrIngest
 
 # Verifies preservation agreement for objects
   class VerifyAgreement < LyberCore::Robot
@@ -29,6 +29,8 @@ module Deposit
       
       # testing for now
       LyberCore::Connection.get("http://sdr-fedora-dev.stanford.edu/fedora/objects/" + agreementId, {})
+
+      # If agreement Id is not in Sedora then throw an exception
       
     end
   end
@@ -36,7 +38,7 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = Deposit::RegisterSdr.new(
+  dm_robot = SdrIngest::RegisterSdr.new(
           'sdrIngest', 'verify-agreement', :druid_ref => ARGV[0])
   dm_robot.start
 end
