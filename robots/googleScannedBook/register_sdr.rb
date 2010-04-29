@@ -9,7 +9,7 @@ require 'active-fedora'
 
 
 
-module Deposit
+module GoogleScannedBook
 
 # Creates +Sedora+ objects and bootstrapping the workflow.
   class RegisterSdr < LyberCore::Robot
@@ -41,7 +41,7 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = Deposit::RegisterSdr.new(
+  dm_robot = GoogleScannedBook::RegisterSdr.new(
           'sdrIngest', 'register-sdr', :druid_ref => ARGV[0])
   dm_robot.start
 end
