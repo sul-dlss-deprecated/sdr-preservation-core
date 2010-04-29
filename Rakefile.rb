@@ -14,8 +14,13 @@ task :default  => :test
 desc  "Run all of the rspec examples and generate the rdocs and rcov report"
 task "test" do
   Rake::Task["examples"].invoke
-  Rake::Task["rdoc"].invoke
+end
+
+desc "Do the whole build"
+task "hudson" do
+  Rake::Task["examples"].invoke
   Rake::Task["coverage"].invoke
+  Rake::Task["rdoc"].invoke
 end
 
 desc "Run all rspec examples"
