@@ -12,6 +12,11 @@ ROBOT_ENVIRONMENT=development WORKFLOW_CONFIG_HOME=/path/to/robot_root_dir/confi
 
 Default is local
 
+==Running tests
+You'll need to check out a local copy of fedora and solr, and a local copy of the sdr2 example objects. 
+<tt>git submodule init</tt>
+<tt>git submodule update</tt>
+
 ==robot_framework
 |
 ---config
