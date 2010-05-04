@@ -20,29 +20,40 @@ module Deposit
 
   class PopulateMetadata < LyberCore::Robot
     
-    attr_reader :obj
+    attr_reader :obj, :bag
 
     # Override the robot LyberCore::Robot.process_item method.
     # * Makes use of the Robot Framework FileUtilities.
     def process_item(work_item)
       # Identifiers
       @druid = work_item.druid
-      @obj = self.get_fedora_object
+      self.get_fedora_object
+      self.fetch_bag
+      self.populate_identity_metadata
     end
     
     # fetch the fedora object from the repository so we can attach datastreams to it
     # throw an error if we can't find the object
     def get_fedora_object
       Fedora::Repository.register(SEDORA_URI)
-      return ActiveFedora::Base.load_instance(@druid)
+      @obj = ActiveFedora::Base.load_instance(@druid)
     end
     
     # once you know the druid, go find a bagit object corresponding to that druid id
     # so we can extract the metadata from it
     def fetch_bag
-      
+      @bag = SDR_DEPOSIT_DIR + '/' + @druid.split(":")[1]
     end
     
+    def populate_identity_metadata
+      # first, read in the identity metadata xml file
+      @identityMetadataFile = @bag + '/data/metadata/identityMetadata.xml'
+      doc = Nokogiri::XML(open(@bag + '/data/metadata/identityMetadata.xml'))
+      
+      # then write it to a datastream
+      
+      puts doc.to_xml
+    end
     
     
   end
