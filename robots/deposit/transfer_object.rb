@@ -25,7 +25,8 @@ module Deposit
       # Identifiers
 
       druid = work_item.druid
-      FileUtilities.transfer_object(druid, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
+      return FileUtilities.transfer_object(druid, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
+      
     end
   end
 end
