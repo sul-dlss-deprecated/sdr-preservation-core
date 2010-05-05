@@ -9,10 +9,17 @@ describe Deposit::TransferObject do
   context "successful transfers" do
     context "local transfers" do 
       before(:all) do
-        DOR_WORKSPACE_DIR="/tmp/dorWorkspaceDir"
-        SDR_DEPOSIT_DIR="/tmp/sdrDepositDir"
+        dir = Dir.pwd
+        DOR_WORKSPACE_DIR="#{dir}/sdr2_example_objects/"
+        SDR_DEPOSIT_DIR="#{dir}/tmp/"
+        FileUtils.mkdir(SDR_DEPOSIT_DIR)
+        
       end
     
+      after(:all) do
+        FileUtils.remove_dir(SDR_DEPOSIT_DIR, true)
+      end
+      
       it "should transfer an object locally" do
 
         # create new transferObject
@@ -27,19 +34,23 @@ describe Deposit::TransferObject do
         # actually call the function we are testing
         transfer_robot.process_item(mock_workitem)
       end
-
-      it "should find the transferred object in the local destination" do
       
+      it "should find the transferred object in the local destination" do
+    
         # create new transferObject
         transfer_robot = Deposit::TransferObject.new( "deposit", "transfer-object")
         # mock out a workitem
         mock_workitem = mock("workitem")
+        
+        objId = "jc837rq9922"        
+        if !File.exist?(DOR_WORKSPACE_DIR + objId) then
+          raise('You need to get the test obj first.  Do "git submodule init", then "git submodule update".')
+        end
+         
         # return druid:123 when work_item.druid is called
-        mock_workitem.stub!(:druid).and_return("jc837rq9922")
-
+        mock_workitem.stub!(:druid).and_return(objId)
         # actually call the function we are testing
         transfer_robot.process_item(mock_workitem).should == true
-        
       end
     end
     
