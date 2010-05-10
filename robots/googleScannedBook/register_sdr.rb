@@ -19,7 +19,7 @@ module GoogleScannedBook
     # - Initializes the +Deposit+ workflow
     def process_item(work_item)
 
-      Fedora::Repository.register(SEDORA_URI)
+      Fedora::Repository.register(FEDORA_URI)
 
       # Identifiers
 
@@ -29,12 +29,8 @@ module GoogleScannedBook
       obj.save
 
       workflow_xml = File.join(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngest", 'sdrIngestWorkflow.xml'))
-      Dor::WorkflowService.create_workflow(druid, 'sdrIngestWF', workflow_xml)
+      Dor::WorkflowService.create_workflow('dor', druid, 'sdrIngestWF', workflow_xml)
       
-      work_item.set_success
-    rescue Exception => e
-      work_item.set_error(e)
-
     end
   end
 end
