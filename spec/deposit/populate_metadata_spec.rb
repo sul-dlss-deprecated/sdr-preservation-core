@@ -12,11 +12,10 @@ describe Deposit::PopulateMetadata do
       
       # in the test environment, and only when we want to test against the SDR2_EXAMPLE_OBJECTS,
       # have these tests assume that the SDR2_EXAMPLE_OBJECTS dir is the SDR_DEPOSIT_DIR
-      @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")
+      @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")    
       mock_workitem = mock("populate_metadata_workitem")
-    
       # return druid:jc837rq9922 when work_item.druid is called
-      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")      
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       
       Fedora::Repository.register(SEDORA_URI)
       ActiveFedora::SolrService.register(SOLR_URL)
@@ -62,20 +61,26 @@ describe Deposit::PopulateMetadata do
     end
           
     it "should accept a workitem passed to process_item" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
-      @robot.process_item(@mock_workitem)
+      @robot.process_item(mock_workitem)
     end
     
     # This pre-supposes that process_item has been called
     it "should load a sedora object with the given druid" do
-      @robot.process_item(@mock_workitem)
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+      @robot.process_item(mock_workitem)
       @robot.obj.should be_instance_of(ActiveFedora::Base)
-      @robot.obj.pid.should eql(@mock_workitem.druid)
+      @robot.obj.pid.should eql(mock_workitem.druid)
     end
     
     it "should be able to find a bag corresponding to the workitem's druid" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
-      @robot.process_item(@mock_workitem)
+      @robot.process_item(mock_workitem)
       @robot.bag_exists?.should eql(true)
       (File.directory? @robot.bag).should eql(true)
     end
