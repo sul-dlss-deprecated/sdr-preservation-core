@@ -23,9 +23,30 @@ task "hudson" do
   Rake::Task["rdoc"].invoke
 end
 
-desc "Run all rspec examples"
+desc "Run RSpec examples"
 Spec::Rake::SpecTask.new('examples') do |t|
   t.spec_files = FileList['spec/**/*.rb']
+end
+
+desc "Run RSpec Examples wrapped in a test instance of jetty"
+task :jetty do
+  require File.expand_path(File.dirname(__FILE__) + '/spec/lib/test_jetty_server.rb')
+  
+  SOLR_PARAMS = {
+    :quiet => ENV['SOLR_CONSOLE'] ? false : true,
+    :jetty_home => ENV['SOLR_JETTY_HOME'] || File.expand_path('./hydra-jetty'),
+    :jetty_port => ENV['SOLR_JETTY_PORT'] || 8983,
+    :solr_home => ENV['SOLR_HOME'] || File.expand_path('./hydra-jetty/solr'),
+    :fedora_home => ENV['FEDORA_HOME'] || File.expand_path('./hydra-jetty/fedora')
+    
+  }
+  # wrap tests with a test-specific Solr server
+  error = TestJettyServer.wrap(SOLR_PARAMS) do
+    rm_f "coverage.data"
+    Rake::Task["examples"].invoke
+    puts `ps aux | grep start.jar` 
+  end
+  raise "test failures: #{error}" if error
 end
 
 desc "Generate HTML report for failing examples"
