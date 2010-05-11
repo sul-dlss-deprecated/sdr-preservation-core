@@ -13,24 +13,24 @@ describe Deposit::PopulateMetadata do
       # in the test environment, and only when we want to test against the SDR2_EXAMPLE_OBJECTS,
       # have these tests assume that the SDR2_EXAMPLE_OBJECTS dir is the SDR_DEPOSIT_DIR
       @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")
-      @mock_workitem = mock("workitem")
+      mock_workitem = mock("populate_metadata_workitem")
     
       # return druid:jc837rq9922 when work_item.druid is called
-      @mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")      
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")      
       
       Fedora::Repository.register(SEDORA_URI)
       ActiveFedora::SolrService.register(SOLR_URL)
       
       # Make sure we're starting with a blank object
       begin
-        obj = ActiveFedora::Base.load_instance(@mock_workitem.druid)
+        obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
         obj.delete
       rescue
         $stderr.print $!
       end
       
       begin
-        obj = ActiveFedora::Base.new(:pid => @mock_workitem.druid)
+        obj = ActiveFedora::Base.new(:pid => mock_workitem.druid)
         obj.save
       rescue
       end
