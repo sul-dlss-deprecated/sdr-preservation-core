@@ -58,31 +58,31 @@ describe Deposit::PopulateMetadata do
       @robot.bag_directory.should eql(SDR2_EXAMPLE_OBJECTS)
     end
           
-    # it "should accept a workitem passed to process_item" do
-    #   @robot.process_item(@mock_workitem)
-    # end
+    it "should accept a workitem passed to process_item" do
+      @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
+      @robot.process_item(@mock_workitem)
+    end
     
     # This pre-supposes that process_item has been called
-    # it "should load a sedora object with the given druid" do
-      # @robot.obj.should be_instance_of(ActiveFedora::Base)
-      # @robot.obj.pid.should eql(@mock_workitem.druid)
-    # end
+    it "should load a sedora object with the given druid" do
+      @robot.process_item(@mock_workitem)
+      @robot.obj.should be_instance_of(ActiveFedora::Base)
+      @robot.obj.pid.should eql(@mock_workitem.druid)
+    end
     
-    # it "should accept a workitem" do
-    #   @robot.should respond_to("process_item(#{@mock_workitem})")
-    # end
-    #   
-
-
+    it "should be able to find a bag corresponding to the workitem's druid" do
+      @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
+      @robot.process_item(@mock_workitem)
+      @robot.bag_exists?.should eql(true)
+      (File.directory? @robot.bag).should eql(true)
+    end
+    
     #   
     # it "should throw an error if it can't find a sedora object with the given druid" do
     #   pending("If we query sedora with a druid and don't get anything back, what's our fail behavior?")
     # end
   
-    # it "should be able to find a bag corresponding to the workitem's druid" do
-    #   @robot.bag.should eql(File.expand_path(SDR2_EXAMPLE_OBJECTS + '/jc837rq9922'))
-    #   # (File.directory? @robot.bag).should eql(true)
-    # end
+
     # 
     # it "should throw an error if it can't find the bag object" do
     #   pending("")

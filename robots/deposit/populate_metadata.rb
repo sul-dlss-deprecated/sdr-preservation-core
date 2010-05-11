@@ -35,11 +35,22 @@ module Deposit
     def process_item(work_item)
       # Identifiers
       @druid = work_item.druid
-      @bag = SDR_DEPOSIT_DIR + '/' + @druid.split(":")[1]
+    
+      self.bag_exists? 
+      if(self.bag_exists?)
+        self.get_fedora_object
+        self.fetch_bag
+        self.populate_identity_metadata
+      else
+        # if the bag doesn't exist, raise an error
+        raise
+      end
       
-      self.get_fedora_object
-      self.fetch_bag
-      self.populate_identity_metadata
+    end
+    
+    def bag_exists?
+      @bag = @bag_directory + '/' + self.druid.split(":")[1]
+      File.directory? @bag
     end
     
     # fetch the fedora object from the repository so we can attach datastreams to it
@@ -62,7 +73,7 @@ module Deposit
       
       # then write it to a datastream
       
-      puts doc.to_xml
+      # puts doc.to_xml
     end
     
     
