@@ -20,13 +20,23 @@ module Deposit
 
   class PopulateMetadata < LyberCore::Robot
     
-    attr_reader :obj, :bag
+    attr_reader :obj, :bag, :druid, :bag_directory
+    attr_writer :bag_directory
+    
+    def initialize(string1,string2)
+      super(string1,string2)
+      # by default, get the bags from the SDR_DEPOSIT_DIR
+      # this can be explicitly changed if necessary
+      @bag_directory = SDR_DEPOSIT_DIR
+    end
 
     # Override the robot LyberCore::Robot.process_item method.
     # * Makes use of the Robot Framework FileUtilities.
     def process_item(work_item)
       # Identifiers
       @druid = work_item.druid
+      @bag = SDR_DEPOSIT_DIR + '/' + @druid.split(":")[1]
+      
       self.get_fedora_object
       self.fetch_bag
       self.populate_identity_metadata
@@ -42,7 +52,7 @@ module Deposit
     # once you know the druid, go find a bagit object corresponding to that druid id
     # so we can extract the metadata from it
     def fetch_bag
-      @bag = SDR_DEPOSIT_DIR + '/' + @druid.split(":")[1]
+      
     end
     
     def populate_identity_metadata
