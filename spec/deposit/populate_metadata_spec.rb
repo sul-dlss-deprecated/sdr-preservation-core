@@ -20,7 +20,7 @@ describe Deposit::PopulateMetadata do
       
       # Make sure we're starting with a blank object
       begin
-        obj = ActiveFedora::Base.load_instance(@druid)
+        obj = ActiveFedora::Base.load_instance(@mock_workitem.druid)
         obj.delete
       rescue
         $stderr.print $!
