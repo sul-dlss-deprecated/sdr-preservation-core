@@ -18,7 +18,9 @@ end
 
 desc "Do the whole build"
 task "hudson" do
-  Rake::Task["examples"].invoke
+  system 'git submodule init'
+  system 'git submodule update'
+  Rake::Task["jetty"].invoke
   Rake::Task["coverage"].invoke
   Rake::Task["rdoc"].invoke
 end
