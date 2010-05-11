@@ -42,9 +42,8 @@ task :jetty do
   }
   # wrap tests with a test-specific Solr server
   error = TestJettyServer.wrap(SOLR_PARAMS) do
-    rm_f "coverage.data"
     Rake::Task["examples"].invoke
-    puts `ps aux | grep start.jar` 
+    # puts `ps aux | grep start.jar` 
   end
   raise "test failures: #{error}" if error
 end
@@ -58,6 +57,7 @@ end
 
 desc "Generate code coverage with rcov"
 task :coverage do
+  # rm_f "coverage.data"
   rcov = %(rcov --aggregate coverage.data --text-summary -Ilib --html -o coverage robots/**/*.rb)
   system rcov
 end
