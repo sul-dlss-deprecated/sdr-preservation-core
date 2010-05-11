@@ -7,8 +7,6 @@ describe Deposit::PopulateMetadata do
 
   context "processing a workitem" do
     before(:all) do
-      # TODO: Why can't it pick up SOLR_URL from the environments file? 
-      SOLR_URL = 'http://127.0.0.1:8983/solr/test'
       
       # in the test environment, and only when we want to test against the SDR2_EXAMPLE_OBJECTS,
       # have these tests assume that the SDR2_EXAMPLE_OBJECTS dir is the SDR_DEPOSIT_DIR
