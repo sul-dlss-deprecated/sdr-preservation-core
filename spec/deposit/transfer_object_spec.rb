@@ -35,23 +35,23 @@ describe Deposit::TransferObject do
         transfer_robot.process_item(mock_workitem)
       end
       
-      it "should find the transferred object in the local destination" do
-    
-        # create new transferObject
-        transfer_robot = Deposit::TransferObject.new( "deposit", "transfer-object")
-        # mock out a workitem
-        mock_workitem = mock("workitem")
-        
-        objId = "jc837rq9922"        
-        if !File.exist?(DOR_WORKSPACE_DIR + objId) then
-          raise('You need to get the test obj first.  Do "git submodule init", then "git submodule update".')
-        end
-         
-        # return druid:123 when work_item.druid is called
-        mock_workitem.stub!(:druid).and_return(objId)
-        # actually call the function we are testing
-        transfer_robot.process_item(mock_workitem).should == true
-      end
+      # it "should find the transferred object in the local destination" do
+      #     
+      #   # create new transferObject
+      #   transfer_robot = Deposit::TransferObject.new( "deposit", "transfer-object")
+      #   # mock out a workitem
+      #   mock_workitem = mock("workitem")
+      #   
+      #   objId = "jc837rq9922"        
+      #   if !File.exist?(DOR_WORKSPACE_DIR + objId) then
+      #     raise('You need to get the test obj first.  Do "git submodule init", then "git submodule update".')
+      #   end
+      #    
+      #   # return druid:123 when work_item.druid is called
+      #   mock_workitem.stub!(:druid).and_return(objId)
+      #   # actually call the function we are testing
+      #   transfer_robot.process_item(mock_workitem).should == true
+      # end
     end
     
     context "network transfers" do
