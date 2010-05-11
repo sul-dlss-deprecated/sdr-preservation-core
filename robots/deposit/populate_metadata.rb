@@ -43,7 +43,7 @@ module Deposit
         self.populate_identity_metadata
       else
         # if the bag doesn't exist, raise an error
-        raise
+        raise("Can't find a bag at #{@bag}")
       end
       
     end
