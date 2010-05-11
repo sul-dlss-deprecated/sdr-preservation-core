@@ -65,9 +65,10 @@ end
 desc "Create RDoc documentation"
 # Rake RDocTask with all of the options stubbed out.
   Rake::RDocTask.new(:rdoc) do |rd|    
+    mkdir_p docs_dir
 #    rd.external # run the rdoc process as an external shell
    rd.main = "README.rdoc" # 'name' will be the initial page displayed
-   rd.rdoc_dir = "docs" # set the output directory
+   rd.rdoc_dir = docs_dir # set the output directory
    rd.rdoc_files.include("README.rdoc", "robots/*.rb", "robots/**/*.rb") # List of files to include in the rdoc generation
 #    rd.template = "html" # Name of the template to be used by rdoc
    rd.title = "SDR Deposit Workflow Robots" # Title of the RDoc documentation
