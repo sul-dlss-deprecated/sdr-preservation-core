@@ -52,7 +52,7 @@ class TestJettyServer
   end
   
   def jetty_command
-    "java -Djetty.port=#{@port} -Dsolr.solr.home=#{@solr_home} -jar start.jar"
+    "cd #{@jetty_home}; java -Djetty.port=#{@port} -Dsolr.solr.home=#{@solr_home} -jar start.jar"
   end
   
   def start
