@@ -36,15 +36,17 @@ module Deposit
       # Identifiers
       @druid = work_item.druid
     
-      self.bag_exists? 
-      if(self.bag_exists?)
-        self.get_fedora_object
-        self.fetch_bag
-        self.populate_identity_metadata
-      else
-        # if the bag doesn't exist, raise an error
-        raise("Can't find a bag at #{@bag}")
-      end
+      raise IOError, "Can't find a bag at #{@bag}" unless self.bag_exists?
+      raise IOError, "Can't load sedora object for #{@druid}" unless self.get_fedora_object
+      
+      # if(self.bag_exists?)
+      #   self.get_fedora_object
+      #   self.fetch_bag
+      #   self.populate_identity_metadata
+      # else
+      #   # if the bag doesn't exist, raise an error
+      #   
+      # end
       
     end
     

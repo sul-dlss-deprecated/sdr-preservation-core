@@ -4,37 +4,44 @@ require 'lyber_core'
 require 'deposit/populate_metadata'
 
 describe Deposit::PopulateMetadata do
-  
+
   context "dealing with bagit objects" do
+    
     before(:each) do
       @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")    
-      mock_workitem = mock("populate_metadata_workitem")
-      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
     end
-    it "should be able to access a bag object" do
+    
+    it "can return information about its bag object" do
       @robot.should respond_to(:bag)
     end
     
-    it "should know where to look for the bag object" do
+    it "knows where to look for the bag object" do
       @robot.should respond_to(:bag_directory)
     end
     
-    it "should look in SDR_DEPOSIT_DIR by default" do
+    it "looks in SDR_DEPOSIT_DIR by default" do
       @robot.bag_directory.should eql(SDR_DEPOSIT_DIR)
     end
     
-    it "should allow us to change the location of bag_directory" do
+    it "allows us to change the location of bag_directory" do
       @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
       @robot.bag_directory.should eql(SDR2_EXAMPLE_OBJECTS)
     end
     
-    it "should be able to find a bag corresponding to the workitem's druid" do
+    it "finds a bag corresponding to the workitem's druid" do
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
       @robot.process_item(mock_workitem)
       @robot.bag_exists?.should eql(true)
       (File.directory? @robot.bag).should eql(true)
+    end
+    
+    it "raises an IOError if it can't find a bagit object for the given druid" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:obviously_fake")
+      
+      lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /Can\'t find a bag/)
     end
   end
 
@@ -44,11 +51,9 @@ describe Deposit::PopulateMetadata do
       
       @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")    
       @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
-      
       mock_workitem = mock("populate_metadata_workitem")
-      # return druid:jc837rq9922 when work_item.druid is called
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
-      
+  
       # This is needed by hudson. I don't know why it isn't being picked up from the 
       # environment file. --bess
       SOLR_URL = 'http://127.0.0.1:8983/solr/test'
@@ -93,14 +98,16 @@ describe Deposit::PopulateMetadata do
       @robot.process_item(mock_workitem)
       @robot.obj.should be_instance_of(ActiveFedora::Base)
       @robot.obj.pid.should eql(mock_workitem.druid)
+    end    
+      
+    # pending("If we query sedora with a druid and don't get anything back, what's our fail behavior?")
+    it "raises and IOError if it can't l object with the given druid" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:obviously_fake")
+      
+      lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /sedora/)
+    
     end
-    
-
-    
-    #   
-    # it "should throw an error if it can't find a sedora object with the given druid" do
-    #   pending("If we query sedora with a druid and don't get anything back, what's our fail behavior?")
-    # end
   
 
     # 
@@ -114,4 +121,6 @@ describe Deposit::PopulateMetadata do
     
   end
 
+  context "creating a metadata datastream" do
+  end
 end
