@@ -76,11 +76,9 @@ context "Populating Metadata" do
     end
     
     it "raises an IOError if it can't find a bagit object for the given druid" do
-	    pending()
-#      mock_workitem = mock("populate_metadata_workitem")
-#      mock_workitem.stub!(:druid).and_return("druid:obviously_fake")
-      
-#      lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /Can\'t find a bag/)
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:obviously_fake")      
+      lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /Can\'t find a bag/)
     end
   end
 
@@ -115,24 +113,14 @@ context "Populating Metadata" do
     end    
       
     # pending("If we query sedora with a druid and don't get anything back, what's our fail behavior?")
-    it "raises and IOError if it can't l object with the given druid" do
-	    pending()
-#      mock_workitem = mock("populate_metadata_workitem")
-#      mock_workitem.stub!(:druid).and_return("druid:obviously_fake")
-#      lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /sedora/)
-    
+    it "raises an IOError if it can't load an object with the given druid" do
+      pending()
+      # The problem is that it never reaches this step when I give it a fake id. It'll first fail on 
+      # the lack of a bag. 
+      # mock_workitem = mock("populate_metadata_workitem")
+      # mock_workitem.stub!(:druid).and_return("druid:obviously_fake")
+      # lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /sedora/)   
     end
-  
-
-    # 
-    # it "should throw an error if it can't find the bag object" do
-    #   pending("")
-    # end
-    # 
-    # it "should be able to extract the identity metadata from the bag" do
-    #   
-    # end
-    
   end
 
   context "creating a metadata datastream" do
