@@ -38,7 +38,7 @@ class TestJettyServer
       
       puts "Waiting for #{params[:startup_wait] || 20} seconds..."
       sleep params[:startup_wait] || 20
-      system "netstat -an | grep LIST"
+      # system "netstat -an | grep LIST"
       yield
     rescue
       error = $!
