@@ -43,7 +43,7 @@ task :jetty do
   # wrap tests with a test-specific Solr server
   error = TestJettyServer.wrap(SOLR_PARAMS) do
     Rake::Task["examples"].invoke
-    puts `ps aux | grep start.jar` 
+    # puts `ps aux | grep start.jar` 
   end
   raise "test failures: #{error}" if error
 end
