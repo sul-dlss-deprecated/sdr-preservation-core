@@ -3,7 +3,36 @@ require 'rubygems'
 require 'lyber_core'
 require 'deposit/populate_metadata'
 
+
+
 describe Deposit::PopulateMetadata do
+  
+context "Populating Metadata" do
+  
+  def setup
+    @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")    
+    @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
+    mock_workitem = mock("populate_metadata_workitem")
+    mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+    
+    Fedora::Repository.register(SEDORA_URI)
+    ActiveFedora::SolrService.register(SOLR_URL)
+    
+    # Make sure we're starting with a blank object
+    begin
+      obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
+      obj.delete
+    rescue
+      $stderr.print $!
+    end
+    
+    begin
+      obj = ActiveFedora::Base.new(:pid => mock_workitem.druid)
+      obj.save
+    rescue
+      $stderr.print $!
+    end
+  end
 
   context "dealing with bagit objects" do
     
@@ -11,8 +40,17 @@ describe Deposit::PopulateMetadata do
       @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")    
     end
     
+    it "can be created" do
+      r = Deposit::PopulateMetadata.new("deposit","populate-metadata")
+      r.should be_instance_of(Deposit::PopulateMetadata)
+    end
+    
     it "can return information about its bag object" do
       @robot.should respond_to(:bag)
+    end
+    
+    it "can tell if the bag exists" do
+      @robot.should respond_to(:bag_exists?)
     end
     
     it "knows where to look for the bag object" do
@@ -49,32 +87,7 @@ describe Deposit::PopulateMetadata do
 
   context "processing a workitem" do
     before(:each) do
-      
-      @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")    
-      @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
-      mock_workitem = mock("populate_metadata_workitem")
-      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
-  
-      # This is needed by hudson. I don't know why it isn't being picked up from the 
-      # environment file. --bess
-      SOLR_URL = 'http://127.0.0.1:8983/solr/test'
-      Fedora::Repository.register(SEDORA_URI)
-      ActiveFedora::SolrService.register(SOLR_URL)
-      
-      # Make sure we're starting with a blank object
-      begin
-        obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
-        obj.delete
-      rescue
-        $stderr.print $!
-      end
-      
-      begin
-        obj = ActiveFedora::Base.new(:pid => mock_workitem.druid)
-        obj.save
-      rescue
-        $stderr.print $!
-      end
+      setup
     end
     
     
@@ -123,5 +136,13 @@ describe Deposit::PopulateMetadata do
   end
 
   context "creating a metadata datastream" do
+    before(:each) do
+      setup
+    end
+    
+    it "populates identity metadata" do
+      
+    end
   end
 end
+end # Populating Metadata
