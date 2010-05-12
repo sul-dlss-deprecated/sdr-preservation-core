@@ -37,13 +37,13 @@ task :jetty do
     :jetty_home => ENV['SOLR_JETTY_HOME'] || File.expand_path('./hydra-jetty'),
     :jetty_port => ENV['SOLR_JETTY_PORT'] || 8983,
     :solr_home => ENV['SOLR_HOME'] || File.expand_path('./hydra-jetty/solr'),
-    :fedora_home => ENV['FEDORA_HOME'] || File.expand_path('./hydra-jetty/fedora')
-    
+    :fedora_home => ENV['FEDORA_HOME'] || File.expand_path('./hydra-jetty/fedora'),
+    :startup_wait => 60
   }
   # wrap tests with a test-specific Solr server
   error = TestJettyServer.wrap(SOLR_PARAMS) do
     Rake::Task["examples"].invoke
-    # puts `ps aux | grep start.jar` 
+    puts `ps aux | grep start.jar` 
   end
   raise "test failures: #{error}" if error
 end
