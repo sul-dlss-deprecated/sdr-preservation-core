@@ -35,7 +35,7 @@ class TestJettyServer
     begin
       puts "starting jetty server on #{RUBY_PLATFORM}"
       jetty_server.start
-      sleep params[:startup_wait] || 5
+      sleep params[:startup_wait] || 20
       yield
     rescue
       error = $!
