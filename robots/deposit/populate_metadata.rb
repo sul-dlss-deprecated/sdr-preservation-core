@@ -58,8 +58,13 @@ module Deposit
     # fetch the fedora object from the repository so we can attach datastreams to it
     # throw an error if we can't find the object
     def get_fedora_object
-      Fedora::Repository.register(SEDORA_URI)
-      @obj = ActiveFedora::Base.load_instance(@druid)
+      begin
+        Fedora::Repository.register(SEDORA_URI)
+      rescue Errno::ECONNREFUSED => e
+        raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"
+      end
+        @obj = ActiveFedora::Base.load_instance(@druid)
+      
     end
     
     # once you know the druid, go find a bagit object corresponding to that druid id
