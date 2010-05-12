@@ -35,8 +35,10 @@ class TestJettyServer
     begin
       puts "starting jetty server on #{RUBY_PLATFORM}"
       jetty_server.start
+      
       puts "Waiting for #{params[:startup_wait] || 20} seconds..."
       sleep params[:startup_wait] || 20
+      system "netstat -an | grep LIST"
       yield
     rescue
       error = $!
