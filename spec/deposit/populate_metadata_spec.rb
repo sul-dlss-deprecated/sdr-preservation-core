@@ -127,30 +127,55 @@ context "Populating Metadata" do
     # the work object being processed should
     # 1. have an identity datastream that can be returned
     # 2. that datastream should have a DSID of "IDENTITY"
-    before(:all) do
-      setup
+    before(:each) do
+      setup      
     end
     
-    it "populates identity metadata" do
+    it "implements methods to populate metadata" do
       @robot.should respond_to(:populate_identity_metadata)
-    end
-    
-    it "should have identity metadata in the identity metadata datastream" do
-      mock_workitem = mock("populate_metadata_workitem")
-      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
-      @robot.process_item(mock_workitem)
+      @robot.should respond_to(:populate_provenance_metadata)
+      @robot.should respond_to(:populate_content_metadata)
     end
     
     it "has an identity metadata datastream" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+      @robot.process_item(mock_workitem)
       @robot.identity_metadata.should be_instance_of(ActiveFedora::Datastream)
     end
     
     it "has a provenance metadata datastream" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+      @robot.process_item(mock_workitem)
       @robot.provenance_metadata.should be_instance_of(ActiveFedora::Datastream)
     end
     
     it "has a content metadata datastream" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+      @robot.process_item(mock_workitem)
       @robot.content_metadata.should be_instance_of(ActiveFedora::Datastream)
+    end
+    
+    it "should have all the datastreams attached to the fedora object" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+      @robot.process_item(mock_workitem)
+      expected_datastreams = ['IDENTITY', 'PROVENANCE', 'CONTENTMD', 'DC']
+      expected_datastreams.each { |dsid| 
+        (@robot.obj.datastreams.keys.include? dsid).should eql(true) 
+      }
+    end
+    
+    it "should have labels for all the datastreams" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+      @robot.process_item(mock_workitem)
+      expected_datastreams = ['IDENTITY', 'PROVENANCE', 'CONTENTMD', 'DC']
+      expected_datastreams.each { |dsid| 
+        (@robot.obj.datastreams[dsid].attributes[:dsLabel]).should_not be_nil
+      }
     end
     
   end
