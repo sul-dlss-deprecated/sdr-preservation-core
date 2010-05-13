@@ -20,7 +20,7 @@ module Deposit
 
   class PopulateMetadata < LyberCore::Robot
     
-    attr_reader :obj, :bag, :druid, :bag_directory, :identity_metadata
+    attr_reader :obj, :bag, :druid, :bag_directory, :identity_metadata, :content_metadata, :provenance_metadata
     attr_writer :bag_directory
     
     def initialize(string1,string2)
@@ -38,6 +38,9 @@ module Deposit
     
       raise IOError, "Can't find a bag at #{@bag}" unless self.bag_exists?
       raise IOError, "Can't load sedora object for #{@druid}" unless self.get_fedora_object
+      self.populate_identity_metadata
+      self.populate_provenance_metadata
+      self.populate_content_metadata
       
       # if(self.bag_exists?)
       #   self.get_fedora_object
@@ -73,6 +76,9 @@ module Deposit
       
     end
     
+    # Go grab identityMetadata.xml from the bagit object, make a datastream out of it, 
+    # attach it to the fedora object, and save. 
+    # Throw an error if you can't find a bag or if you can't find the identityMetadata.xml file
     def populate_identity_metadata
       if bag_exists? 
         # first, read in the identity metadata xml file
@@ -85,22 +91,45 @@ module Deposit
         # by default this is inline xml
         # anything big, make it a managed datastream
         # content is always externally referenced 
-        # @test_datastream = ActiveFedora::Datastream.new(:pid=>@test_object.pid, :dsid=>'abcd', :blob=>StringIO.new("hi there"))
-      
-        # then write it to a datastream
-      
-        # puts doc.to_xml    
+      else
+        raise IOError, "Hmm... I can't seem to find a bagit object."
       end  
     end
     
     def populate_provenance_metadata
-      
+      if bag_exists? 
+        # first, read in the identity metadata xml file
+        provenanceMetadataFile = File.expand_path(@bag + '/data/metadata/provenanceMetadata.xml')
+        @provenance_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'PROVENANCE', :dsLabel=>'PROVENANCE', :blob=>IO.read(provenanceMetadataFile))
+        @obj.add_datastream(@provenance_metadata)
+        @obj.save
+        # add a label 
+        # Willy asks: have we decided the datastream types? 
+        # by default this is inline xml
+        # anything big, make it a managed datastream
+        # content is always externally referenced 
+      else
+        raise IOError, "Hmm... I can't seem to find a bagit object."
+      end
     end
     
     # What does this look like? 
     # What do we mean by populate content? 
-    def populate_content
-      
+    def populate_content_metadata
+      if bag_exists? 
+        # first, read in the identity metadata xml file
+        contentMetadataFile = File.expand_path(@bag + '/data/metadata/contentMetadata.xml')
+        @content_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'CONTENTMD', :dsLabel=>'CONTENTMD', :blob=>IO.read(contentMetadataFile))
+        @obj.add_datastream(@content_metadata)
+        @obj.save
+        # add a label 
+        # Willy asks: have we decided the datastream types? 
+        # by default this is inline xml
+        # anything big, make it a managed datastream
+        # content is always externally referenced 
+      else
+        raise IOError, "Hmm... I can't seem to find a bagit object."
+      end
     end
     
   end
