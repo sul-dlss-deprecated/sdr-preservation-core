@@ -140,8 +140,6 @@ context "Populating Metadata" do
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       @robot.process_item(mock_workitem)
       @robot.populate_identity_metadata
-      puts @robot.bag.inspect
-      puts @robot.identity_metadata.inspect
     end
     
   end

@@ -76,10 +76,8 @@ module Deposit
     def populate_identity_metadata
       if bag_exists? 
         # first, read in the identity metadata xml file
-        @identityMetadataFile = File.expand_path(@bag + '/data/metadata/identityMetadata.xml')
-        doc = Nokogiri::XML(open(@identityMetadataFile))
-        puts doc.to_xml
-        @identity_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'IDENTITY', :blob=>open(@identityMetadataFile){ |f| f.read })
+        identityMetadataFile = File.expand_path(@bag + '/data/metadata/identityMetadata.xml')
+        @identity_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'IDENTITY', :dsLabel=>'IDENTITY', :blob=>IO.read(identityMetadataFile))
         @obj.add_datastream(@identity_metadata)
         @obj.save
         # add a label 
