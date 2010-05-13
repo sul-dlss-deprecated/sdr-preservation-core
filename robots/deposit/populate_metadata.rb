@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+# Bess Sadler
+# bess@stanford.edu
+# 13 May 2010
 
 require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
@@ -41,18 +44,10 @@ module Deposit
       self.populate_identity_metadata
       self.populate_provenance_metadata
       self.populate_content_metadata
-      
-      # if(self.bag_exists?)
-      #   self.get_fedora_object
-      #   self.fetch_bag
-      #   self.populate_identity_metadata
-      # else
-      #   # if the bag doesn't exist, raise an error
-      #   
-      # end
-      
     end
     
+    # Check to see if the bagit directory exists.
+    # It does not check the validity of the bag, it assumes this has already happened.
     def bag_exists?
       @bag = @bag_directory + '/' + self.druid.split(":")[1]
       File.directory? @bag
@@ -66,10 +61,13 @@ module Deposit
       rescue Errno::ECONNREFUSED => e
         raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"
       end
-        @obj = ActiveFedora::Base.load_instance(@druid)
-      
+      @obj = ActiveFedora::Base.load_instance(@druid)
     end
     
+    # Go grab the given filename from the bagit object, 
+    # make a datastream out of it using the given label, 
+    # attach it to the fedora object, and save. 
+    # Throw an error if you can't find a bag or if you can't find the file
     def populate_metadata(filename,label)
       mdfile = File.expand_path(@bag + '/data/metadata/' + filename)
       md = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>label, :dsLabel=>label, :blob=>IO.read(mdfile))
@@ -78,9 +76,6 @@ module Deposit
       return md
     end
     
-    # Go grab identityMetadata.xml from the bagit object, make a datastream out of it, 
-    # attach it to the fedora object, and save. 
-    # Throw an error if you can't find a bag or if you can't find the identityMetadata.xml file
     def populate_identity_metadata
       @identity_metadata = populate_metadata('identityMetadata.xml','IDENTITY')
     end
