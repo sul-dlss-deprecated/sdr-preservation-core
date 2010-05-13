@@ -175,6 +175,7 @@ context "Populating Metadata" do
       expected_datastreams = ['IDENTITY', 'PROVENANCE', 'CONTENTMD', 'DC']
       expected_datastreams.each { |dsid| 
         (@robot.obj.datastreams[dsid].attributes[:dsLabel]).should_not be_nil
+        (@robot.obj.datastreams[dsid].attributes[:dsLabel]).length.should_not eql(0)
       }
     end
     

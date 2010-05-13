@@ -70,43 +70,27 @@ module Deposit
       
     end
     
+    def populate_metadata(filename,label)
+      mdfile = File.expand_path(@bag + '/data/metadata/' + filename)
+      md = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>label, :dsLabel=>label, :blob=>IO.read(mdfile))
+      @obj.add_datastream(md)
+      @obj.save
+      return md
+    end
+    
     # Go grab identityMetadata.xml from the bagit object, make a datastream out of it, 
     # attach it to the fedora object, and save. 
     # Throw an error if you can't find a bag or if you can't find the identityMetadata.xml file
     def populate_identity_metadata
-      if bag_exists? 
-        # first, read in the identity metadata xml file
-        identityMetadataFile = File.expand_path(@bag + '/data/metadata/identityMetadata.xml')
-        @identity_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'IDENTITY', :dsLabel=>'IDENTITY', :blob=>IO.read(identityMetadataFile))
-        @obj.add_datastream(@identity_metadata)
-        @obj.save
-      else
-        raise IOError, "Hmm... I can't seem to find a bagit object."
-      end  
+      @identity_metadata = populate_metadata('identityMetadata.xml','IDENTITY')
     end
     
     def populate_provenance_metadata
-      if bag_exists? 
-        # first, read in the identity metadata xml file
-        provenanceMetadataFile = File.expand_path(@bag + '/data/metadata/provenanceMetadata.xml')
-        @provenance_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'PROVENANCE', :dsLabel=>'PROVENANCE', :blob=>IO.read(provenanceMetadataFile))
-        @obj.add_datastream(@provenance_metadata)
-        @obj.save
-      else
-        raise IOError, "Hmm... I can't seem to find a bagit object."
-      end
+      @provenance_metadata = populate_metadata('provenanceMetadata.xml','PROVENANCE')
     end
     
     def populate_content_metadata
-      if bag_exists? 
-        # first, read in the identity metadata xml file
-        contentMetadataFile = File.expand_path(@bag + '/data/metadata/contentMetadata.xml')
-        @content_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'CONTENTMD', :dsLabel=>'CONTENTMD', :blob=>IO.read(contentMetadataFile))
-        @obj.add_datastream(@content_metadata)
-        @obj.save
-      else
-        raise IOError, "Hmm... I can't seem to find a bagit object."
-      end
+      @content_metadata = populate_metadata('contentMetadata.xml','CONTENTMD')
     end
     
   end
