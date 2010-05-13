@@ -70,12 +70,6 @@ module Deposit
       
     end
     
-    # once you know the druid, go find a bagit object corresponding to that druid id
-    # so we can extract the metadata from it
-    def fetch_bag
-      
-    end
-    
     # Go grab identityMetadata.xml from the bagit object, make a datastream out of it, 
     # attach it to the fedora object, and save. 
     # Throw an error if you can't find a bag or if you can't find the identityMetadata.xml file
@@ -86,11 +80,6 @@ module Deposit
         @identity_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'IDENTITY', :dsLabel=>'IDENTITY', :blob=>IO.read(identityMetadataFile))
         @obj.add_datastream(@identity_metadata)
         @obj.save
-        # add a label 
-        # Willy asks: have we decided the datastream types? 
-        # by default this is inline xml
-        # anything big, make it a managed datastream
-        # content is always externally referenced 
       else
         raise IOError, "Hmm... I can't seem to find a bagit object."
       end  
@@ -103,18 +92,11 @@ module Deposit
         @provenance_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'PROVENANCE', :dsLabel=>'PROVENANCE', :blob=>IO.read(provenanceMetadataFile))
         @obj.add_datastream(@provenance_metadata)
         @obj.save
-        # add a label 
-        # Willy asks: have we decided the datastream types? 
-        # by default this is inline xml
-        # anything big, make it a managed datastream
-        # content is always externally referenced 
       else
         raise IOError, "Hmm... I can't seem to find a bagit object."
       end
     end
     
-    # What does this look like? 
-    # What do we mean by populate content? 
     def populate_content_metadata
       if bag_exists? 
         # first, read in the identity metadata xml file
@@ -122,11 +104,6 @@ module Deposit
         @content_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'CONTENTMD', :dsLabel=>'CONTENTMD', :blob=>IO.read(contentMetadataFile))
         @obj.add_datastream(@content_metadata)
         @obj.save
-        # add a label 
-        # Willy asks: have we decided the datastream types? 
-        # by default this is inline xml
-        # anything big, make it a managed datastream
-        # content is always externally referenced 
       else
         raise IOError, "Hmm... I can't seem to find a bagit object."
       end
