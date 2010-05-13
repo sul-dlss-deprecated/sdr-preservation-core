@@ -19,7 +19,7 @@ module GoogleScannedBook
     # - Initializes the +Deposit+ workflow
     def process_item(work_item)
 
-      Fedora::Repository.register(FEDORA_URI)
+      Fedora::Repository.register(SEDORA_URI)
 
       # Identifiers
 
@@ -28,8 +28,9 @@ module GoogleScannedBook
       obj = ActiveFedora::Base.new(:pid => druid)
       obj.save
 
-      workflow_xml = File.join(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngest", 'sdrIngestWorkflow.xml'))
-      Dor::WorkflowService.create_workflow('dor', druid, 'sdrIngestWF', workflow_xml)
+      workflow_xml = File.open(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngest", 'sdrIngestWorkflow.xml'), 'rb') { |f| f.read }
+      
+      Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml)
       
     end
   end
@@ -38,7 +39,7 @@ end
 # This is the equivalent of a java main method
 if __FILE__ == $0
   dm_robot = GoogleScannedBook::RegisterSdr.new(
-          'sdrIngest', 'register-sdr', :druid_ref => ARGV[0])
+          'googleScannedBook', 'register-sdr')
   dm_robot.start
 end
 
