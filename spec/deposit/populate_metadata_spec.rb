@@ -124,13 +124,26 @@ context "Populating Metadata" do
   end
 
   context "creating a metadata datastream" do
+    # the work object being processed should
+    # 1. have an identity datastream that can be returned
+    # 2. that datastream should have a DSID of "IDENTITY"
     before(:each) do
       setup
     end
     
     it "populates identity metadata" do
-      
+      @robot.should respond_to(:populate_identity_metadata)
     end
+    
+    it "has a nokogiri object after the populate_identity_metadata method is called" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+      @robot.process_item(mock_workitem)
+      @robot.populate_identity_metadata
+      puts @robot.bag.inspect
+      puts @robot.identity_metadata.inspect
+    end
+    
   end
 end
 end # Populating Metadata

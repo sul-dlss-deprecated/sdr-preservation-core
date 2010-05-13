@@ -20,7 +20,7 @@ module Deposit
 
   class PopulateMetadata < LyberCore::Robot
     
-    attr_reader :obj, :bag, :druid, :bag_directory
+    attr_reader :obj, :bag, :druid, :bag_directory, :identity_metadata
     attr_writer :bag_directory
     
     def initialize(string1,string2)
@@ -74,15 +74,36 @@ module Deposit
     end
     
     def populate_identity_metadata
-      # first, read in the identity metadata xml file
-      @identityMetadataFile = @bag + '/data/metadata/identityMetadata.xml'
-      doc = Nokogiri::XML(open(@bag + '/data/metadata/identityMetadata.xml'))
+      if bag_exists? 
+        # first, read in the identity metadata xml file
+        @identityMetadataFile = File.expand_path(@bag + '/data/metadata/identityMetadata.xml')
+        doc = Nokogiri::XML(open(@identityMetadataFile))
+        puts doc.to_xml
+        @identity_metadata = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'IDENTITY', :blob=>open(@identityMetadataFile){ |f| f.read })
+        @obj.add_datastream(@identity_metadata)
+        @obj.save
+        # add a label 
+        # Willy asks: have we decided the datastream types? 
+        # by default this is inline xml
+        # anything big, make it a managed datastream
+        # content is always externally referenced 
+        # @test_datastream = ActiveFedora::Datastream.new(:pid=>@test_object.pid, :dsid=>'abcd', :blob=>StringIO.new("hi there"))
       
-      # then write it to a datastream
+        # then write it to a datastream
       
-      # puts doc.to_xml
+        # puts doc.to_xml    
+      end  
     end
     
+    def populate_provenance_metadata
+      
+    end
+    
+    # What does this look like? 
+    # What do we mean by populate content? 
+    def populate_content
+      
+    end
     
   end
 end
