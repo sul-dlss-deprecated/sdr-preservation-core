@@ -44,6 +44,7 @@ module Deposit
       self.populate_identity_metadata
       self.populate_provenance_metadata
       self.populate_content_metadata
+      @obj.save
     end
     
     # Check to see if the bagit directory exists.
@@ -72,7 +73,6 @@ module Deposit
       mdfile = File.expand_path(@bag + '/data/metadata/' + filename)
       md = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>label, :dsLabel=>label, :blob=>IO.read(mdfile))
       @obj.add_datastream(md)
-      @obj.save
       return md
     end
     
