@@ -34,18 +34,20 @@ context "Populating Metadata" do
     end
   end
 
-  context "dealing with bagit objects" do
-    
-    before(:each) do
-      @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")    
-    end
-    
+  context "basic behavior" do
     it "can be created" do
       r = Deposit::PopulateMetadata.new("deposit","populate-metadata")
       r.should be_instance_of(Deposit::PopulateMetadata)
     end
+  end
+  
+  context "knows how to deal with bagit objects" do
     
-    it "can return information about its bag object" do
+    before(:each) do
+      @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")    
+    end
+        
+    it "knows fully qualified path to its bag object" do
       @robot.should respond_to(:bag)
     end
     
@@ -100,6 +102,7 @@ context "Populating Metadata" do
     it "should accept a workitem passed to process_item" do
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+      @robot.should_receive(:process_item).with(mock_workitem)
       @robot.process_item(mock_workitem)
     end
     
@@ -112,14 +115,13 @@ context "Populating Metadata" do
       @robot.obj.pid.should eql(mock_workitem.druid)
     end    
       
-    # pending("If we query sedora with a druid and don't get anything back, what's our fail behavior?")
+    # If we query sedora with a druid and don't get anything back, raise an IOError
     it "raises an IOError if it can't load an object with the given druid" do
-      pending()
-      # The problem is that it never reaches this step when I give it a fake id. It'll first fail on 
-      # the lack of a bag. 
-      # mock_workitem = mock("populate_metadata_workitem")
-      # mock_workitem.stub!(:druid).and_return("druid:obviously_fake")
-      # lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /sedora/)   
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+      obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
+      obj.delete
+      lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /sedora/)   
     end
   end
 
