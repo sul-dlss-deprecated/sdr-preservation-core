@@ -14,13 +14,38 @@ task :default  => :test
 desc  "Run all of the rspec examples and generate the rdocs and rcov report"
 task "test" do
   Rake::Task["examples"].invoke
-  Rake::Task["rdoc"].invoke
-  Rake::Task["coverage"].invoke
 end
 
-desc "Run all rspec examples"
+desc "Do the whole build"
+task "hudson" do
+  Rake::Task["jetty"].invoke
+  Rake::Task["coverage"].invoke
+  Rake::Task["rdoc"].invoke
+end
+
+desc "Run RSpec examples"
 Spec::Rake::SpecTask.new('examples') do |t|
   t.spec_files = FileList['spec/**/*.rb']
+end
+
+desc "Run RSpec Examples wrapped in a test instance of jetty"
+task :jetty do
+  require File.expand_path(File.dirname(__FILE__) + '/spec/lib/test_jetty_server.rb')
+  
+  SOLR_PARAMS = {
+    :quiet => ENV['SOLR_CONSOLE'] ? false : true,
+    :jetty_home => ENV['SOLR_JETTY_HOME'] || File.expand_path('./hydra-jetty'),
+    :jetty_port => ENV['SOLR_JETTY_PORT'] || 8983,
+    :solr_home => ENV['SOLR_HOME'] || File.expand_path('./hydra-jetty/solr'),
+    :fedora_home => ENV['FEDORA_HOME'] || File.expand_path('./hydra-jetty/fedora'),
+    :startup_wait => 60
+  }
+  # wrap tests with a test-specific Solr server
+  error = TestJettyServer.wrap(SOLR_PARAMS) do
+    Rake::Task["examples"].invoke
+    # puts `ps aux | grep start.jar` 
+  end
+  raise "test failures: #{error}" if error
 end
 
 desc "Generate HTML report for failing examples"
@@ -32,6 +57,7 @@ end
 
 desc "Generate code coverage with rcov"
 task :coverage do
+  # rm_f "coverage.data"
   rcov = %(rcov --aggregate coverage.data --text-summary -Ilib --html -o coverage robots/**/*.rb)
   system rcov
 end
@@ -39,14 +65,15 @@ end
 desc "Create RDoc documentation"
 # Rake RDocTask with all of the options stubbed out.
   Rake::RDocTask.new(:rdoc) do |rd|    
+    mkdir_p docs_dir
 #    rd.external # run the rdoc process as an external shell
    rd.main = "README.rdoc" # 'name' will be the initial page displayed
-   rd.rdoc_dir = "docs" # set the output directory
-#    rd.rdoc_file = [] # List of files to include in the rdoc generation
+   rd.rdoc_dir = docs_dir # set the output directory
+   rd.rdoc_files.include("README.rdoc", "robots/*.rb", "robots/**/*.rb") # List of files to include in the rdoc generation
 #    rd.template = "html" # Name of the template to be used by rdoc
    rd.title = "SDR Deposit Workflow Robots" # Title of the RDoc documentation
-#    rd.options << "--accessor accessorname[,..]" # comma separated list of additional class methods that should be treated like 'attr_reader' and friends.
-#    rd.options << "--all" # include all methods (not just public) in the output
+#    rd.options << "--accessor accessorname[,..]" # comma separated list of additional class methods that should be treated like 'attr_reader' and friends.  
+   rd.options << "--all" # include all methods (not just public) in the output
 #    rd.options << "--charset charset" # specifies HTML character-set
 #    rd.options << "--debug" # displays lots on internal stuff
 #    rd.options << "--diagram" # Generate diagrams showing modules and classes using dot.

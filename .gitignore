@@ -3,3 +3,7 @@
 sdr2.iml
 html/*
 docs/*
+coverage/*
+coverage.data
+hydra-jetty
+hydra-jetty/*
