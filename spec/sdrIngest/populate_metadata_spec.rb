@@ -1,16 +1,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'rubygems'
 require 'lyber_core'
-require 'deposit/populate_metadata'
+require 'sdrIngest/populate_metadata'
 
 
 
-describe Deposit::PopulateMetadata do
+describe SdrIngest::PopulateMetadata do
   
 context "Populating Metadata" do
   
   def setup
-    @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")    
+    @robot = SdrIngest::PopulateMetadata.new("sdrIngest","populate-metadata")    
     @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
     mock_workitem = mock("populate_metadata_workitem")
     mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
@@ -35,16 +35,17 @@ context "Populating Metadata" do
   end
 
   context "basic behavior" do
-    it "can be created" do
-      r = Deposit::PopulateMetadata.new("deposit","populate-metadata")
-      r.should be_instance_of(Deposit::PopulateMetadata)
+   it "can be created" do
+      r = SdrIngest::PopulateMetadata.new("sdrIngest","populate-metadata")
+      r.should be_instance_of(SdrIngest::PopulateMetadata)
     end
   end
   
   context "knows how to deal with bagit objects" do
     
     before(:each) do
-      @robot = Deposit::PopulateMetadata.new("deposit","populate-metadata")    
+#      @robot = SdrIngest::PopulateMetadata.new("sdrIngest","populate-metadata")    
+      setup
     end
         
     it "knows fully qualified path to its bag object" do
@@ -60,6 +61,7 @@ context "Populating Metadata" do
     end
     
     it "looks in SDR_DEPOSIT_DIR by default" do
+      SDR_DEPOSIT_DIR = SDR2_EXAMPLE_OBJECTS
       @robot.bag_directory.should eql(SDR_DEPOSIT_DIR)
     end
     

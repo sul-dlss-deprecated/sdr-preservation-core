@@ -11,7 +11,7 @@ require 'lyber_core'
 # (Content included below.)
 # :include:config/workflows/deposit/depositWorkflow.xml
 
-module Deposit
+module SdrIngest
 
 # Transfers objects from DOR workspace to SDR's staging area.  
 # - notifies DOR of success by: <b><i>need to be filled in</i></b>
@@ -34,7 +34,7 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = Deposit::TransferObject.new(
-          'deposit', 'transfer-object')
+  dm_robot = SdrIngest::TransferObject.new(
+          'sdrIngest', 'transfer-object')
   dm_robot.start
 end

@@ -9,7 +9,7 @@ require 'active-fedora'
 
 
 
-module Deposit
+module GoogleScannedBook
 
 # Creates +Sedora+ objects and bootstrapping the workflow.
   class RegisterSdr < LyberCore::Robot
@@ -28,21 +28,18 @@ module Deposit
       obj = ActiveFedora::Base.new(:pid => druid)
       obj.save
 
-      workflow_xml = File.join(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "deposit", 'depositWorkflow.xml'))
-      Dor::WorkflowService.create_workflow(druid, 'depositWF', workflow_xml)
+      workflow_xml = File.open(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngest", 'sdrIngestWorkflow.xml'), 'rb') { |f| f.read }
       
-      work_item.set_success
-    rescue Exception => e
-      work_item.set_error(e)
-
+      Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml)
+      
     end
   end
 end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = Deposit::RegisterSdr.new(
-          'deposit', 'register-sdr', :druid_ref => ARGV[0])
+  dm_robot = GoogleScannedBook::RegisterSdr.new(
+          'googleScannedBook', 'register-sdr')
   dm_robot.start
 end
 

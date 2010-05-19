@@ -14,7 +14,7 @@ require 'lyber_core'
 # (Content included below.)
 # :include:config/workflows/deposit/depositWorkflow.xml
 
-module Deposit
+module SdrIngest
 
 # Populates metadata for an SDR object by reading the appropriate XML files
 # from the bagit object and attaching them as datastreams in Sedora
@@ -97,7 +97,7 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = Deposit::PopulateMetadata.new(
-          'deposit', 'populate-metadata')
+  dm_robot = SdrIngest::PopulateMetadata.new(
+          'sdrIngest', 'populate-metadata')
   dm_robot.start
 end

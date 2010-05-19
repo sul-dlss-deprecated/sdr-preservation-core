@@ -1,9 +1,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'rubygems'
 require 'lyber_core'
-require 'deposit/transfer_object'
+require 'sdrIngest/transfer_object'
 
-describe Deposit::TransferObject do
+describe SdrIngest::TransferObject do
 
 
   context "successful transfers" do
@@ -23,7 +23,7 @@ describe Deposit::TransferObject do
       it "should transfer an object locally" do
 
         # create new transferObject
-        transfer_robot = Deposit::TransferObject.new( "deposit", "transfer-object")
+        transfer_robot = SdrIngest::TransferObject.new( "sdrIngest", "transfer-object")
         # mock out a workitem
         mock_workitem = mock("workitem")
         # return druid:123 when work_item.druid is called
@@ -38,7 +38,7 @@ describe Deposit::TransferObject do
       # it "should find the transferred object in the local destination" do
       #     
       #   # create new transferObject
-      #   transfer_robot = Deposit::TransferObject.new( "deposit", "transfer-object")
+      #   transfer_robot = SdrIngest::TransferObject.new( "sdrIngest", "transfer-object")
       #   # mock out a workitem
       #   mock_workitem = mock("workitem")
       #   
@@ -63,7 +63,7 @@ describe Deposit::TransferObject do
       it "should transfer an object across network" do
            pending()
            # create new transferObject
-           transfer_robot = Deposit::TransferObject.new( "deposit", "transfer-object")
+           transfer_robot = SdrIngest::TransferObject.new( "sdrIngest", "transfer-object")
            # mock out a workitem
            mock_workitem = mock("workitem")
            # return druid:123 when work_item.druid is called
