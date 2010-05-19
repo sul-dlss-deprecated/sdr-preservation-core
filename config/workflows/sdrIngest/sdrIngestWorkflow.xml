@@ -1,9 +1,8 @@
-<workflow id="depositWF">
+<workflow id="sdrIngestWF">
      <process name="register-sdr" status="waiting" lifecycle="inprocess"/>
      <process name="transfer-object" status="waiting" />
-     <process name="validate-bag" status="completed" attempts="1"/>
-     <process name="populate-metadata" status="completed" attempts="1"/>
+     <process name="validate-bag" status="waiting" attempts="1"/>
+     <process name="populate-metadata" status="waiting" attempts="1"/>
      <process name="verify-agreement" status="waiting" />
-     <process name="process-content" status="waiting" />
      <process name="cleanup" lifecycle="registered" status="waiting" />
 </workflow>
