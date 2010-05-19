@@ -3,4 +3,4 @@
 	url = git://github.com/projecthydra/hydra-jetty.git
 [submodule "sdr2_example_objects"]
 	path = sdr2_example_objects
-	url = /afs/ir/dev/dlss/git/sdr/sdr2_example_objects.git
+	url = corn.stanford.edu:/afs/ir/dev/dlss/git/sdr/sdr2_example_objects.git
