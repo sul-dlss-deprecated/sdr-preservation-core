@@ -59,10 +59,13 @@ module SdrIngest
     def get_fedora_object
       begin
         Fedora::Repository.register(SEDORA_URI)
+        @obj = ActiveFedora::Base.load_instance(@druid)
       rescue Errno::ECONNREFUSED => e
-        raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"
+        raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"   
+        return nil     
+      rescue
+        return nil
       end
-      @obj = ActiveFedora::Base.load_instance(@druid)
     end
     
     # Go grab the given filename from the bagit object, 
