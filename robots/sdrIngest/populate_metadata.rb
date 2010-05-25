@@ -47,16 +47,29 @@ module SdrIngest
       @obj.save
     end
     
+    def process_druid(druid)
+      @druid = druid
+    
+      raise IOError, "Can't find a bag at #{@bag}" unless self.bag_exists?
+      raise IOError, "Can't load sedora object for #{@druid}" unless self.get_fedora_object
+      self.populate_identity_metadata
+      self.populate_provenance_metadata
+      self.populate_content_metadata
+      @obj.save
+    end
+    
     # Check to see if the bagit directory exists.
     # It does not check the validity of the bag, it assumes this has already happened.
     def bag_exists?
       @bag = @bag_directory + '/' + self.druid.split(":")[1]
+      puts "Loading metadata from #{@bag}..."
       File.directory? @bag
     end
     
     # fetch the fedora object from the repository so we can attach datastreams to it
     # throw an error if we can't find the object
     def get_fedora_object
+      puts "Connecting to #{SEDORA_URI}..."
       begin
         Fedora::Repository.register(SEDORA_URI)
         @obj = ActiveFedora::Base.load_instance(@druid)
@@ -97,7 +110,15 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::PopulateMetadata.new(
-          'sdrIngest', 'populate-metadata')
-  dm_robot.start
+  # If this robot is invoked with a specific druid, it will populate the metadata for that druid only
+  if(ARGV[0])
+    puts "Updating metadata for #{ARGV[0]}"
+    dm_robot = SdrIngest::PopulateMetadata.new("sdrIngest","populate-metadata")
+    dm_robot.process_druid(ARGV[0])
+  else
+    dm_robot = SdrIngest::PopulateMetadata.new('sdrIngest', 'populate-metadata')
+    puts "workflow = #{dm_robot.workflow}"
+    dm_robot.start
+  end
+  puts "Done."
 end
