@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-# Bess Sadler
-# bess@stanford.edu
+# Xinlei Qiu
+# xinlei@stanford.edu
 # 13 May 2010
 
 require File.expand_path(File.dirname(__FILE__) + '/../boot')
@@ -17,20 +17,44 @@ require 'lyber_core'
 module SdrIngest
   
   class CompleteDeposit < LyberCore::Robot
+    attr_reader :obj, :druid;
+    attr_writer :bag_directory;
+    
+    
+    def initialize(string1,string2)
+      super(string1,string2)
+      # by default, get the bags from the SDR_DEPOSIT_DIR
+      # this can be explicitly changed if necessary
+      @bag_directory = SDR_DEPOSIT_DIR
+    end
+    
     def process_item(work_item)
-      druid = work_item.druid
+      @druid = work_item.druid
       result = Dor::WorkflowService.update_workflow_status("sdr", druid, "sdrIngestWF", "complete-deposit", "completed")
-      if not result then
-        raise "Update workflow \"complete-deposit\" failed"
-      end
+      raise "Update workflow \"complete-deposit\" failed" unless result
+      
+      raise "Cannot load Sedora object" unless get_fedora_object
       
       update_provenance(druid, "deposit complete")
     end
     
-    def update_provenance (druid, status)
+    def update_provenance (druid, provenance)
       return true
     end
     
+    # fetch the fedora object from the repository so we can attach datastreams to it
+    # throw an error if we can't find the object
+    def get_fedora_object
+      begin
+        Fedora::Repository.register(SEDORA_URI)
+        @obj = ActiveFedora::Base.load_instance(@druid)
+      rescue Errno::ECONNREFUSED => e
+        raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"   
+        return nil     
+      rescue
+        return nil
+      end
+    end
   end
   
 end
