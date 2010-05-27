@@ -39,7 +39,7 @@ end
 # This is the equivalent of a java main method
 if __FILE__ == $0
   dm_robot = SdrIngest::RegisterSdr.new(
-          'sdrIngest', 'verify-agreement', :druid_ref => ARGV[0])
+          'sdrIngest', 'verify-agreement')
   dm_robot.start
 end
 
