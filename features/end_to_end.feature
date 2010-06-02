@@ -4,9 +4,9 @@ Feature: Deposit an object into Sedora
   As a depositor
   I want to know that all parts of the ingest workflow are behaving correctly
 
-  Scenario: New Object
-    When I create a new object
-    # Then I should see a search field
+  Scenario: End to End test
+    When I want to test the sedora ingest workflow
+    Then I should be able to talk to the workflow service
     #    And I should see a selectable list with field choices
     #    And I should see a "search" button
     #    And I should not see the "startOverLink" element

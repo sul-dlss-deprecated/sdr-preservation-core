@@ -5,7 +5,8 @@ require 'rubygems'
 require 'lyber_core'
 
 Dor::CREATE_WORKFLOW= true
-Dor::WF_URI = 'http://lyberservices-dev.stanford.edu:8080/workflow'
+#Dor::WF_URI = 'http://lyberservices-dev.stanford.edu:8080/workflow'
+Dor::WF_URI = 'http://localhost:8080/workflow'
 
 xml = <<-EOXML
 <workflow id="googleScannedBookWF">
