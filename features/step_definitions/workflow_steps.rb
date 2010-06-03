@@ -8,24 +8,34 @@ require 'open-uri'
 # use ssh port forwarding like this:
 # 1. ssh -L 8080:localhost:8080 lyberadmin@lyberservices-dev.stanford.edu
 # 2. replace the value of WORKFLOW_SERVICE_URL with "http://localhost:8080/workflow"
-WORKFLOW_SERVICE_URL = "http://lyberservices-dev.stanford.edu:8080/workflow"
+WORKFLOW_SERVICE_URL = "http://lyberservices-dev.stanford.edu/workflow"
 DOR_DEV_FEDORA_URL = "http://dor-dev.stanford.edu/fedora/"
 
 # At the start of the process, get a new pid
 testpid ||= Nokogiri::XML(open(DOR_DEV_FEDORA_URL << "/management/getNextPID?xml=true&namespace=sdrtwo", {:http_basic_authentication=>["fedoraAdmin", "fedoraAdmin"]})).xpath("//pid").text
 
-# This is a dummy test. It just helps the cucumber read more easily. 
+# ###################################################
+#
+# This is a dummy test. It just helps the cucumber features read more easily. 
+# 
 When /^I want to test the sedora ingest workflow$/ do
   true
 end
 
-# Can I get to the WORKFLOW_SERVICE_URL without raising an exception
+# ###################################################
+#
+# Can I get to the WORKFLOW_SERVICE_URL without raising an exception?
+# Do I get a 200 response code or something else? 
+#
 Then /^I should be able to talk to the workflow service$/ do
   lambda { Net::HTTP.get_response(URI.parse(WORKFLOW_SERVICE_URL))}.should_not raise_exception()
   # TODO: Do I get a 200 response code?
 end
 
+# ###################################################
+# 
 # This is a re-write of the test_dor_object_creator script that Willy wrote
+# 
 Then /^I should be able to create a new object in DOR for testing against$/ do
 
  ENABLE_SOLR_UPDATES = false
@@ -40,7 +50,7 @@ Then /^I should be able to create a new object in DOR for testing against$/ do
   </workflow>
   EOXML
 
-  Fedora::Repository.register(DOR_DEV_FEDORA_URL)
+  Fedora::Repository.register("http://fedoraAdmin:fedoraAdmin@dor-dev.stanford.edu/fedora/")
   puts "testpid = #{testpid}"
   obj = ActiveFedora::Base.new(:pid => testpid, :label => 'sdr robot testing')
   obj.save
@@ -50,12 +60,17 @@ Then /^I should be able to create a new object in DOR for testing against$/ do
   obj.pid.should include("sdrtwo")
 end
 
-Then /^that object should have a "([^\"]*)" state where "([^\"]*)" is "([^\"]*)" and "([^\"]*)" is "([^\"]*)"$/ do |arg1, arg2, arg3, arg4, arg5|
-  # http://lyberservices-dev.stanford.edu/workflow/dor/objects/sdrtwo:june2a1112/workflows/googleScannedBookWF
+# ###################################################
+# Check the workflow datastreams:
+# 1. Do they exist?
+# 2. Are they in the expected state? 
+#
+Then /^that object should have a "([^\"]*)" state where "([^\"]*)" is "([^\"]*)"$/ do |workflow, step, status|
+  
+  uri = WORKFLOW_SERVICE_URL + "/dor/objects/" + testpid + "/workflows/" + workflow
+  # puts "Checking for workflow at #{uri}"
+  workflow_xml = Nokogiri::XML(open(uri))
+  workflow_xml.xpath("//process[@name='#{step}'][@status='#{status}']").should_not be_empty
 
-  pending # express the regexp above with the code you wish you had
 end
-
-# Then /^that object should have a DOR workflow datastream$/ do
-# end
 
