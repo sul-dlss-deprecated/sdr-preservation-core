@@ -7,6 +7,9 @@ require 'rake/testtask'
 require 'hanna/rdoctask'
 require 'spec/rake/spectask'
 
+# Import external rake tasks
+Dir.glob('lib/tasks/*.rake').each { |r| import r }
+
 docs_dir = File.join(File.join(File.dirname(__FILE__), 'docs'))
 
 task :default  => :test
@@ -24,6 +27,11 @@ task "hudson" do
 end
 
 desc "Run RSpec examples"
+Spec::Rake::SpecTask.new('examples') do |t|
+  t.spec_files = FileList['spec/**/*.rb']
+end
+
+desc "Run cucumber features"
 Spec::Rake::SpecTask.new('examples') do |t|
   t.spec_files = FileList['spec/**/*.rb']
 end
