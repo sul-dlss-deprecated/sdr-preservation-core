@@ -7,9 +7,22 @@ Feature: Deposit an object into Sedora
   Scenario: End to End test
     When I want to test the sedora ingest workflow
     Then I should be able to talk to the workflow service
-    #    And I should see a selectable list with field choices
-    #    And I should see a "search" button
-    #    And I should not see the "startOverLink" element
-    #    And I should see "Welcome!"
-    #    And I should see a stylesheet
+	And I should be able to create a new object in DOR for testing against
+	And that object should have a DOR workflow datastream
+	# 
+	# When I run the ingest robot
+	# Then that object should exist in SEDORA
+	# And it should have a SEDORA workflow datastream where "ingest" is "completed" and "transfer" is "waiting"
+	# 
+	# When I run the transfer robot
+	# Then there should be a properly named bagit object in SEDORA_DROPOFF
+	# And it should have a SEDORA workflow datastream where "transfer" is "completed" and "populate-metadata" is "waiting"
+	# 
+	# When I run the populate-metadata robot
+	# Then the object should have a metadata datastream
+	# And it should have an identity datastream
+	# And it should have a provenance datastream
+	# And it should have a SEDORA workflow datastream where "populate-metadata" is "completed" and "??" is "waiting"
+	# 
+	
 
