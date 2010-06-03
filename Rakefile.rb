@@ -19,7 +19,7 @@ end
 desc "Do the whole build"
 task "hudson" do
   Rake::Task["jetty"].invoke
-  Rake::Task["examples_with_rcov"].invoke
+#  Rake::Task["examples_with_rcov"].invoke # jetty already runs examples_with_rcov
   Rake::Task["rdoc"].invoke
 end
 
@@ -32,7 +32,7 @@ desc "Run RSpec with RCov"
 Spec::Rake::SpecTask.new('examples_with_rcov') do |t|
   t.spec_files = FileList['spec/**/*.rb']
   t.rcov = true
-  t.rcov_opts = ['--exclude', 'spec', '--aggregate', 'coverage.data']
+  t.rcov_opts = ['--exclude', 'spec,/usr/,/home/hudson', '--aggregate', 'coverage.data']
 end
 
 desc "Run RSpec Examples wrapped in a test instance of jetty"
@@ -49,7 +49,7 @@ task :jetty do
   }
   # wrap tests with a test-specific Solr server
   error = TestJettyServer.wrap(SOLR_PARAMS) do
-    Rake::Task["examples"].invoke
+    Rake::Task["examples_with_rcov"].invoke
     # puts `ps aux | grep start.jar` 
   end
   raise "test failures: #{error}" if error
