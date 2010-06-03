@@ -8,7 +8,7 @@ Feature: Deposit an object into Sedora
     When I want to test the sedora ingest workflow
     Then I should be able to talk to the workflow service
 	And I should be able to create a new object in DOR for testing against
-	And that object should have a DOR workflow datastream
+	# And that object should have a "googleScannedBookWF" state where "ingest-deposit" is "completed" and "register-sdr" is "waiting"
 	# 
 	# When I run the ingest robot
 	# Then that object should exist in SEDORA
