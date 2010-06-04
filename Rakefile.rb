@@ -20,7 +20,7 @@ end
 desc "Do the whole build"
 task "hudson" do
   Rake::Task["jetty"].invoke
-#  Rake::Task["examples_with_rcov"].invoke # jetty already runs examples_with_rcov
+ # Rake::Task["examples_with_rcov"].invoke # jetty already runs examples_with_rcov
   Rake::Task["rdoc"].invoke
 end
 
@@ -63,9 +63,9 @@ Spec::Rake::SpecTask.new('failing_examples_with_html') do |t|
   t.fail_on_error = false
 end
 
-desc "Generate code coverage with rcov"
-task :coverage do
-  # rm_f "coverage.data"
-  rcov = %(rcov --aggregate coverage.data --text-summary -Ilib --html -o coverage robots/**/*.rb)
-  system rcov
+desc "Run RSpec with RCov"
+Spec::Rake::SpecTask.new('examples_with_rcov') do |t|
+  t.spec_files = FileList['spec/**/*.rb']
+  t.rcov = true
+  t.rcov_opts = ['--exclude', 'spec,/usr/,/home/hudson', '--aggregate', 'coverage.data']
 end
