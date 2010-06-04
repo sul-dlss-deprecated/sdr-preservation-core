@@ -1,22 +1,12 @@
-#!/usr/bin/env ruby
-# Bess Sadler
-# bess@stanford.edu
-# 13 May 2010
-
 require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
 require 'lyber_core'
 
-# +Deposit+ initializes the SdrIngest workflow by registering the object and transferring 
-# the object from DOR to SDR's staging area.
-#
-# The most up to date description of the deposit workflow is always in config/workflows/deposit/depositWorkflow.xml. 
-# (Content included below.)
-# :include:config/workflows/deposit/depositWorkflow.xml
-
 module SdrIngest
   
+  # +CompleteDeposit+ blah blah blah what does it do?   
   class CompleteDeposit < LyberCore::Robot
+    
     def process_item(work_item)
       druid = work_item.druid
       result = Dor::WorkflowService.update_workflow_status("sdr", druid, "sdrIngestWF", "complete-deposit", "completed")

@@ -4,16 +4,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
 require 'lyber_core'
 
-# +Deposit+ initializes the SdrIngest workflow by registering the object and transferring 
-# the object from DOR to SDR's staging area.
-#
-# The most up to date description of the deposit workflow is always in config/workflows/deposit/depositWorkflow.xml. 
-# (Content included below.)
-# :include:config/workflows/deposit/depositWorkflow.xml
-
 module SdrIngest
 
-# Transfers objects from DOR workspace to SDR's staging area.  
+# +TransferObject+ Transfers objects from DOR workspace to SDR's staging area.  
 # - notifies DOR of success by: <b><i>need to be filled in</i></b>
 # - notifies DOR of missing object by: <i><b>need to be filled in</b></i>
 

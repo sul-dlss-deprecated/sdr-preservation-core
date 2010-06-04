@@ -6,10 +6,9 @@ require 'dor_service'
 require 'lyber_core'
 require 'active-fedora'
 
-
 module SdrIngest
 
-# Verifies preservation agreement for objects
+  # Verifies preservation agreement for objects
   class VerifyAgreement < LyberCore::Robot
 
 

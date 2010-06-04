@@ -5,17 +5,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 require 'lyber_core'
 require 'bagit'
 
-# +Deposit+ initializes the SdrIngest workflow by registering the object and transferring 
-# the object from DOR to SDR's staging area.
-#
-# The most up to date description of the deposit workflow is always in config/workflows/deposit/depositWorkflow.xml. 
-# (Content included below.)
-# :include:config/workflows/deposit/depositWorkflow.xml
-
 module SdrIngest
 
-# Validates the Bag that has been transferring in SDR's staging area
-
+  # Validates the Bag that has been transferring in SDR's staging area
   class ValidateBag < LyberCore::Robot
 
     # Override the robot LyberCore::Robot.process_item method.
