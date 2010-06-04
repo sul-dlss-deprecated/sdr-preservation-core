@@ -33,7 +33,7 @@ desc "Run RSpec with RCov"
 Spec::Rake::SpecTask.new('examples_with_rcov') do |t|
   t.spec_files = FileList['spec/**/*.rb']
   t.rcov = true
-  t.rcov_opts = ['--exclude', 'spec,/usr/,/home/hudson', '--aggregate', 'coverage.data']
+  t.rcov_opts = ['--exclude', 'spec,/usr/,/home/hudson']
 end
 
 desc "Run RSpec Examples wrapped in a test instance of jetty"
