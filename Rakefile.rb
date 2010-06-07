@@ -62,10 +62,3 @@ Spec::Rake::SpecTask.new('failing_examples_with_html') do |t|
   t.spec_opts = ["--format", "html:doc/reports/tools/failing_examples.html", "--diff"]
   t.fail_on_error = false
 end
-
-desc "Run RSpec with RCov"
-Spec::Rake::SpecTask.new('examples_with_rcov') do |t|
-  t.spec_files = FileList['spec/**/*.rb']
-  t.rcov = true
-  t.rcov_opts = ['--exclude', 'spec,/usr/,/home/hudson', '--aggregate', 'coverage.data']
-end
