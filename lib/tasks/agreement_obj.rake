@@ -26,7 +26,7 @@ namespace :objects do
   EOXML
   
   DC = <<-EOXML
-  <oai_dc:dc xmlns:='http://www.openarchives.org/OAI/2.0/oai_dc/' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd'>
+  <oai_dc:dc xmlns:oai_dc='http://www.openarchives.org/OAI/2.0/oai_dc/' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd'>
   <dc:title xmlns:dc='http://purl.org/dc/elements/1.1/'>Agreement object for agreements</dc:title>
   <dc:identifier xmlns:dc='http://purl.org/dc/elements/1.1/'>sulair:SULAIR_agreement_agreement</dc:identifier>
   <dc:identifier xmlns:dc='http://purl.org/dc/elements/1.1/'>uuid:c2e47ead-9ab8-4da8-b447-a30f0e097ddd</dc:identifier>
@@ -101,10 +101,31 @@ namespace :objects do
         $stderr.print $!
       end
       
+      # Create a new object
       obj = ActiveFedora::Base.new(:pid => PID)
+      
+      # Add the agreementWF
       agreementWFDS = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"agreementWF", :dsLabel=>"agreementWF", :blob=>agreementWF)
       obj.add_datastream(agreementWFDS)
+      
+      contentMetadataDS = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"contentMetadata", :dsLabel=>"contentMetadata", :blob=>contentMetadata)
+      obj.add_datastream(contentMetadataDS)
+      
+      descMetadataDS = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"descMetadata", :dsLabel=>"descMetadata", :blob=>descMetadata)
+      obj.add_datastream(descMetadataDS)
+      
+      identityMetadataDS = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"identityMetadata", :dsLabel=>"identityMetadata", :blob=>identityMetadata)
+      obj.add_datastream(identityMetadataDS)
+      
+      
+      # DC needs special handling
+      dc_ds = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"DC", :dsLabel=>"Dublin Core Record for this object", :blob=>DC)
+      obj.add_datastream(dc_ds)
+      
       obj.save
+      
+      # rels_ext_ds = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"RELS-EXT", :dsLabel=>"RELS-EXT", :blob=>rels_ext)
+      # obj.add_datastream(rels_ext_ds)
       
     end
   end
