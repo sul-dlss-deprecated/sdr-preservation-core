@@ -12,7 +12,7 @@ Feature: Deposit an object into Sedora
 	And that object should have a "googleScannedBookWF" state where "register-sdr" is "waiting"
 	
 	
-	# When I run the ingest robot
+	When I run the robot "googleScannedBook":"register_sdr.rb"
 	# Then that object should exist in SEDORA
 	# And it should have a SEDORA workflow datastream where "ingest" is "completed" and "transfer" is "waiting"
 	# 

@@ -8,7 +8,8 @@ require 'open-uri'
 # use ssh port forwarding like this:
 # 1. ssh -L 8080:localhost:8080 lyberadmin@lyberservices-dev.stanford.edu
 # 2. replace the value of WORKFLOW_SERVICE_URL with "http://localhost:8080/workflow"
-WORKFLOW_SERVICE_URL = "http://lyberservices-dev.stanford.edu/workflow"
+# WORKFLOW_SERVICE_URL = "http://lyberservices-dev.stanford.edu/workflow"
+WORKFLOW_SERVICE_URL = "http://localhost:8080/workflow"
 DOR_DEV_FEDORA_URL = "http://dor-dev.stanford.edu/fedora/"
 
 # At the start of the process, get a new pid
@@ -72,5 +73,29 @@ Then /^that object should have a "([^\"]*)" state where "([^\"]*)" is "([^\"]*)"
   workflow_xml = Nokogiri::XML(open(uri))
   workflow_xml.xpath("//process[@name='#{step}'][@status='#{status}']").should_not be_empty
 
+end
+
+# ###################################################
+# Run a robot. Assume robots are in robots/wf_name/robot_name.rb
+#
+When /^I run the robot "([^\"]*)":"([^\"]*)"$/ do |wf_name, robot_name|
+  # results = %x[ROBOT_ENV=test ruby ../../robots/#\{wf_name\}/#\{robot_name\}.rcb]
+  # puts results
+  # puts "ROBOT_ENVIRONMENT=test ruby robots/#{wf_name}/#{robot_name}"
+  # puts %x[ROBOT_ENVIRONMENT=test cd robots/#{wf_name}; ./#{robot_name}]
+  
+  # IO.popen("ROBOT_ENVIRONMENT=test cd robots/#{wf_name}; ls -la", 'r+') do |pipe| 
+  #   1.upto(100) { |i| pipe << "This is line #{i}.\n" } 
+  #   pipe.close_write 
+  #   puts pipe.read
+  # end
+  # require File.expand_path(File.dirname(__FILE__) + '../../../robots/boot')
+  # require File.expand_path(File.dirname(__FILE__) + '../../../robots/googleScannedBook/register_sdr.rb')
+  
+  r = `ROBOT_ENVIRONMENT=test; cd /usr/local/projects/sdr2_newcheckout/sdr2; ruby ./robots/googleScannedBook/register_sdr.rb`
+  puts r
+
+  # dm_robot.start
+  
 end
 
