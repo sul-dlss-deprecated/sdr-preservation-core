@@ -23,8 +23,11 @@ require 'nokogiri'
 module SdrIngest
   
   class CompleteDeposit < LyberCore::Robot
-    attr_reader :obj, :druid, :sdr_provXML;
-    attr_writer :bag_directory;
+    attr_reader :obj, :druid
+    attr_reader :sdr_provXML
+    
+    attr_writer :bag_directory
+    attr_writer :sdr_provXML
         
     def initialize(string1,string2)
       super(string1,string2)
@@ -38,23 +41,38 @@ module SdrIngest
       raise "Cannot load Sedora object." unless get_fedora_object
 
       # Update provenance
-      raise "Failed to update provenance to include Deposit completion." unless update_provenance
+
+      
+      @sdr_provXML = create
+      puts "sdr_provXML is #{@sdr_provXML}"
+      #raise "Failed to update provenance to include Deposit completion." unless update_provenance
 
       # Update DOR workflow 
-      result = Dor::WorkflowService.update_workflow_status("dor", druid, "googleScannedBookWF", "sdr-ingest-complete", "completed")
-      raise "Update workflow \"complete-deposit\" failed." unless result
+      #result = Dor::WorkflowService.update_workflow_status("dor", druid, "googleScannedBookWF", "sdr-ingest-complete", "completed")
+      #raise "Update workflow \"complete-deposit\" failed." unless result
+    end
+    
+    def create
+      # doc = Nokogiri::XML::DocumentFragment.parse <<-EOXML
+      #       <agent name="SDR">
+      #       </agent>
+      #       EOXML
+      #       puts "Doc is #{doc.to_xml}"
+      doc = %{<agent name="SDR"> </agent>}
+      return doc
     end
     
     def update_provenance 
       # Create (and add?) new SDR prov datastream
-      create_sdr_provenance
+      @sdr_provXML = create_sdr_provenance
+      puts "sdr_provXML is " + create_sdr_provenance
       
       # retrieve existing prov
-      prov = retrieve_existing_provenance
+      #prov = retrieve_existing_provenance
       #raise "Provenance metadata datastream not found." unless prov       
 
       # append new prov to existing
-      append_provenance(prov, sdr_provXML)
+      #append_provenance(prov, sdr_provXML)
 
       # delete existing provenance datastream
       # make sure to check the old one is indeed deleted.
@@ -79,28 +97,23 @@ module SdrIngest
       prov = self.obj.datastreams[ds_id]
       
     end
-    
+
+    # Create the SDR provenance stanza from sdrIngest workflow events
+    # It should looks something like this:
+    # <agent name="SDR">
+      #   <what object="druid:jc837rq9922">
+      #     <event who="SDR-robot:register-object" when="2009-12-28T11:37:39-0800">Object registered with Sedora</event>
+      #     ...
+      #   </what>
+      # </agent>
     def create_sdr_provenance
-      #workflowXML = SdrService.get_datastream(@druid, 'sdrIngestWF')
-      #workflowRoxml = WorkflowModel.from_xml(workflowXML)
-      #events = workflowRoxml.get_events()
-      event = Event.new
-      event.event = "SDR event"
-      event.who="SDR-robot"
-      event.when = "whenever"
-      
-      what = What.new
-      what.object = @druid
-#      what.event = events 
-      what.event = [event]
-      
-      agent = Agent.new
-      agent.name = "SDR"
-      agent.what = what
-      
-      @sdr_provXML = agent.to_xml
-# Why would this cause all the tests to fail?
-#      puts "SDR Agent: " + agent.to_xml
+      return true
+      puts "In create_sdr_prov method now"
+      doc = Nokogiri::XML::DocumentFragment.parse <<-EOXML
+      <agent name="SDR">
+      </agent>
+      EOXML
+      "foo"
     end
     
     # fetch the fedora object from the repository so we can attach datastreams to it

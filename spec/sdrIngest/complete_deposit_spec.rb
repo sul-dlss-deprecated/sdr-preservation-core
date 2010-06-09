@@ -67,7 +67,7 @@ describe SdrIngest::CompleteDeposit do
       cleanup
     end
     
-    it "should be able to access a Sedora object" do
+    it "has an accessor method for obj" do
       @complete_robot.should respond_to(:obj)
     end
     
@@ -87,6 +87,38 @@ describe SdrIngest::CompleteDeposit do
       
       lambda {@complete_robot.process_item(mock_workitem)}.should raise_error(/Sedora/)
     end  
+  end
+  
+  context "create sdr provenance" do
+    before(:each) do
+      setup
+    end
+    
+    after(:each) do
+      cleanup
+    end
+    
+    it "should respond to create_sdr_provenance method" do
+      mock_workitem = mock("complete_deposit_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+
+      @complete_robot.should_receive(:create)
+      @complete_robot.process_item(mock_workitem)
+    end
+
+    it "should create valid SDR provenance" do
+      mock_workitem = mock("complete_deposit_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+
+      @complete_robot.should_receive(:create)
+
+
+      @complete_robot.process_item(mock_workitem)
+#    @complete_robot.sdr_provXML = "foo"
+      @complete_robot.sdr_provXML.should_not be_nil      
+
+    end
+
   end
   
   context "Update provenance" do
@@ -134,10 +166,13 @@ describe SdrIngest::CompleteDeposit do
 
       @complete_robot.should_receive(:create_sdr_provenance)
       @complete_robot.process_item(mock_workitem)
+
       @complete_robot.sdr_provXML.should_not be_nil
       @complete_robot.sdr_provXML.should_not be_empty
-      puts @complete_robot.sdr_provXML.class
-#      @complete_robot.sdr_provXML.should be_instance_of()
+      @complete_robot.sdr_provXML.should be_instance_of(String)
+      
+      # xmlDoc = Nokogiri::XML(@complete_robot.sdr_provXML)
+      #       xmlDoc.xpath("/agent").should_not be_nil
     end
     
     # This and the next test would not necessarily be true if SDR keeps its own prov datastream
