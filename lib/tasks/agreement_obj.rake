@@ -4,7 +4,7 @@ namespace :objects do
   
   PID = "druid:tx617qp8040"
   
-  RELS-EXT = <<-EOXML
+  rels_ext = <<-EOXML
   <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
   <rdf:Description rdf:about='info:fedora/druid:tx617qp8040'>
   <fedora-model:hasModel xmlns:fedora-model='info:fedora/fedora-system:def/model#' rdf:resource='info:fedora/dor:agreement'/>
@@ -90,6 +90,22 @@ namespace :objects do
       environment = ENV['ROBOT_ENVIRONMENT']
       require File.expand_path(File.dirname(__FILE__) + "/../../config/environments/#{environment}")
       puts "Connecting to #{SEDORA_URI}..."
+      Fedora::Repository.register(SEDORA_URI)
+      ActiveFedora::SolrService.register(SOLR_URL)
+      
+      # Make sure we're starting with a blank object
+      begin
+        obj = ActiveFedora::Base.load_instance(PID)
+        obj.delete
+      rescue
+        $stderr.print $!
+      end
+      
+      obj = ActiveFedora::Base.new(:pid => PID)
+      agreementWFDS = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"agreementWF", :dsLabel=>"agreementWF", :blob=>agreementWF)
+      obj.add_datastream(agreementWFDS)
+      obj.save
+      
     end
   end
 
