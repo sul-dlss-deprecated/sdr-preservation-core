@@ -120,6 +120,11 @@ namespace :objects do
       dc_ds = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"DC", :dsLabel=>"Dublin Core Record for this object", :blob=>DC)
       obj.add_datastream(dc_ds)
       
+      # Add the PDF as a managed datastream
+      file = File.new(File.expand_path(File.dirname(__FILE__) << '/' << 'OpLvlAgrmt_Agreements_v01.pdf'))
+      file_ds = ActiveFedora::Datastream.new(:dsID => "PDF", :dsLabel => 'PDF of Uber-Agreement', :controlGroup => 'M', :blob => file)
+      obj.add_datastream(file_ds)
+      
       obj.save
       
       # rels_ext_ds = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"RELS-EXT", :dsLabel=>"RELS-EXT", :blob=>rels_ext)
