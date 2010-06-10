@@ -117,8 +117,6 @@ namespace :objects do
       identityMetadataDS = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"identityMetadata", :dsLabel=>"identityMetadata", :blob=>identityMetadata)
       obj.add_datastream(identityMetadataDS)
       
-      
-      # DC needs special handling
       dc_ds = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"DC", :dsLabel=>"Dublin Core Record for this object", :blob=>DC)
       obj.add_datastream(dc_ds)
       
