@@ -127,6 +127,8 @@ namespace :objects do
       
       obj.save
       
+      puts "The object should be available at #{SEDORA_URI}/get/#{PID}"
+      
       # rels_ext_ds = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"RELS-EXT", :dsLabel=>"RELS-EXT", :blob=>rels_ext)
       # obj.add_datastream(rels_ext_ds)
       
