@@ -33,7 +33,7 @@ module SdrIngest
       raise "Failed to update provenance to include Deposit completion." unless update_provenance
 
       # Update DOR workflow 
-      result = Dor::WorkflowService.update_workflow_status("dor", druid, "googleScannedBookWF", "sdr-ingest-complete", "completed")
+      result = Dor::WorkflowService.update_workflow_status("dor", @druid, "googleScannedBookWF", "sdr-ingest-complete", "completed")
       raise "Update workflow \"complete-deposit\" failed." unless result
     end
     
@@ -69,7 +69,7 @@ module SdrIngest
       # Create the "what" for this obj
       what = Nokogiri::XML::Node.new 'what', doc_frag
       what['object'] = @druid
-      agent.add_child (what)
+      agent.add_child(what)
 
       # Parse the events out of sdrIngestWorkflow.xml
       wfFile = File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngest", "sdrIngestWorkflow.xml")
@@ -88,7 +88,7 @@ module SdrIngest
           event['when'] = ""
           event.content = pname
     
-          what.add_child (event)
+          what.add_child(event)
         end
       end
       
@@ -106,7 +106,6 @@ module SdrIngest
       # Retrieve existing provenance
       @obj_prov = @obj.datastreams['PROVENANCE']
       if (@obj_prov != nil && !@obj_prov.eql?('')) then
-        puts "obj_prov is not nil or empty"
         ex_prov_frag = Nokogiri::XML::DocumentFragment.parse @obj_prov
       else
        ex_prov_frag = Nokogiri::XML::DocumentFragment.parse <<-EOXML
@@ -119,10 +118,9 @@ module SdrIngest
       # Add sdr_prov to provenanceMetadata as a child node
       sdr_prov_frag = Nokogiri::XML::DocumentFragment.parse @sdr_prov
       sdr_prov_node = sdr_prov_frag.child
-      ex_prov_node.add_child (sdr_prov_node)
+      ex_prov_node.add_child(sdr_prov_node)
       
       @obj_prov = ex_prov_node.to_xml
-      puts "new prov is #{obj_prov}"
     end
     
     def update_prov_datastream
