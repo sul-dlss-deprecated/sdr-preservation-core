@@ -15,8 +15,7 @@ module SdrIngest
     attr_reader :obj, :druid
     attr_writer :bag_directory
     
-    attr_reader :sdr_prov
-    attr_reader :obj_prov
+    attr_reader :obj_wf, :sdr_prov, :obj_prov
     
     def initialize(string1,string2)
       super(string1,string2)
@@ -44,6 +43,7 @@ module SdrIngest
     # * Append SDR provenance to the existing provenance data
     # * Update the object's Sedora provenance datastream with SDR provenance attached    
     def update_provenance 
+      #retrieve_sdr_workflow
       create_sdr_provenance
       make_new_prov
       update_prov_datastream
@@ -55,7 +55,6 @@ module SdrIngest
     # * Builds "events" from events with 'completed' status in the sdrIngestWorkflow
     # * Adds events as child of "what"
     # * Saves the entire build up as an XML string in "sdr_prov"
-    # ??????WHERE IS THE ROBOT COMPLETION TIMESTAMP SAVED??????    
     def create_sdr_provenance
       # Create the "agent" for SDR
       doc_frag = Nokogiri::XML::DocumentFragment.parse <<-EOXML
@@ -71,13 +70,11 @@ module SdrIngest
       what['object'] = @druid
       agent.add_child(what)
 
-      # Parse the events out of sdrIngestWorkflow.xml
-      wfFile = File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngest", "sdrIngestWorkflow.xml")
-      ingestWF = Nokogiri::XML(File.open(wfFile))
-      
-      processes = ingestWF.xpath("//process")
-      process = processes[0]
+      # Get the events from the object, store it in "obj_wf" temporarily  
+      @obj_wf = @obj.datastreams['sdrIngestWF']
+      ingestWF = Nokogiri::XML.fragment(self.obj_wf)
 
+      processes = ingestWF.xpath(".//process")
       processes.each do |process|
         pstatus = process['status']
   
@@ -85,7 +82,7 @@ module SdrIngest
           pname = process['name']
           event = Nokogiri::XML::Node.new 'event', doc_frag
           event['who'] = 'SDR-robot:' + pname
-          event['when'] = ""
+          event['when'] = process['datetime']
           event.content = pname
     
           what.add_child(event)
