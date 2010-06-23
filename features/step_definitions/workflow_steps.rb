@@ -94,9 +94,7 @@ end
 # ###################################################
 
 Then /^that object should exist in SEDORA$/ do
-  pending
-  # uri = SEDORA_URI << '/get/' << testpid
-  # puts "uri = #{uri}"
-  # lambda { Net::HTTP.get_response(URI.parse(uri))}.should_not raise_exception()  
+  uri = SEDORA_URI << '/get/' << testpid
+  lambda { Net::HTTP.get_response(URI.parse(uri))}.should_not raise_exception()  
 end
 
