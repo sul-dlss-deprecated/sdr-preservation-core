@@ -100,7 +100,7 @@ end
 
 # ###################################################
 
-Then /^it should have a SEDORA workflow datastream where "([^"]*)" is "([^"]*)" and "([^"]*)" is "([^"]*)"$/ do |arg1, arg2, arg3, arg4|
+Then /^it should have a SEDORA workflow datastream where "([^"]*)" is "([^"]*)"$/ do |name, status|
   # uri = SEDORA_URI + '/objects/' + testpid + '/datastreams/sdrIngestWF/content'
   # puts "uri = #{uri}"
   # lambda { Net::HTTP.get_response(URI.parse(uri))}.should_not raise_exception()
@@ -121,13 +121,12 @@ Then /^it should have a SEDORA workflow datastream where "([^"]*)" is "([^"]*)" 
       response = http.request(req)
       resp = response.body
     end
-    puts resp.inspect
-    #  XML Document
-    doc = REXML::Document.new(resp)
-    # iterate over each element <tag count="200" tag="Rails"/>
-    doc.root.elements.each do |elem|
-      puts elem.inspect
-    end
+    doc = Nokogiri::XML(resp)
+    doc.xpath("//process[@name='#{name}']/@status").text.should eql(status)
+    # puts "!!!"
+    # puts "//process[@name='#{name}']/@status"
+    # puts doc.xpath("//process[@name='#{name}']/@status").text
+    # puts "!!!"
   end
 
 
