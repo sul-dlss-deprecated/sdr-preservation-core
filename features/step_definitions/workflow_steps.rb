@@ -123,10 +123,7 @@ Then /^it should have a SEDORA workflow datastream where "([^"]*)" is "([^"]*)"$
     end
     doc = Nokogiri::XML(resp)
     doc.xpath("//process[@name='#{name}']/@status").text.should eql(status)
-    # puts "!!!"
-    # puts "//process[@name='#{name}']/@status"
-    # puts doc.xpath("//process[@name='#{name}']/@status").text
-    # puts "!!!"
+
   end
 
 
