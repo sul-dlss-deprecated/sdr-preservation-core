@@ -5,15 +5,15 @@ Feature: Deposit an object into Sedora
   I want to know that all parts of the ingest workflow are behaving correctly
 
   Scenario: End to End test
-    When I want to test the sedora ingest workflow
+   When I want to test the sedora ingest workflow
     Then I should be able to talk to the workflow service
-	And I should be able to create a new object in DOR for testing against
-	And that object should have a "googleScannedBookWF" state where "ingest-deposit" is "completed"
-	And that object should have a "googleScannedBookWF" state where "register-sdr" is "waiting"
-	
+ 	And I should be able to create a new object in DOR for testing against
+ 	And that object should have a "googleScannedBookWF" state where "ingest-deposit" is "completed"
+ 	And that object should have a "googleScannedBookWF" state where "register-sdr" is "waiting"
+ 	
 	
 	When I run the robot "googleScannedBook":"register_sdr.rb"
-	# Then that object should exist in SEDORA
+	Then that object should exist in SEDORA
 	# And it should have a SEDORA workflow datastream where "ingest" is "completed" and "transfer" is "waiting"
 	# 
 	# When I run the transfer robot

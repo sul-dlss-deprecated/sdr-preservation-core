@@ -8,8 +8,8 @@ require 'open-uri'
 # use ssh port forwarding like this:
 # 1. ssh -L 8080:localhost:8080 lyberadmin@lyberservices-dev.stanford.edu
 # 2. replace the value of WORKFLOW_SERVICE_URL with "http://localhost:8080/workflow"
-# WORKFLOW_SERVICE_URL = "http://lyberservices-dev.stanford.edu/workflow"
-WORKFLOW_SERVICE_URL = "http://localhost:8080/workflow"
+WORKFLOW_SERVICE_URL = "http://lyberservices-dev.stanford.edu/workflow"
+# WORKFLOW_SERVICE_URL = "http://localhost:8080/workflow"
 DOR_DEV_FEDORA_URL = "http://dor-dev.stanford.edu/fedora/"
 
 # At the start of the process, get a new pid
@@ -92,10 +92,23 @@ When /^I run the robot "([^\"]*)":"([^\"]*)"$/ do |wf_name, robot_name|
   # require File.expand_path(File.dirname(__FILE__) + '../../../robots/boot')
   # require File.expand_path(File.dirname(__FILE__) + '../../../robots/googleScannedBook/register_sdr.rb')
   
-  r = `ROBOT_ENVIRONMENT=test; cd /usr/local/projects/sdr2_newcheckout/sdr2; ruby ./robots/googleScannedBook/register_sdr.rb`
-  puts r
-
-  # dm_robot.start
+  # r = `ROBOT_ENVIRONMENT=test; cd /usr/local/projects/sdr2/sdr2; /opt/local/bin/ruby ./robots/googleScannedBook/register_sdr.rb`
+  # puts r
+  $:.unshift File.join(File.dirname(__FILE__), "../..", "lib")
+  $:.unshift File.join(File.dirname(__FILE__), "../..", "robots")
+  require 'googleScannedBook/register_sdr'
   
+  ENV['ROBOT_ENVIRONMENT']='test'
+
+  dm_robot = GoogleScannedBook::RegisterSdr.new(
+          'googleScannedBook', 'register-sdr')
+  dm_robot.start  
+end
+
+# ###################################################
+
+Then /^that object should exist in SEDORA$/ do
+  uri = SEDORA_URI << '/get/' << testpid
+  lambda { Net::HTTP.get_response(URI.parse(uri))}.should_not raise_exception()  
 end
 
