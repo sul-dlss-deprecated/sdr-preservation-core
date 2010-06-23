@@ -14,8 +14,8 @@ Feature: Deposit an object into Sedora
 	
 	When I run the robot "googleScannedBook":"register_sdr.rb"
 	Then that object should exist in SEDORA
-	# And it should have a SEDORA workflow datastream where "ingest" is "completed" and "transfer" is "waiting"
-	# 
+	And it should have a SEDORA workflow datastream where "ingest" is "completed" and "transfer" is "waiting"
+	
 	# When I run the transfer robot
 	# Then there should be a properly named bagit object in SEDORA_DROPOFF
 	# And it should have a SEDORA workflow datastream where "transfer" is "completed" and "populate-metadata" is "waiting"

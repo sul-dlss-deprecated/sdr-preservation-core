@@ -94,7 +94,43 @@ end
 # ###################################################
 
 Then /^that object should exist in SEDORA$/ do
-  uri = SEDORA_URI << '/get/' << testpid
+  uri = SEDORA_URI + '/get/' + testpid
   lambda { Net::HTTP.get_response(URI.parse(uri))}.should_not raise_exception()  
+end
+
+# ###################################################
+
+Then /^it should have a SEDORA workflow datastream where "([^"]*)" is "([^"]*)" and "([^"]*)" is "([^"]*)"$/ do |arg1, arg2, arg3, arg4|
+  # uri = SEDORA_URI + '/objects/' + testpid + '/datastreams/sdrIngestWF/content'
+  # puts "uri = #{uri}"
+  # lambda { Net::HTTP.get_response(URI.parse(uri))}.should_not raise_exception()
+  require 'net/https'
+  require "rexml/document"
+
+  username = "fedoraAdmin"
+  password = "fedoraAdmin"
+
+  resp = href = "";
+  begin
+    http = Net::HTTP.new("sdr-fedora-dev.stanford.edu", 443)
+    http.use_ssl = true
+    http.start do |http|
+      req = Net::HTTP::Get.new("/fedora/objects/#{testpid}/datastreams/sdrIngestWF/content", {"User-Agent" =>
+          "RubyLicious 0.2"})
+      req.basic_auth(username, password)
+      response = http.request(req)
+      resp = response.body
+    end
+    puts resp.inspect
+    #  XML Document
+    doc = REXML::Document.new(resp)
+    # iterate over each element <tag count="200" tag="Rails"/>
+    doc.root.elements.each do |elem|
+      puts elem.inspect
+    end
+  end
+
+
+
 end
 
