@@ -15,8 +15,15 @@ module SdrIngest
     attr_reader :obj, :druid
     attr_writer :bag_directory
     
-    attr_reader :obj_wf, :sdr_prov, :obj_prov
-    
+    # Workflow XML as read from the object 
+     attr_reader :obj_wf 
+
+     # Instance variable containing sdr provenance generated from the workflow datastream
+     attr_reader :sdr_prov 
+
+     # Existing provenance datastream, as read from the object
+     attr_reader :obj_prov
+       
     def initialize(string1,string2)
       super(string1,string2)
       # by default, get the bags from the SDR_DEPOSIT_DIR
@@ -32,7 +39,7 @@ module SdrIngest
       raise "Failed to update provenance to include Deposit completion." unless update_provenance
 
       # Update DOR workflow 
-      result = Dor::WorkflowService.update_workflow_status("dor", @druid, "googleScannedBookWF", "sdr-ingest-complete", "completed")
+      result = Dor::WorkflowService.update_workflow_status("dor", @druid, "googleScannedBookWF", "sdr-ingest-deposit", "completed")
       raise "Update workflow \"complete-deposit\" failed." unless result
     end
     
@@ -71,7 +78,7 @@ module SdrIngest
       agent.add_child(what)
 
       # Get the events from the object, store it in "obj_wf" temporarily  
-      @obj_wf = @obj.datastreams['sdrIngestWF']
+      @obj_wf = @obj.datastreams['sdrIngestWF'].content
       ingestWF = Nokogiri::XML.fragment(self.obj_wf)
 
       processes = ingestWF.xpath(".//process")
