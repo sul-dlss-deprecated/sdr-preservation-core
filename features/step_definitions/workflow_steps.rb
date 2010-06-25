@@ -80,7 +80,7 @@ Then /^that object should have a "([^\"]*)" state where "([^\"]*)" is "([^\"]*)"
 end
 
 # ###################################################
-# Run a robot. Assume robots are in robots/wf_name/robot_name.rb
+# Run a robot. 
 #
 When /^I run the robot "([^"]*)" for the "([^"]*)" step of the "([^"]*)" workflow$/ do |robot, step, workflow|
   $:.unshift File.join(File.dirname(__FILE__), "../..", "lib")
@@ -144,7 +144,13 @@ Then /^it should have a SEDORA workflow datastream where "([^"]*)" is "([^"]*)"$
 
   end
 
+end
 
+# ##################################################
 
+Then /^there should be a properly named bagit object in SDR_DEPOSIT_DIR$/ do
+  bagit_object = File.join(SDR_DEPOSIT_DIR, testpid)
+  (File.exists? bagit_object).should == true
+  (File.directory? bagit_object).should == true
 end
 
