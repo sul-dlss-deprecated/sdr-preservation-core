@@ -69,7 +69,7 @@ module SdrIngest
     # Check to see if the bagit directory exists.
     # It does not check the validity of the bag, it assumes this has already happened.
     def bag_exists?
-      @bag = @bag_directory + '/' + self.druid.split(":")[1]
+      @bag = @bag_directory + '/' + self.druid
       puts "Loading metadata from #{@bag}..."
       File.directory? @bag
     end
