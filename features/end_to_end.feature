@@ -43,13 +43,12 @@ Feature: Deposit an object into Sedora
 	Then it should have a SEDORA workflow datastream where "populate-metadata" is "completed"  
 	And it should have a SEDORA workflow datastream where "verify-agreement" is "waiting"
 	
+	# ##################################################
+	# Robot 5: verify-agreement
+	When I run the robot "SdrIngest::VerifyAgreement" for the "verify-agreement" step of the "sdrIngest" workflow
+	 # because it isn't working yet
+	Then it should have a SEDORA workflow datastream where "verify-agreement" is "waiting"
+	And when I explicitly set "verify-agreement" to "completed"
+	Then it should have a SEDORA workflow datastream where "verify-agreement" is "completed"
+	And it should have a SEDORA workflow datastream where "complete-deposit" is "waiting"
 	
-	# 
-	# When I run the populate-metadata robot
-	# Then the object should have a metadata datastream
-	# And it should have an identity datastream
-	# And it should have a provenance datastream
-	# And it should have a SEDORA workflow datastream where "populate-metadata" is "completed" and "??" is "waiting"
-	# 
-	
-

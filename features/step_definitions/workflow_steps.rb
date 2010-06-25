@@ -105,12 +105,16 @@ When /^I run the robot "([^"]*)" for the "([^"]*)" step of the "([^"]*)" workflo
     dm_robot.start
   when "SdrIngest::ValidateBag"
     require 'sdrIngest/validate_bag'
-    dm_robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+    dm_robot = SdrIngest::ValidateBag.new(workflow, step)
     dm_robot.start
   when "SdrIngest::PopulateMetadata"
     require 'sdrIngest/populate_metadata'
-    dm_robot = SdrIngest::PopulateMetadata.new("sdrIngest", "populate-metadata")
+    dm_robot = SdrIngest::PopulateMetadata.new(workflow, step)
     dm_robot.start
+  when "SdrIngest::VerifyAgreement"
+    # require 'sdrIngest/verify_agreement'
+    # dm_robot = SdrIngest::VerifyAgreement.new(workflow, step)
+    # dm_robot.start
   end
 
 end
