@@ -16,6 +16,11 @@ populate-metadata:
   prerequisite: transfer-object  
   batch_limit: 1000
   error_limit: 5
+  
+verify-agreement:
+  prerequisite: populate-metadata  
+  batch_limit: 1000
+  error_limit: 5
 
 complete-deposit:
   prerequisite: populate-metadata  
