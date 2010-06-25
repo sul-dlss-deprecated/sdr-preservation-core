@@ -84,9 +84,7 @@ end
 #
 When /^I run the robot "([^"]*)" for the "([^"]*)" step of the "([^"]*)" workflow$/ do |robot, step, workflow|
   $:.unshift File.join(File.dirname(__FILE__), "../..", "lib")
-  $:.unshift File.join(File.dirname(__FILE__), "../..", "robots")
-  require 'googleScannedBook/register_sdr'
-  require 'sdrIngest/transfer_object'
+  $:.unshift File.join(File.dirname(__FILE__), "../..", "robots")  
   
   ENV['ROBOT_ENVIRONMENT']='test'
 
@@ -94,16 +92,22 @@ When /^I run the robot "([^"]*)" for the "([^"]*)" step of the "([^"]*)" workflo
   dm_robot = ""
   case robot
   when "GoogleScannedBook::RegisterSdr"
+    require 'googleScannedBook/register_sdr'
     dm_robot = GoogleScannedBook::RegisterSdr.new(workflow, step)
+    dm_robot.start
   when "SdrIngest::TransferObject"
+    require 'sdrIngest/transfer_object'
     dm_robot = SdrIngest::TransferObject.new(workflow, step)
     FileUtils::mkdir_p(DOR_WORKSPACE_DIR)
     example_object = File.join(SDR2_EXAMPLE_OBJECTS, "jc837rq9922")
     file_to_be_copied = File.join(DOR_WORKSPACE_DIR, testpid)
     FileUtils::cp_r(example_object, file_to_be_copied)
+    dm_robot.start
+  when "SdrIngest::ValidateBag"
+    require 'sdrIngest/validate_bag'
+    dm_robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+    dm_robot.start
   end
-  # 
-  dm_robot.start unless dm_robot == ""
 
 end
 
@@ -154,3 +158,8 @@ Then /^there should be a properly named bagit object in SDR_DEPOSIT_DIR$/ do
   (File.directory? bagit_object).should == true
 end
 
+# ##################################################
+
+Then /^when I explicitly set "([^"]*)" to "([^"]*)"$/ do |step, status|
+    Dor::WorkflowService.update_workflow_status("sdr", testpid, "sdrIngestWF", step, status)
+end
