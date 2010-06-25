@@ -99,13 +99,17 @@ When /^I run the robot "([^"]*)" for the "([^"]*)" step of the "([^"]*)" workflo
     require 'sdrIngest/transfer_object'
     dm_robot = SdrIngest::TransferObject.new(workflow, step)
     FileUtils::mkdir_p(DOR_WORKSPACE_DIR)
-    example_object = File.join(SDR2_EXAMPLE_OBJECTS, "jc837rq9922")
+    example_object = File.join(SDR2_EXAMPLE_OBJECTS, "druid:jc837rq9922")
     file_to_be_copied = File.join(DOR_WORKSPACE_DIR, testpid)
     FileUtils::cp_r(example_object, file_to_be_copied)
     dm_robot.start
   when "SdrIngest::ValidateBag"
     require 'sdrIngest/validate_bag'
     dm_robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+    dm_robot.start
+  when "SdrIngest::PopulateMetadata"
+    require 'sdrIngest/populate_metadata'
+    dm_robot = SdrIngest::PopulateMetadata.new("sdrIngest", "populate-metadata")
     dm_robot.start
   end
 

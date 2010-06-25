@@ -37,6 +37,12 @@ Feature: Deposit an object into Sedora
 	And when I explicitly set "validate-bag" to "completed"
 	Then it should have a SEDORA workflow datastream where "validate-bag" is "completed"  
 	
+	# ##################################################
+	# Robot 4: populate-metadata
+	When I run the robot "SdrIngest::PopulateMetadata" for the "populate-metadata" step of the "sdrIngest" workflow
+	Then it should have a SEDORA workflow datastream where "populate-metadata" is "completed"  
+	And it should have a SEDORA workflow datastream where "verify-agreement" is "waiting"
+	
 	
 	# 
 	# When I run the populate-metadata robot
