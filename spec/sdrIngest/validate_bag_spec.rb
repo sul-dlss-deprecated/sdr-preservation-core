@@ -6,13 +6,13 @@ require 'sdrIngest/validate_bag'
 describe SdrIngest::ValidateBag do 
   
   context "bag_exists?" do
-      it "should return false when base_path is does not exist" do
+      it "should return false when base_path does not exist" do
         base_path = File.join(Dir.tmpdir, "lkdjflksdjda")
-	puts base_path
-	FileUtils.rm_rf(base_path)
+      	puts base_path
+      	FileUtils.rm_rf(base_path)
 
         robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
-	robot.bag_exists?(base_path).should == false
+      	robot.bag_exists?(base_path).should == false
       end
 
       it "should return false when base_path is not a directory" do 
