@@ -26,8 +26,8 @@ Feature: Deposit an object into Sedora
 	# Robot 2: transfer-object 
 	When I run the robot "SdrIngest::TransferObject" for the "transfer-object" step of the "sdrIngest" workflow
 	Then there should be a properly named bagit object in SDR_DEPOSIT_DIR
-	# And it should have a SEDORA workflow datastream where "transfer-object" is "completed"  
-	# And it should have a SEDORA workflow datastream where "validate-bag" is "waiting"
+	And it should have a SEDORA workflow datastream where "transfer-object" is "completed"  
+	And it should have a SEDORA workflow datastream where "validate-bag" is "waiting"
 	
 	# 
 	# When I run the populate-metadata robot
