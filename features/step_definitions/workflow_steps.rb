@@ -71,7 +71,7 @@ end
 Then /^that object should have a "([^\"]*)" state where "([^\"]*)" is "([^\"]*)"$/ do |workflow, step, status|
   
   uri = WORKFLOW_SERVICE_URL + "/dor/objects/" + testpid + "/workflows/" + workflow
-  # puts "Checking for workflow at #{uri}"
+  puts "Checking for workflow at #{uri}"
   workflow_xml = Nokogiri::XML(open(uri))
   workflow_xml.xpath("//process[@name='#{step}'][@status='#{status}']").should_not be_empty
 
@@ -80,15 +80,28 @@ end
 # ###################################################
 # Run a robot. Assume robots are in robots/wf_name/robot_name.rb
 #
-When /^I run the robot "([^\"]*)":"([^\"]*)"$/ do |wf_name, robot_name|
+When /^I run the robot "([^"]*)" for the "([^"]*)" step of the "([^"]*)" workflow$/ do |robot, step, workflow|
   $:.unshift File.join(File.dirname(__FILE__), "../..", "lib")
   $:.unshift File.join(File.dirname(__FILE__), "../..", "robots")
   require 'googleScannedBook/register_sdr'
+  require 'sdrIngest/transfer_object'
   
   ENV['ROBOT_ENVIRONMENT']='test'
 
-  dm_robot = GoogleScannedBook::RegisterSdr.new('googleScannedBook', 'register-sdr')
-  dm_robot.start  
+  puts "running robot #{robot}"
+  dm_robot = ""
+  case robot
+  when "GoogleScannedBook::RegisterSdr"
+    dm_robot = GoogleScannedBook::RegisterSdr.new(workflow, step)
+  when "SdrIngest::TransferObject"
+  #   mkdir_p(DOR_WORKSPACE_DIR)
+  #   cp_r(File.join(SDR_DEPOSIT_DIR, 'jc837rq9922') File.join(DOR_WORKSPACE_DIR, testpid))
+    dm_robot = SdrIngest::TransferObject.new(workflow, step)
+  
+  end
+  # 
+  dm_robot.start unless dm_robot == ""
+
 end
 
 # ###################################################
@@ -120,8 +133,10 @@ Then /^it should have a SEDORA workflow datastream where "([^"]*)" is "([^"]*)"$
       req.basic_auth(username, password)
       response = http.request(req)
       resp = response.body
+      puts resp
     end
     doc = Nokogiri::XML(resp)
+    # puts doc.to_xml
     doc.xpath("//process[@name='#{name}']/@status").text.should eql(status)
 
   end

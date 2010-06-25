@@ -8,19 +8,21 @@ Feature: Deposit an object into Sedora
    When I want to test the sedora ingest workflow
     Then I should be able to talk to the workflow service
  	And I should be able to create a new object in DOR for testing against
+# note: ingest-deposit is going to become sdr-ingest-transfer 
  	And that object should have a "googleScannedBookWF" state where "ingest-deposit" is "completed"
  	And that object should have a "googleScannedBookWF" state where "register-sdr" is "waiting"
  	
 	
-	When I run the robot "googleScannedBook":"register_sdr.rb"
+	When I run the robot "GoogleScannedBook::RegisterSdr" for the "register-sdr" step of the "googleScannedBook" workflow
 	Then that object should exist in SEDORA
-	# this step is broken b/c after the register-sdr robot runs, the status of register-sdr is still "waiting... is that right? "
-	# And it should have a SEDORA workflow datastream where "register-sdr" is "completed"
+	And it should have a SEDORA workflow datastream where "register-sdr" is "completed"
 	And it should have a SEDORA workflow datastream where "transfer-object" is "waiting"
 	
-	# When I run the transfer robot
+	When I run the robot "SdrIngest::TransferObject" for the "transfer-object" step of the "sdrIngest" workflow
 	# Then there should be a properly named bagit object in SEDORA_DROPOFF
-	# And it should have a SEDORA workflow datastream where "transfer" is "completed" and "populate-metadata" is "waiting"
+	# Then it should have a SEDORA workflow datastream where "transfer" is "completed"
+	# And it should have a SEDORA workflow datastream where "populate-metadata" is "waiting"
+	
 	# 
 	# When I run the populate-metadata robot
 	# Then the object should have a metadata datastream
