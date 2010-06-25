@@ -7,12 +7,17 @@ transfer-object:
   batch_limit: 1000
   error_limit: 5
   
+validate-bag:
+  prerequisite: transfer-object 
+  batch_limit: 1000
+  error_limit: 5
+  
 populate-metadata:
   prerequisite: transfer-object  
   batch_limit: 1000
   error_limit: 5
 
 complete-deposit:
-    prerequisite: populate-metadata  
-    batch_limit: 1000
-    error_limit: 5  
+  prerequisite: populate-metadata  
+  batch_limit: 1000
+  error_limit: 5  
