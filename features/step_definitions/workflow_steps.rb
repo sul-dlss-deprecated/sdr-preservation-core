@@ -3,6 +3,8 @@ require 'lyber_core'
 require 'net/http'
 require 'nokogiri'
 require 'open-uri'
+require 'fileutils'
+
 
 # if you need to run these tests from a machine that can't connect to lyberservices-dev
 # use ssh port forwarding like this:
@@ -94,10 +96,11 @@ When /^I run the robot "([^"]*)" for the "([^"]*)" step of the "([^"]*)" workflo
   when "GoogleScannedBook::RegisterSdr"
     dm_robot = GoogleScannedBook::RegisterSdr.new(workflow, step)
   when "SdrIngest::TransferObject"
-  #   mkdir_p(DOR_WORKSPACE_DIR)
-  #   cp_r(File.join(SDR_DEPOSIT_DIR, 'jc837rq9922') File.join(DOR_WORKSPACE_DIR, testpid))
     dm_robot = SdrIngest::TransferObject.new(workflow, step)
-  
+    FileUtils::mkdir_p(DOR_WORKSPACE_DIR)
+    example_object = File.join(SDR2_EXAMPLE_OBJECTS, "jc837rq9922")
+    file_to_be_copied = File.join(DOR_WORKSPACE_DIR, testpid)
+    FileUtils::cp_r(example_object, file_to_be_copied)
   end
   # 
   dm_robot.start unless dm_robot == ""
