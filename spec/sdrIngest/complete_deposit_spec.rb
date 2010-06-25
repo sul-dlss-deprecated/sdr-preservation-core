@@ -44,9 +44,20 @@ describe SdrIngest::CompleteDeposit do
         <process lifecycle="registered" elapsed="0.0" attempts="1" datetime="2010-06-21T15:45:10-0700" status="waiting" name="complete-deposit"/>
         </workflow>}
     
-        wf_ds = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'sdrIngestWF', :dsLabel=>'sdrIngestWF', :blob=>wf_str)
-        @obj.add_datastream(wf_ds)
-        @obj.save
+      wf_ds = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'sdrIngestWF', :dsLabel=>'sdrIngestWF', :blob=>wf_str)
+      @obj.add_datastream(wf_ds)
+        
+      prov_str = %{<agent name="DOR">
+          <what object="druid:bp119bq5041">
+            <event when="2010-04-06T10:26:52-0700" who="DOR-robot:register-object">Google data received</event>
+            <event when="2010-04-23T15:28:41-0700" who="DOR-robot:google-download">Checksums verified</event>
+            <event when="2010-04-23T15:30:13-0700" who="DOR-robot: process-content">Image files JHOVE 1.4 validated</event>
+          </what>
+        </agent>
+      }
+      prov_ds = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'PROVENANCE', :dsLabel=>'PROVENANCE', :blob=>prov_str)  
+      @obj.add_datastream(prov_ds)
+      @obj.save
     rescue
       $stderr.print $!
     end

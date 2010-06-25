@@ -50,7 +50,6 @@ module SdrIngest
     # * Append SDR provenance to the existing provenance data
     # * Update the object's Sedora provenance datastream with SDR provenance attached    
     def update_provenance 
-      #retrieve_sdr_workflow
       create_sdr_provenance
       make_new_prov
       update_prov_datastream
@@ -79,7 +78,7 @@ module SdrIngest
 
       # Get the events from the object, store it in "obj_wf" temporarily  
       @obj_wf = @obj.datastreams['sdrIngestWF'].content
-      ingestWF = Nokogiri::XML.fragment(self.obj_wf)
+      ingestWF = Nokogiri::XML.parse(self.obj_wf)
 
       processes = ingestWF.xpath(".//process")
       processes.each do |process|
@@ -108,7 +107,7 @@ module SdrIngest
     # * Saves the end result as an XML string in "obj_prov"
     def make_new_prov
       # Retrieve existing provenance
-      @obj_prov = @obj.datastreams['PROVENANCE']
+      @obj_prov = @obj.datastreams['PROVENANCE'].content
       if (@obj_prov != nil && !@obj_prov.eql?('')) then
         ex_prov_frag = Nokogiri::XML::DocumentFragment.parse @obj_prov
       else
