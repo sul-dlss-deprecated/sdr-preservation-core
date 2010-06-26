@@ -109,9 +109,9 @@ module SdrIngest
       # Retrieve existing provenance
       @obj_prov = @obj.datastreams['PROVENANCE'].content
       if (@obj_prov != nil && !@obj_prov.eql?('')) then
-        ex_prov_frag = Nokogiri::XML::DocumentFragment.parse @obj_prov
+        ex_prov_frag = Nokogiri::XML @obj_prov 
       else
-       ex_prov_frag = Nokogiri::XML::DocumentFragment.parse <<-EOXML
+       ex_prov_frag = Nokogiri::XML <<-EOXML
         <provenanceMetadata objectId="#{@druid}">
         </provenanceMetadata>
         EOXML
