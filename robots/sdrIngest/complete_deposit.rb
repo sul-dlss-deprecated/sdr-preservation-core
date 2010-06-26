@@ -15,8 +15,15 @@ module SdrIngest
     attr_reader :obj, :druid
     attr_writer :bag_directory
     
-    attr_reader :obj_wf, :sdr_prov, :obj_prov
-    
+    # Workflow XML as read from the object 
+     attr_reader :obj_wf 
+
+     # Instance variable containing sdr provenance generated from the workflow datastream
+     attr_reader :sdr_prov 
+
+     # Existing provenance datastream, as read from the object
+     attr_reader :obj_prov
+       
     def initialize(string1,string2)
       super(string1,string2)
       # by default, get the bags from the SDR_DEPOSIT_DIR
@@ -32,7 +39,7 @@ module SdrIngest
       raise "Failed to update provenance to include Deposit completion." unless update_provenance
 
       # Update DOR workflow 
-      result = Dor::WorkflowService.update_workflow_status("dor", @druid, "googleScannedBookWF", "sdr-ingest-complete", "completed")
+      result = Dor::WorkflowService.update_workflow_status("dor", @druid, "googleScannedBookWF", "sdr-ingest-deposit", "completed")
       raise "Update workflow \"complete-deposit\" failed." unless result
     end
     
@@ -43,7 +50,6 @@ module SdrIngest
     # * Append SDR provenance to the existing provenance data
     # * Update the object's Sedora provenance datastream with SDR provenance attached    
     def update_provenance 
-      #retrieve_sdr_workflow
       create_sdr_provenance
       make_new_prov
       update_prov_datastream
@@ -71,8 +77,8 @@ module SdrIngest
       agent.add_child(what)
 
       # Get the events from the object, store it in "obj_wf" temporarily  
-      @obj_wf = @obj.datastreams['sdrIngestWF']
-      ingestWF = Nokogiri::XML.fragment(self.obj_wf)
+      @obj_wf = @obj.datastreams['sdrIngestWF'].content
+      ingestWF = Nokogiri::XML.parse(self.obj_wf)
 
       processes = ingestWF.xpath(".//process")
       processes.each do |process|
@@ -101,7 +107,7 @@ module SdrIngest
     # * Saves the end result as an XML string in "obj_prov"
     def make_new_prov
       # Retrieve existing provenance
-      @obj_prov = @obj.datastreams['PROVENANCE']
+      @obj_prov = @obj.datastreams['PROVENANCE'].content
       if (@obj_prov != nil && !@obj_prov.eql?('')) then
         ex_prov_frag = Nokogiri::XML::DocumentFragment.parse @obj_prov
       else

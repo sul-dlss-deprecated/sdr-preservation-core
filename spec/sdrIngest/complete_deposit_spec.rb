@@ -11,23 +11,53 @@ describe SdrIngest::CompleteDeposit do
     @complete_robot = SdrIngest::CompleteDeposit.new("sdrIngest","complete-deposit")    
     @complete_robot.bag_directory = SDR2_EXAMPLE_OBJECTS
 
-    mock_workitem = mock("complete_deposit_workitem")
-    mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")    
+    @objectID = "druid:jc837rq9922"
+    
+    @mock_workitem = mock("complete_deposit_workitem")
+    @mock_workitem.stub!(:druid).and_return(@objectID)    
     
     Fedora::Repository.register(SEDORA_URI)
     ActiveFedora::SolrService.register(SOLR_URL)
     
     # Make sure we're starting with a blank object
     begin
-      obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
-      obj.delete
+      @obj = ActiveFedora::Base.load_instance(@mock_workitem.druid)
+      @obj.delete
     rescue
       $stderr.print $!
     end
     
     begin
-      obj = ActiveFedora::Base.new(:pid => mock_workitem.druid)
-      obj.save
+      @obj = ActiveFedora::Base.new(:pid => @mock_workitem.druid)
+      @obj.save
+    
+      @obj = ActiveFedora::Base.load_instance(@mock_workitem.druid)
+      @mock_workitem.stub!(:obj).and_return(@obj)
+        
+      wf_str = %{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <workflow objectId="druid:jc837rq9922" id="sdrIngestWF">
+        <process lifecycle="inprocess" elapsed="0.0" attempts="0" datetime="2010-06-08T22:09:43-0700" status="completed" name="register-sdr"/>
+        <process elapsed="0.158" attempts="1" datetime="2010-06-08T22:14:07-0700" status="completed" name="transfer-object"/>
+        <process elapsed="0.104" attempts="1" datetime="2010-06-08T22:16:27-0700" status="completed" name="validate-bag"/>
+        <process elapsed="0.481" attempts="1" datetime="2010-06-08T22:19:36-0700" status="completed" name="populate-metadata"/>
+        <process elapsed="0.0" attempts="2" datetime="2010-06-21T15:43:33-0700" status="completed" name="verify-agreement"/>
+        <process lifecycle="registered" elapsed="0.0" attempts="1" datetime="2010-06-21T15:45:10-0700" status="waiting" name="complete-deposit"/>
+        </workflow>}
+    
+      wf_ds = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'sdrIngestWF', :dsLabel=>'sdrIngestWF', :blob=>wf_str)
+      @obj.add_datastream(wf_ds)
+        
+      prov_str = %{<agent name="DOR">
+          <what object="druid:bp119bq5041">
+            <event when="2010-04-06T10:26:52-0700" who="DOR-robot:register-object">Google data received</event>
+            <event when="2010-04-23T15:28:41-0700" who="DOR-robot:google-download">Checksums verified</event>
+            <event when="2010-04-23T15:30:13-0700" who="DOR-robot: process-content">Image files JHOVE 1.4 validated</event>
+          </what>
+        </agent>
+      }
+      prov_ds = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'PROVENANCE', :dsLabel=>'PROVENANCE', :blob=>prov_str)  
+      @obj.add_datastream(prov_ds)
+      @obj.save
     rescue
       $stderr.print $!
     end
@@ -71,13 +101,10 @@ describe SdrIngest::CompleteDeposit do
     end
     
     it "should load a Sedora object with the corresponding druid" do     
-      mock_workitem = mock("complete_deposit_workitem")
-      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
-      
-      @complete_robot.process_item(mock_workitem)
+      @complete_robot.process_item(@mock_workitem)
       
       @complete_robot.obj.should be_instance_of(ActiveFedora::Base)
-      @complete_robot.obj.pid.should eql(mock_workitem.druid) 
+      @complete_robot.obj.pid.should eql(@mock_workitem.druid) 
     end
     
     it "should raise an error if the Sedora obj with corresponding druid cannot be loaded" do
@@ -98,12 +125,8 @@ describe SdrIngest::CompleteDeposit do
     end
 
     it "should raise error if update provenance fails" do
-      objectID = "druid:jc837rq9922"
-      mock_workitem = mock("complete_deposit_workitem")
-      mock_workitem.stub!(:druid).and_return(objectID)
-
       @complete_robot.stub!(:update_provenance).and_return(false)
-      lambda {@complete_robot.process_item(mock_workitem)}.should raise_exception("Failed to update provenance to include Deposit completion.")
+      lambda {@complete_robot.process_item(@mock_workitem)}.should raise_exception("Failed to update provenance to include Deposit completion.")
     end
     
     # This test looks at the "sdr_prov" instance var
@@ -119,33 +142,22 @@ describe SdrIngest::CompleteDeposit do
     #   </what>
     # </agent>
     it "should compose SDR provenance" do
-      objectID = "druid:jc837rq9922"
-      mock_workitem = mock("complete_deposit_workitem")
-      mock_workitem.stub!(:druid).and_return(objectID)
 
-      wf_str = '<process name="register-sdr" status="completed" datetime="2010-10-05T13:47:21-0800" lifecycle="inprocess"/> \
-         <process name="transfer-object" status="completed" datetime="2010-10-05T13:47:21-0800"/> \
-         <process name="validate-bag" status="completed" datetime="2010-10-05T13:47:21-0800" attempts="1"/> \
-         <process name="populate-metadata" status="completed" datetime="2010-10-05T13:47:21-0800" attempts="1"/> \
-         <process name="verify-agreement" status="completed" datetime="2010-10-05T13:47:21-0800"/> \
-         <process name="complete-deposit" lifecycle="registered" status="waiting" /> '
-       @complete_robot.stub!(:obj_wf).and_return(wf_str)
-
-      @complete_robot.process_item(mock_workitem)  
+      @complete_robot.process_item(@mock_workitem)  
       
       @complete_robot.sdr_prov.should_not be_nil
       @complete_robot.sdr_prov.should_not be_empty
       @complete_robot.sdr_prov.should =~ /agent name="SDR"/
-      @complete_robot.sdr_prov.should =~ /what object="#{objectID}"/
-      
-      @complete_robot.sdr_prov.should =~ /event who="SDR-robot:register-sdr" when="2010-10-05T13:47:21-0800"/
-      @complete_robot.sdr_prov.should =~ /event who="SDR-robot:transfer-object" when="2010-10-05T13:47:21-0800"/
-      @complete_robot.sdr_prov.should =~ /event who="SDR-robot:validate-bag" when="2010-10-05T13:47:21-0800"/
-      @complete_robot.sdr_prov.should =~ /event who="SDR-robot:populate-metadata" when="2010-10-05T13:47:21-0800"/
-      @complete_robot.sdr_prov.should =~ /event who="SDR-robot:verify-agreement" when="2010-10-05T13:47:21-0800"/
+      @complete_robot.sdr_prov.should =~ /what object="#{@objectID}"/
+            
+      @complete_robot.sdr_prov.should =~ /event/
+      @complete_robot.sdr_prov.should =~ /who="SDR-robot:transfer-object"/
+      @complete_robot.sdr_prov.should =~ /who="SDR-robot:validate-bag"/
+      @complete_robot.sdr_prov.should =~ /who="SDR-robot:populate-metadata"/
+      @complete_robot.sdr_prov.should =~ /who="SDR-robot:verify-agreement"/
       
       # Make sure complete-deposit is NOT included as it is still in "waiting" status.
-      @complete_robot.sdr_prov.should_not =~ /event who="SDR-robot:complete-deposit" when=/
+      @complete_robot.sdr_prov.should_not =~ /who="SDR-robot:complete-deposit"/
     end
         
     # Existing provenance might look like this:
@@ -154,34 +166,23 @@ describe SdrIngest::CompleteDeposit do
     # After appending SDR provenance, we should see an additional
     # <agent name="SDR"> ... </agent>  
     it "should make SDR provenance part of the object's provenance" do
-      objectID = "druid:jc837rq9922"
-      mock_workitem = mock("complete_deposit_workitem")
-      mock_workitem.stub!(:druid).and_return(objectID)
-
-      wf_str = '<process name="register-sdr" status="completed" datetime="2010-10-05T13:47:21-0800" lifecycle="inprocess"/> \
-         <process name="transfer-object" status="completed" datetime="2010-10-05T13:47:21-0800"/> \
-         <process name="validate-bag" status="completed" datetime="2010-10-05T13:47:21-0800" attempts="1"/> \
-         <process name="populate-metadata" status="completed" datetime="2010-10-05T13:47:21-0800" attempts="1"/> \
-         <process name="verify-agreement" status="completed" datetime="2010-10-05T13:47:21-0800"/> \
-         <process name="complete-deposit" lifecycle="registered" status="waiting" /> '
-      @complete_robot.stub!(:obj_wf).and_return(wf_str)
-
-      @complete_robot.process_item(mock_workitem)  
+      
+      @complete_robot.process_item(@mock_workitem)  
 
       @complete_robot.obj_prov.should_not be_nil
       @complete_robot.obj_prov.should_not be_empty
       
       @complete_robot.obj_prov.should =~ /agent name="SDR"/      
-      @complete_robot.obj_prov.should =~ /what object="#{objectID}"/
+      @complete_robot.obj_prov.should =~ /what object="#{@objectID}"/
       
-      @complete_robot.obj_prov.should =~ /event who="SDR-robot:register-sdr" when="2010-10-05T13:47:21-0800"/
-      @complete_robot.obj_prov.should =~ /event who="SDR-robot:transfer-object" when="2010-10-05T13:47:21-0800"/
-      @complete_robot.obj_prov.should =~ /event who="SDR-robot:validate-bag" when="2010-10-05T13:47:21-0800"/
-      @complete_robot.obj_prov.should =~ /event who="SDR-robot:populate-metadata" when="2010-10-05T13:47:21-0800"/
-      @complete_robot.obj_prov.should =~ /event who="SDR-robot:verify-agreement" when="2010-10-05T13:47:21-0800"/
+      @complete_robot.obj_prov.should =~ /event/
+      @complete_robot.obj_prov.should =~ /who="SDR-robot:transfer-object"/
+      @complete_robot.obj_prov.should =~ /who="SDR-robot:validate-bag"/
+      @complete_robot.obj_prov.should =~ /who="SDR-robot:populate-metadata"/
+      @complete_robot.obj_prov.should =~ /who="SDR-robot:verify-agreement"/
       
       # Make sure complete-deposit is NOT included as it is still in "waiting" status.
-      @complete_robot.obj_prov.should_not =~ /event who="SDR-robot:complete-deposit" when=/
+      @complete_robot.obj_prov.should_not =~ /who="SDR-robot:complete-deposit"/
     end
     
     # This test reads the provenance back from the Sedora object,
@@ -192,20 +193,7 @@ describe SdrIngest::CompleteDeposit do
     # So what gets read back looks like <event when="" who="SDR-robot: register-sdr"> register-sdr</event>.
     # It's still valid, but the test can't test that the when and who attrs are in the same order they got written.
     it "updates Sedora Provenance Datastream with the SDR provenance added" do
-      objectID = "druid:jc837rq9922"
-      mock_workitem = mock("complete_deposit_workitem")
-      mock_workitem.stub!(:druid).and_return(objectID)
-
-
-      wf_str = '<process name="register-sdr" status="completed" datetime="2010-10-05T13:47:21-0800" lifecycle="inprocess"/> \
-         <process name="transfer-object" status="completed" datetime="2010-10-05T13:47:21-0800"/> \
-         <process name="validate-bag" status="completed" datetime="2010-10-05T13:47:21-0800" attempts="1"/> \
-         <process name="populate-metadata" status="completed" datetime="2010-10-05T13:47:21-0800" attempts="1"/> \
-         <process name="verify-agreement" status="completed" datetime="2010-10-05T13:47:21-0800"/> \
-         <process name="complete-deposit" lifecycle="registered" status="waiting" /> '
-      @complete_robot.stub!(:obj_wf).and_return(wf_str)
-      
-      @complete_robot.process_item(mock_workitem)  
+      @complete_robot.process_item(@mock_workitem)  
       
       prov_ds = @complete_robot.obj.datastreams['PROVENANCE']
       prov_read_back = prov_ds.content
@@ -213,7 +201,7 @@ describe SdrIngest::CompleteDeposit do
       prov_read_back.should_not be_nil
       prov_read_back.should_not be_empty
       prov_read_back.should =~ /agent name="SDR"/      
-      prov_read_back.should =~ /what object="#{objectID}"/
+      prov_read_back.should =~ /what object="#{@objectID}"/
       prov_read_back.should =~ /event/
       prov_read_back.should =~ /who="SDR-robot:register-sdr"/
       prov_read_back.should =~ /who="SDR-robot:transfer-object"/
@@ -235,20 +223,15 @@ describe SdrIngest::CompleteDeposit do
         
     # How do we test this?  We need to call the method and then read the googleScannedBook workflow to verify the status...    
     it "should update DOR workflow to sdr-deposit-complete" do
-      mock_workitem = mock("complete_deposit_workitem")
-      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
-
+      pending
       # actually call the function we are testing
-      @complete_robot.process_item(mock_workitem)
+      @complete_robot.process_item(@mock_workitem)
     end
     
     it "should report an error if workflow update failed" do
-      mock_workitem = mock("complete_deposit_workitem")
-      mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+      Dor::WorkflowService.should_receive(:update_workflow_status).with("dor", "druid:jc837rq9922", "googleScannedBookWF", "sdr-ingest-deposit", "completed")
       
-      Dor::WorkflowService.should_receive(:update_workflow_status).with("dor", "druid:jc837rq9922", "googleScannedBookWF", "sdr-ingest-complete", "completed")
-      
-      lambda {@complete_robot.process_item(mock_workitem)}.should raise_error(/Update workflow "complete-deposit" failed/)
+      lambda {@complete_robot.process_item(@mock_workitem)}.should raise_error(/Update workflow "complete-deposit" failed/)
     end
   end
 end
