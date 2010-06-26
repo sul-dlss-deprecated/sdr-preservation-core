@@ -115,6 +115,10 @@ When /^I run the robot "([^"]*)" for the "([^"]*)" step of the "([^"]*)" workflo
     # require 'sdrIngest/verify_agreement'
     # dm_robot = SdrIngest::VerifyAgreement.new(workflow, step)
     # dm_robot.start
+  when "SdrIngest::CompleteDeposit"
+    require 'sdrIngest/complete_deposit'
+    dm_robot = SdrIngest::CompleteDeposit.new(workflow, step)
+    dm_robot.start
   end
 
 end

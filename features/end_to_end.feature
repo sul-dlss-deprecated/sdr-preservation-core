@@ -54,5 +54,6 @@ Feature: Deposit an object into Sedora
 	
 	# ##################################################
 	# Robot 6: complete-deposit
-	When I run the robot "SdrIngest::VerifyAgreement" for the "verify-agreement" step of the "sdrIngest" workflow
+	When I run the robot "SdrIngest::CompleteDeposit" for the "complete-deposit" step of the "sdrIngest" workflow
+	And it should have a SEDORA workflow datastream where "complete-deposit" is "completed"
 	
