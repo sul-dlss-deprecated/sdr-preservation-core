@@ -52,3 +52,7 @@ Feature: Deposit an object into Sedora
 	Then it should have a SEDORA workflow datastream where "verify-agreement" is "completed"
 	And it should have a SEDORA workflow datastream where "complete-deposit" is "waiting"
 	
+	# ##################################################
+	# Robot 6: complete-deposit
+	When I run the robot "SdrIngest::VerifyAgreement" for the "verify-agreement" step of the "sdrIngest" workflow
+	
