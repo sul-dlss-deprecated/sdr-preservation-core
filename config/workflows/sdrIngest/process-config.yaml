@@ -23,6 +23,6 @@ verify-agreement:
   error_limit: 5
 
 complete-deposit:
-  prerequisite: populate-metadata  
+  prerequisite: verify-agreement  
   batch_limit: 1000
   error_limit: 5  
