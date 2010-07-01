@@ -5,23 +5,27 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 require 'lyber_core'
 require 'bagit'
 
+DATA_DIR = "data"
+BAGIT_TXT = "bagit.txt"
+PACKAGE_INFO_TXT = "package-info.txt" 
+
 module SdrIngest
 
   # Validates the Bag that has been transferring in SDR's staging area
   class ValidateBag < LyberCore::Robot
 
     def bag_exists?(base_path)
-    	data_dir = File.join(base_path, "data")
-    	bagit_txt_file = File.join(base_path, "bagit.txt")
-    	package_info_txt_file = File.join(base_path, "package-info.txt")
+    	data_dir = File.join(base_path, DATA_DIR)
+    	bagit_txt_file = File.join(base_path, BAGIT_TXT)
+    	package_info_txt_file = File.join(base_path, PACKAGE_INFO_TXT)
 
-    	if not (File.exists?(base_path) || File.directory?(base_path) ||
-	        File.exists?(data_dir) || File.directory?(data_dir) ||
-      		File.exists?(bagit_txt_file) || File.file?(bagit_txt_file) ||
-      		File.exists?(package_info_txt_file) || File.file?(package_info_txt_file))
+    	if !File.exists?(base_path) || !File.directory?(base_path) ||
+	   !File.exists?(data_dir) || !File.directory?(data_dir) ||
+           !File.exists?(bagit_txt_file) || !File.file?(bagit_txt_file) ||
+           !File.exists?(package_info_txt_file) || !File.file?(package_info_txt_file)
           return false
-      else
-          return true # 
+	else
+          return true 
     	end
     end
 

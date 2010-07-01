@@ -4,54 +4,99 @@ require 'lyber_core'
 require 'sdrIngest/validate_bag'
 
 describe SdrIngest::ValidateBag do 
-  
+
   context "bag_exists?" do
-      it "should return false when base_path does not exist" do
-        base_path = File.join(Dir.tmpdir, "lkdjflksdjda")
-      	puts base_path
-      	FileUtils.rm_rf(base_path)
 
+    before(:each) do
+      @path = File.join(Dir.tmpdir, "lkdjflksdjda")
+      @data = File.join(@path, DATA_DIR)
+      @bagit = File.join(@path, BAGIT_TXT)
+      @package = File.join(@path, PACKAGE_INFO_TXT)
+      FileUtils.mkdir_p(@data)
+      FileUtils.touch(@bagit)
+      FileUtils.touch(@package)
+    end
+
+    after(:each) do
+      FileUtils.rm_rf(@path)
+    end
+    
+    it "should return true to test the initial bag setup"  do
+      	puts @path
         robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
-      	robot.bag_exists?(base_path).should == false
-      end
+      	robot.bag_exists?(@path).should == true
+    end 
 
-      it "should return false when base_path is not a directory" do 
-        pending("writing the test case")
-      end
+    it "should return false when base_path does not exist" do
+      # delete the bag dir
+      FileUtils.rm_rf @path   
 
-      it "should return false when data_dir does not exist" do
-        pending("writing the test case")
-      end
+      robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+      robot.bag_exists?(@path).should == false
+    end
 
-      it "should return false when data_dir is not a directory" do
-        pending("writing the test case")
-      end
+    it "should return false when @path is not a directory" do 
+      FileUtils.rm_rf(@path)
+      FileUtils.touch(@path) # create a file
 
-      it "should return false when bagit_txt_file does not exist" do
-        pending("writing the test case")
-      end
+      robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")      	
+      robot.bag_exists?(@path).should == false
+    end
+      
+    it "should return false when data_dir does not exist" do
+      FileUtils.rm_rf(@data)
 
-      it "should return false when bagit_txt_file is not a file" do
-        pending("writing the test case")
-      end
+      robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+      robot.bag_exists?(@path).should == false
+    end
 
-      it "should return false when package_info_txt_file does not exist" do
-        pending("writing the test case")
-      end
+    it "should return false when data_dir is not a directory" do
+      FileUtils.rm_rf(@data)
+      FileUtils.touch(@data)
 
-      it "should return false when package_info_txt_file is not a file" do
-        pending("writing the test case")
-      end
+      robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+      robot.bag_exists?(@path).should == false
+    end
 
-      it "should return true when it is a real bag" do
-        base_path = File.join(Dir.tmpdir, "lkdjflksdjfalda")
-        BagIt::Bag.new(base_path)
+    it "should return false when bagit_txt_file does not exist" do
+      FileUtils.rm_rf(@bagit)
 
-        robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
-	robot.bag_exists?(base_path).should == true
+      robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+      robot.bag_exists?(@path).should == false
+    end
 
-	FileUtils.rm_rf(base_path)
-      end
+    it "should return false when bagit_txt_file is not a file" do
+      FileUtils.rm_rf(@bagit)
+      FileUtils.mkdir(@bagit)
+
+      robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+      robot.bag_exists?(@path).should == false
+    end
+
+    it "should return false when package_info_txt_file does not exist" do
+      FileUtils.rm_rf(@package)
+
+      robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+      robot.bag_exists?(@path).should == false
+    end
+
+    it "should return false when package_info_txt_file is not a file" do
+      FileUtils.rm_rf(@package)
+      FileUtils.mkdir(@package)
+
+      robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+      robot.bag_exists?(@path).should == false
+    end
+
+    it "should return true when it is a real bag" do
+      path = File.join(Dir.tmpdir, "lkdjflksdjfalddfsdfa")
+      BagIt::Bag.new(path)
+
+      robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
+      robot.bag_exists?(path).should == true
+
+      FileUtils.rm_rf(path)
+    end
   end
 
   context "validate" do
