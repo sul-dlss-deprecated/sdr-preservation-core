@@ -6,7 +6,7 @@ namespace :solrizer do
   require 'sdr2_model.rb'
   
   desc 'Index test'
-  task :index do
+  task :index => :environment  do
     pid = 'sdrtwo:jul1alpana3'
     puts "indexing #{pid}"
     SEDORA_USER = 'fedoraAdmin'
@@ -23,6 +23,9 @@ namespace :solrizer do
     end
 
     # This isn't working and I can't figure out why. 
+    # In order to get it to register the fedora URL I want I have to change the fedora.yml
+    # file that comes with the solrizer gem
+    # It should be able to pick up config/fedora.yml
     # ENV['RAILS_ROOT']='../../../'
     solrizer = Solrizer::Solrizer.new()
     solrizer.solrize(obj)
