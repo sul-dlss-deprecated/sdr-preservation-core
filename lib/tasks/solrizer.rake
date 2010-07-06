@@ -13,12 +13,19 @@ namespace :solrizer do
     SEDORA_PASS = 'fedoraAdmin'
     SEDORA_URI= "http://#{SEDORA_USER}:#{SEDORA_PASS}@sdr-fedora-dev.stanford.edu/fedora"
     Fedora::Repository.register(SEDORA_URI)
-    obj = ActiveFedora::Base.load_instance(PID)
+    obj = ActiveFedora::Base.load_instance(pid)
     puts obj.to_solr.inspect
-    
-    obj.add_relationship(:has_model, "info:fedora/afmodel:Sdr2Model")
-    obj.save
+
     model_klazz_array = ActiveFedora::ContentModel.known_models_for( obj )
+    puts 
+    puts model_klazz_array.inspect
+    puts model_klazz_array.include? Sdr2Model
+    puts
+    unless model_klazz_array.include? Sdr2Model
+      obj.add_relationship(:has_model, "info:fedora/afmodel:Sdr2Model") 
+      obj.save
+    end
+    
     puts model_klazz_array.inspect
     ENV['RAILS_ROOT']='../../../'
     solrizer = Solrizer::Solrizer.new()
