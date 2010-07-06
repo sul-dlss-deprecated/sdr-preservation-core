@@ -17,17 +17,13 @@ namespace :solrizer do
     puts obj.to_solr.inspect
 
     model_klazz_array = ActiveFedora::ContentModel.known_models_for( obj )
-    puts 
-    puts model_klazz_array.inspect
-    puts model_klazz_array.include? Sdr2Model
-    puts
     unless model_klazz_array.include? Sdr2Model
       obj.add_relationship(:has_model, "info:fedora/afmodel:Sdr2Model") 
       obj.save
     end
-    
-    puts model_klazz_array.inspect
-    ENV['RAILS_ROOT']='../../../'
+
+    # This isn't working and I can't figure out why. 
+    # ENV['RAILS_ROOT']='../../../'
     solrizer = Solrizer::Solrizer.new()
     solrizer.solrize(obj)
   end
