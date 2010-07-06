@@ -27,7 +27,7 @@ class Sdr2Model < ActiveFedora::Base
   def get_title    
     title = @identity.xpath("/identityMetadata/citationTitle/text()")
     @solr_doc << { solr_name(:title, :string) => title }
-    @solr_doc << { solr_name(:title, :text) => title }
+    # @solr_doc << { solr_name(:title, :text) => title }
   end
   
   def get_agreement_id
