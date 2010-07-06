@@ -48,6 +48,9 @@ describe Sdr2Model do
       @solr_doc['title_t'].should == "Why go to college?: An address"
     end
     
+    it "should extract an agreement id" do
+      @solr_doc['agreement_facet'].should == "druid:tx617qp8040"
+    end
     
   end
 end

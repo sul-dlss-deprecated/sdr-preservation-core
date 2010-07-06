@@ -4,9 +4,11 @@ class Sdr2Model < ActiveFedora::Base
     
     ds = self.datastreams()    
     @identity = Nokogiri::XML(ds['IDENTITY'].content)
+    @solr_doc = solr_doc
     
-    solr_doc << get_fedora_model
-    solr_doc << get_title
+    get_fedora_model
+    get_title
+    get_agreement_id
     
     # unless opts[:model_only]
     #       solr_doc << {SOLR_DOCUMENT_ID.to_sym => pid, solr_name(:system_create, :date) => self.create_date, solr_name(:system_modified, :date) => self.modified_date, solr_name(:active_fedora_model, :symbol) => self.class.inspect}
@@ -15,15 +17,21 @@ class Sdr2Model < ActiveFedora::Base
     #       # solr_doc = ds.to_solr(solr_doc) if ds.class.included_modules.include?(ActiveFedora::MetadataDatastreamHelper) ||( ds.kind_of?(ActiveFedora::RelsExtDatastream) || ( ds.kind_of?(ActiveFedora::QualifiedDublinCoreDatastream) && !opts[:model_only] )
     #       solr_doc = ds.to_solr(solr_doc) if ds.kind_of?(ActiveFedora::MetadataDatastream) || ds.kind_of?(ActiveFedora::NokogiriDatastream) || ( ds.kind_of?(ActiveFedora::RelsExtDatastream) && !opts[:model_only] )
     #     end
-    return solr_doc
+    return @solr_doc
   end
   
   def get_fedora_model
-    { solr_name(:active_fedora_model, :symbol) => self.class.inspect }
+    @solr_doc << { solr_name(:active_fedora_model, :symbol) => self.class.inspect }
   end
   
   def get_title    
-    { solr_name(:title, :string) => @identity.xpath("/identityMetadata/citationTitle/text()") }
+    title = @identity.xpath("/identityMetadata/citationTitle/text()")
+    @solr_doc << { solr_name(:title, :string) => title }
+    @solr_doc << { solr_name(:title, :text) => title }
+  end
+  
+  def get_agreement_id
+    @solr_doc << { solr_name(:agreement, :facet) => @identity.xpath("/identityMetadata/agreementId/text()") }
   end
   
 end
