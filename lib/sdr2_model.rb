@@ -2,6 +2,7 @@ class Sdr2Model < ActiveFedora::Base
   
   def to_solr(solr_doc = Solr::Document.new, opts={})
     solr_doc << { solr_name(:active_fedora_model, :symbol) => self.class.inspect }
+    solr_doc << { solr_name(:title, :symbol) => "blah"}
     # unless opts[:model_only]
     #       solr_doc << {SOLR_DOCUMENT_ID.to_sym => pid, solr_name(:system_create, :date) => self.create_date, solr_name(:system_modified, :date) => self.modified_date, solr_name(:active_fedora_model, :symbol) => self.class.inspect}
     #     end
