@@ -1,6 +1,10 @@
 class Sdr2Model < ActiveFedora::Base
   
   def to_solr(solr_doc = Solr::Document.new, opts={})
+    
+    ds = self.datastreams()    
+    @identity = Nokogiri::XML(ds['IDENTITY'].content)
+    
     solr_doc << get_fedora_model
     solr_doc << get_title
     
@@ -18,8 +22,8 @@ class Sdr2Model < ActiveFedora::Base
     { solr_name(:active_fedora_model, :symbol) => self.class.inspect }
   end
   
-  def get_title
-    { solr_name(:title, :string) => "Why go to college?: An address" }
+  def get_title    
+    { solr_name(:title, :string) => @identity.xpath("/identityMetadata/citationTitle/text()") }
   end
   
 end
