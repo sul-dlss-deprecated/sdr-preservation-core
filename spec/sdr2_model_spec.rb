@@ -7,6 +7,7 @@ describe Sdr2Model do
   context "adding content to a solr document" do
     
     before(:all) do
+      pid = "fixture:fixture1"
       Fedora::Repository.register(SEDORA_URI)
       ActiveFedora::SolrService.register(SOLR_URL)
       filename = File.expand_path(File.dirname(__FILE__) + '/fixtures/fixture_fixture1.foxml.xml')
@@ -18,6 +19,8 @@ describe Sdr2Model do
       else
         puts "Failed to ingest the fixture"
       end
+      @obj = Sdr2Model.load_instance(pid)
+      @solr_doc = @obj.to_solr
     end
     
     after(:all) do
@@ -29,13 +32,20 @@ describe Sdr2Model do
       puts "The object has been deleted."
     end
     
-    it "should add its class" do
-      pending
-      # solr_doc << { solr_name(:active_fedora_model, :symbol) => self.class.inspect }
+    it "should be an instance of Sdr2Model" do
+      @obj.should be_instance_of(Sdr2Model)
+    end
+    
+    it "should have a solr document" do
+      @solr_doc.should be_instance_of(Solr::Document)
+    end
+    
+    it "should have a solr field called active_fedora_model_s with value Sdr2Model" do
+      @solr_doc['active_fedora_model_s'].should == "Sdr2Model"
     end
     
     it "should extract a title" do
-      pending
+      @solr_doc['title_t'].should == "Why go to college?: An address"
     end
     
     
