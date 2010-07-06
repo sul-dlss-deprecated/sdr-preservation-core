@@ -12,7 +12,7 @@ Dir.glob('lib/tasks/*.rake').each { |r| import r }
 
 task :default  => :test
 
-desc "Setup environment variables"
+desc "Set up environment variables. Unless otherwise specified ROBOT_ENVIRONMENT defaults to local"
 task :environment do
    environment = ENV['ROBOT_ENVIRONMENT'] || "local"
    require File.expand_path(File.dirname(__FILE__) + "/config/environments/#{environment}")  
