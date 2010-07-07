@@ -13,7 +13,7 @@ validate-bag:
   error_limit: 5
   
 populate-metadata:
-  prerequisite: transfer-object  
+  prerequisite: validate-bag
   batch_limit: 1000
   error_limit: 5
   
@@ -23,6 +23,6 @@ verify-agreement:
   error_limit: 5
 
 complete-deposit:
-  prerequisite: verify-agreement  
+  prerequisite: verify-agreement
   batch_limit: 1000
   error_limit: 5  
