@@ -48,6 +48,10 @@ Feature: Deposit an object into Sedora
 	When I run the robot "SdrIngest::VerifyAgreement" for the "verify-agreement" step of the "sdrIngest" workflow
 	 # because it isn't working yet
 	Then it should have a SEDORA workflow datastream where "verify-agreement" is "waiting"
+	#Then it should be able to connect to DOR FEDORA
+	#Then it should be able to connect to SEDORA
+	#And the Agreement ID should be found in DOR FEDORA
+	#And the Agreement Object should be available in SEDORA
 	And when I explicitly set "verify-agreement" to "completed"
 	Then it should have a SEDORA workflow datastream where "verify-agreement" is "completed"
 	And it should have a SEDORA workflow datastream where "complete-deposit" is "waiting"
