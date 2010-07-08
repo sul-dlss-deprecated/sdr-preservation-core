@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'rubygems'
 require 'lyber_core'
 require 'sdr2_model'
@@ -10,7 +10,7 @@ describe Sdr2Model do
       pid = "fixture:fixture1"
       Fedora::Repository.register(SEDORA_URI)
       ActiveFedora::SolrService.register(SOLR_URL)
-      filename = File.expand_path(File.dirname(__FILE__) + '/fixtures/fixture_fixture1.foxml.xml')
+      filename = File.expand_path(File.dirname(__FILE__) + '/../fixtures/fixture_fixture1.foxml.xml')
       puts "Importing '#{filename}' to #{Fedora::Repository.instance.fedora_url}"
       file = File.new(filename, "r")
       result = foxml = Fedora::Repository.instance.ingest(file.read)
