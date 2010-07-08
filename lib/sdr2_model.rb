@@ -1,5 +1,14 @@
+#!/usr/bin/env ruby
+# Author::    Bess Sadler  (mailto:bess@stanford.edu)
+# Date::      8 July 2010
+# Every SDR2 object can be instantiated as both an ActiveFedora::Base object and as an Sdr2Model object
+# By virtue of being an instance of Sdr2Model we expect it to conform to certain standards and we expect
+# to be able to index specific information from it into solr.
 class Sdr2Model < ActiveFedora::Base
-  
+
+  # +to_solr+ overrides the method of the same name from +ActiveFedora::Base+
+  # This method is called on each object that declares itself an instance of +Sdr2Model+
+  # This method parses the datastreams and extracts the data needed for indexing into solr.
   def to_solr(solr_doc = Solr::Document.new, opts={})
     
     ds = self.datastreams()    
