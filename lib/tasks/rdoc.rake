@@ -10,7 +10,7 @@ docs_dir = File.join(File.join(File.dirname(__FILE__), '../../docs'))
     #    rd.external # run the rdoc process as an external shell
        rd.main = "README.rdoc" # 'name' will be the initial page displayed
        rd.rdoc_dir = docs_dir # set the output directory
-       rd.rdoc_files.include("README.rdoc", "robots/*.rb", "robots/**/*.rb") # List of files to include in the rdoc generation
+       rd.rdoc_files.include("README.rdoc", "robots/*.rb", "robots/**/*.rb", "lib/*.rb") # List of files to include in the rdoc generation
     #    rd.template = "html" # Name of the template to be used by rdoc
        rd.title = "SDR Deposit Workflow Robots" # Title of the RDoc documentation
     #    rd.options << "--accessor accessorname[,..]" # comma separated list of additional class methods that should be treated like 'attr_reader' and friends.  
