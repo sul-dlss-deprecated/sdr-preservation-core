@@ -4,10 +4,3 @@
 [submodule "sdr2_example_objects"]
 	path = sdr2_example_objects
 	url = corn.stanford.edu:/afs/ir/dev/dlss/git/sdr/sdr2_example_objects.git
-[submodule "sdr2-admin/jetty"]
-	path = sdr2-admin/jetty
-        url = git://github.com/projecthydra/hydra-jetty.git
-[submodule "blacklight plugin"]
-	path = sdr2-admin/vendor/plugins/blacklight
-        url = git://github.com/projectblacklight/blacklight.git
-
