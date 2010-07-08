@@ -99,12 +99,11 @@ class TestJettyServer
       
       jruby_raise_error?
       
-      puts self.inspect
       Dir.chdir(@jetty_home) do
         @pid = fork do
           STDERR.close if @quiet
           exec jetty_command
-        end
+        end        
       end
     end
 
@@ -112,6 +111,7 @@ class TestJettyServer
     def platform_specific_stop
       jruby_raise_error?
       Process.kill('TERM', @pid)
+      `for i in \`ps -o pid,ppid,command -ax | grep jetty | awk '{print $1}'\`; do kill -9 $i; done`
       Process.wait
     end
   end

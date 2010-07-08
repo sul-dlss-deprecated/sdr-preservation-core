@@ -6,9 +6,6 @@ require 'dor_service'
 require 'lyber_core'
 require 'active-fedora'
 
-
-
-
 module GoogleScannedBook
 
 # Creates +Sedora+ objects and bootstrapping the workflow.
@@ -22,7 +19,6 @@ module GoogleScannedBook
       Fedora::Repository.register(SEDORA_URI)
 
       # Identifiers
-
       druid = work_item.druid
 
       obj = ActiveFedora::Base.new(:pid => druid)
@@ -38,8 +34,7 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = GoogleScannedBook::RegisterSdr.new(
-          'googleScannedBook', 'register-sdr')
+  dm_robot = GoogleScannedBook::RegisterSdr.new('googleScannedBook', 'register-sdr')
   dm_robot.start
 end
 

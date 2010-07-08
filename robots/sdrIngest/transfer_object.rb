@@ -4,30 +4,25 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
 require 'lyber_core'
 
-# +Deposit+ initializes the SdrIngest workflow by registering the object and transferring 
-# the object from DOR to SDR's staging area.
-#
-# The most up to date description of the deposit workflow is always in config/workflows/deposit/depositWorkflow.xml. 
-# (Content included below.)
-# :include:config/workflows/deposit/depositWorkflow.xml
-
 module SdrIngest
 
-# Transfers objects from DOR workspace to SDR's staging area.  
+# +TransferObject+ Transfers objects from DOR workspace to SDR's staging area.  
 # - notifies DOR of success by: <b><i>need to be filled in</i></b>
 # - notifies DOR of missing object by: <i><b>need to be filled in</b></i>
 
   class TransferObject < LyberCore::Robot
+    
+    # the destination object that gets created by running this script
+    attr_reader :dest_path
 
     # Override the robot LyberCore::Robot.process_item method.
     # * Makes use of the Robot Framework FileUtilities.
     def process_item(work_item)
       # Identifiers
-
       druid = work_item.druid
-      dest_path = File.join(SDR_DEPOSIT_DIR,druid)
-      if File.exists?(dest_path)
-        raise "Object already exists: #{dest_path}"
+      @dest_path = File.join(SDR_DEPOSIT_DIR,druid)
+      if File.exists?(@dest_path)
+        raise "Object already exists: #{@dest_path}"
       else
         return FileUtilities.transfer_object(druid, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
       end

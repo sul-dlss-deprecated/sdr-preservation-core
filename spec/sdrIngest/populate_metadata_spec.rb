@@ -34,6 +34,23 @@ context "Populating Metadata" do
     end
   end
 
+  def cleanup
+    mock_workitem = mock("populate_metadata_workitem")
+    mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
+
+    Fedora::Repository.register(SEDORA_URI)
+    ActiveFedora::SolrService.register(SOLR_URL)
+    
+    # Make sure we're starting with a blank object
+    begin
+      obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
+      obj.delete
+    rescue
+      $stderr.print $!
+    end
+  
+  end
+  
   context "basic behavior" do
    it "can be created" do
       r = SdrIngest::PopulateMetadata.new("sdrIngest","populate-metadata")
@@ -71,6 +88,8 @@ context "Populating Metadata" do
     end
     
     it "finds a bag corresponding to the workitem's druid" do
+      setup
+      
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
@@ -92,6 +111,9 @@ context "Populating Metadata" do
       setup
     end
     
+    after(:each) do
+      cleanup
+    end
     
     it "should be able to access a fedora object" do
       @robot.should respond_to(:obj)
@@ -133,6 +155,10 @@ context "Populating Metadata" do
     # 2. that datastream should have a DSID of "IDENTITY"
     before(:each) do
       setup      
+    end
+    
+    after(:each) do
+      cleanup
     end
     
     it "implements methods to populate metadata" do
