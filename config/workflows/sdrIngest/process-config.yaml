@@ -3,7 +3,7 @@ sdr-ingest-deposit:
    error_limit: 5
 
 transfer-object:
-  prerequisite: register-sdr  
+  prerequisite: sdr-ingest-deposit  
   batch_limit: 1000
   error_limit: 5
   
@@ -13,7 +13,7 @@ validate-bag:
   error_limit: 5
   
 populate-metadata:
-  prerequisite: transfer-object  
+  prerequisite: validate-bag  
   batch_limit: 1000
   error_limit: 5
   
