@@ -34,7 +34,7 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = GoogleScannedBook::RegisterSdr.new('googleScannedBook', 'register-sdr')
+  dm_robot = GoogleScannedBook::RegisterSdr.new('googleScannedBook', 'sdr-ingest-deposit')
   dm_robot.start
 end
 
