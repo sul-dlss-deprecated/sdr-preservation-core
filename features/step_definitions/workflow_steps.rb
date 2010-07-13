@@ -50,8 +50,8 @@ Then /^I should be able to create a new object in DOR for testing against$/ do
 
   xml = <<-EOXML
   <workflow id="googleScannedBookWF">
-           <process name="ingest-deposit" status="completed"/>
-     <process name="register-sdr" status="waiting"/>
+           <process name="sdr-ingest-transfer" status="completed"/>
+     <process name="sdr-ingest-deposit" status="waiting"/>
   </workflow>
   EOXML
 

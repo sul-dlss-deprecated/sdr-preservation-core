@@ -11,9 +11,9 @@ Feature: Deposit an object into Sedora
 	When I want to test the sedora ingest workflow
     Then I should be able to talk to the workflow service
  	And I should be able to create a new object in DOR for testing against
-	# note: ingest-deposit is going to become sdr-ingest-transfer 
- 	And that object should have a "googleScannedBookWF" state where "ingest-deposit" is "completed"
- 	And that object should have a "googleScannedBookWF" state where "register-sdr" is "waiting"
+	# note: ingest-deposit is going to become sdr-ingest-transfer where it was ingest-deposit
+ 	And that object should have a "googleScannedBookWF" state where "sdr-ingest-transfer" is "completed"
+ 	And that object should have a "googleScannedBookWF" state where "sdr-ingest-deposit" is "waiting"
  	
 	# ##################################################
 	# Robot 1: register-sdr
@@ -48,10 +48,10 @@ Feature: Deposit an object into Sedora
 	When I run the robot "SdrIngest::VerifyAgreement" for the "verify-agreement" step of the "sdrIngest" workflow
 	 # because it isn't working yet
 	Then it should have a SEDORA workflow datastream where "verify-agreement" is "waiting"
-	#Then it should be able to connect to DOR FEDORA
-	#Then it should be able to connect to SEDORA
-	#And the Agreement ID should be found in DOR FEDORA
-	#And the Agreement Object should be available in SEDORA
+        #Then it should be able to connect to DOR FEDORA
+        #Then it should be able to connect to SEDORA
+        #And the Agreement ID should be found in DOR FEDORA
+        #And the Agreement Object should be available in SEDORA
 	And when I explicitly set "verify-agreement" to "completed"
 	Then it should have a SEDORA workflow datastream where "verify-agreement" is "completed"
 	And it should have a SEDORA workflow datastream where "complete-deposit" is "waiting"
