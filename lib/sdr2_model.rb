@@ -12,14 +12,20 @@ class Sdr2Model < ActiveFedora::Base
   def to_solr(solr_doc = Solr::Document.new, opts={})
     
     ds = self.datastreams()    
-    @identity = Nokogiri::XML(ds['IDENTITY'].content)
     @solr_doc = solr_doc
     
-    get_fedora_model
-    get_title
-    get_agreement_id
-    get_tags
+    # These methods don't require any specific datastream.
+    # They should work even for stub objects
     get_format
+    
+    # These methods require an IDENTITY datastream
+    @identity = Nokogiri::XML(ds['IDENTITY'].content)
+    unless @identity.nil?
+      get_fedora_model
+      get_title
+      get_agreement_id
+      get_tags
+    end
     
     # unless opts[:model_only]
     #       solr_doc << {SOLR_DOCUMENT_ID.to_sym => pid, solr_name(:system_create, :date) => self.create_date, solr_name(:system_modified, :date) => self.modified_date, solr_name(:active_fedora_model, :symbol) => self.class.inspect}

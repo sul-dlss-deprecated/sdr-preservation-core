@@ -17,27 +17,29 @@ namespace :solrizer do
     Nokogiri::XML(open(completed_pids_url)).xpath("/objects/object/@id").each do |pid|
     
       puts "indexing #{pid}"
-      SEDORA_USER = 'fedoraAdmin'
-      SEDORA_PASS = 'fedoraAdmin'
-      SEDORA_URI= "http://#{SEDORA_USER}:#{SEDORA_PASS}@sdr-fedora-dev.stanford.edu/fedora"
       Fedora::Repository.register(SEDORA_URI)
-      obj = ActiveFedora::Base.load_instance(pid)
-      puts obj.to_solr.inspect
-
-      model_klazz_array = ActiveFedora::ContentModel.known_models_for( obj )
-      unless model_klazz_array.include? Sdr2Model
-        obj.add_relationship(:has_model, "info:fedora/afmodel:Sdr2Model") 
-        obj.save
+      obj = nil
+      begin
+        obj = ActiveFedora::Base.load_instance(pid)
+      rescue
       end
+      # puts obj.to_solr.inspect
+      unless obj.nil?
+        model_klazz_array = ActiveFedora::ContentModel.known_models_for( obj )
+        unless model_klazz_array.include? Sdr2Model
+          obj.add_relationship(:has_model, "info:fedora/afmodel:Sdr2Model") 
+          obj.save
+        end
 
-      # This isn't working and I can't figure out why. 
-      # In order to get it to register the fedora URL I want I have to change the fedora.yml
-      # file that comes with the solrizer gem
-      # It should be able to pick up config/fedora.yml
-      # ENV['RAILS_ROOT']='../../../'
-      # require File.expand_path(File.dirname(__FILE__) + "/../../config/fedora.yml")
+        # This isn't working and I can't figure out why. 
+        # In order to get it to register the fedora URL I want I have to change the fedora.yml
+        # file that comes with the solrizer gem
+        # It should be able to pick up config/fedora.yml
+        # ENV['RAILS_ROOT']='../../../'
+        # require File.expand_path(File.dirname(__FILE__) + "/../../config/fedora.yml")
     
-      solrizer.solrize(obj)
+        solrizer.solrize(obj)
+      end
     end
   end
   
