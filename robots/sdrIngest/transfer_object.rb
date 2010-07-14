@@ -22,7 +22,7 @@ module SdrIngest
       druid = work_item.druid
       @dest_path = File.join(SDR_DEPOSIT_DIR,druid)
       if File.exists?(@dest_path)
-        raise "Object already exists: #{@dest_path}"
+        puts "Object already exists: #{@dest_path}"
       else
         return FileUtilities.transfer_object(druid, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
       end

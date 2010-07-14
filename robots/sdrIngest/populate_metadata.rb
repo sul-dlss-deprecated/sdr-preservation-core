@@ -70,14 +70,13 @@ module SdrIngest
     # It does not check the validity of the bag, it assumes this has already happened.
     def bag_exists?
       @bag = @bag_directory + '/' + self.druid
-      puts "Loading metadata from #{@bag}..."
       File.directory? @bag
     end
     
     # fetch the fedora object from the repository so we can attach datastreams to it
     # throw an error if we can't find the object
     def get_fedora_object
-      puts "Connecting to #{SEDORA_URI}..."
+      # puts "Connecting to #{SEDORA_URI}..."
       begin
         Fedora::Repository.register(SEDORA_URI)
         @obj = ActiveFedora::Base.load_instance(@druid)
@@ -125,7 +124,7 @@ if __FILE__ == $0
     dm_robot.process_druid(ARGV[0])
   else
     dm_robot = SdrIngest::PopulateMetadata.new('sdrIngest', 'populate-metadata')
-    puts "workflow = #{dm_robot.workflow}"
+    # puts "workflow = #{dm_robot.workflow}"
     dm_robot.start
   end
   puts "Done."
