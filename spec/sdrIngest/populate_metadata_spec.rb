@@ -3,13 +3,12 @@ require 'rubygems'
 require 'lyber_core'
 require 'sdrIngest/populate_metadata'
 
-
-
 describe SdrIngest::PopulateMetadata do
   
 context "Populating Metadata" do
   
   def setup
+    
     @robot = SdrIngest::PopulateMetadata.new("sdrIngest","populate-metadata")    
     @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
     mock_workitem = mock("populate_metadata_workitem")
@@ -21,16 +20,16 @@ context "Populating Metadata" do
     # Make sure we're starting with a blank object
     begin
       obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
-      obj.delete
+      obj.delete unless obj.nil?
     rescue
-      $stderr.print $!
+      # $stderr.print $!
     end
     
     begin
       obj = ActiveFedora::Base.new(:pid => mock_workitem.druid)
-      obj.save
+      obj.save unless obj.nil?
     rescue
-      $stderr.print $!
+      # $stderr.print $!
     end
   end
 
@@ -44,9 +43,9 @@ context "Populating Metadata" do
     # Make sure we're starting with a blank object
     begin
       obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
-      obj.delete
+      obj.delete unless obj.nil?
     rescue
-      $stderr.print $!
+      # $stderr.print $!
     end
   
   end
@@ -66,6 +65,7 @@ context "Populating Metadata" do
     end
         
     it "knows fully qualified path to its bag object" do
+      # my_buggy_method('foo')
       @robot.should respond_to(:bag)
     end
     
@@ -78,7 +78,6 @@ context "Populating Metadata" do
     end
     
     it "looks in SDR_DEPOSIT_DIR by default" do
-      SDR_DEPOSIT_DIR = SDR2_EXAMPLE_OBJECTS
       @robot.bag_directory.should eql(SDR_DEPOSIT_DIR)
     end
     
@@ -120,10 +119,12 @@ context "Populating Metadata" do
     end
     
     it "should have a process_item method" do
+      
       @robot.should respond_to(:process_item)
     end
           
     it "should accept a workitem passed to process_item" do
+      
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       @robot.should_receive(:process_item).with(mock_workitem)
