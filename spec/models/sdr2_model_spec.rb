@@ -11,14 +11,8 @@ describe Sdr2Model do
       Fedora::Repository.register(SEDORA_URI)
       ActiveFedora::SolrService.register(SOLR_URL)
       filename = File.expand_path(File.dirname(__FILE__) + '/../fixtures/fixture_fixture1.foxml.xml')
-      puts "Importing '#{filename}' to #{Fedora::Repository.instance.fedora_url}"
       file = File.new(filename, "r")
       result = foxml = Fedora::Repository.instance.ingest(file.read)
-      if result
-        puts "The fixture has been ingested as #{result}"
-      else
-        puts "Failed to ingest the fixture"
-      end
       @obj = Sdr2Model.load_instance(pid)
       @solr_doc = @obj.to_solr
     end
@@ -27,9 +21,7 @@ describe Sdr2Model do
       Fedora::Repository.register(SEDORA_URI)
       ActiveFedora::SolrService.register(SOLR_URL)
       pid = "fixture:fixture1"
-      puts "Deleting '#{pid}' from #{Fedora::Repository.instance.fedora_url}"
       ActiveFedora::Base.load_instance(pid).delete
-      puts "The object has been deleted."
     end
     
     it "should be an instance of Sdr2Model" do
