@@ -1,5 +1,4 @@
 = SDR Deposit Workflow Robots
-test
 
 ==An overview of the workflow
 You can see the steps of the workflow in <tt>config/workflows/deposit/depositWorkflow.xml</tt>
