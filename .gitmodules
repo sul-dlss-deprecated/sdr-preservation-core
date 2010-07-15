@@ -1,6 +1,6 @@
-[submodule "hydra-jetty"]
-	path = hydra-jetty
-	url = git://github.com/projecthydra/hydra-jetty.git
 [submodule "sdr2_example_objects"]
 	path = sdr2_example_objects
 	url = /afs/ir/dev/dlss/git/sdr/sdr2_example_objects.git
+[submodule "hydra-jetty"]
+	path = hydra-jetty
+	url = git://github.com/projecthydra/hydra-jetty.git
