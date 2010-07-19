@@ -1,9 +1,9 @@
-sdr-ingest-deposit:
+register-sdr:
    batch_limit: 1000
    error_limit: 5
 
 transfer-object:
-  prerequisite: sdr-ingest-deposit  
+  prerequisite: register-sdr  
   batch_limit: 1000
   error_limit: 5
   
