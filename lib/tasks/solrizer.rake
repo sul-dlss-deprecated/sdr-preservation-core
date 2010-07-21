@@ -27,44 +27,24 @@ namespace :solrizer do
   desc 'Index test'
   task :indexall => :environment  do
     
+    Fedora::Repository.register(SEDORA_URI)
     solrizer = Solrizer::Solrizer.new()
     
     completed_pids_url = "http://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&completed=complete-deposit"
     
     Nokogiri::XML(open(completed_pids_url)).xpath("/objects/object/@id").each do |pid|
-    
-      puts "indexing #{pid}"
-      Fedora::Repository.register(SEDORA_URI)
-      obj = nil
-      begin
-        obj = ActiveFedora::Base.load_instance(pid)
-      rescue
-      end
-      # puts obj.to_solr.inspect
-      unless obj.nil?
-        model_klazz_array = ActiveFedora::ContentModel.known_models_for( obj )
-        unless model_klazz_array.include? Sdr2Model
-          obj.add_relationship(:has_model, "info:fedora/afmodel:Sdr2Model") 
-          obj.save
-        end
-
-        # This isn't working and I can't figure out why. 
-        # In order to get it to register the fedora URL I want I have to change the fedora.yml
-        # file that comes with the solrizer gem
-        # It should be able to pick up config/fedora.yml
-        # ENV['RAILS_ROOT']='../../../'
-        # require File.expand_path(File.dirname(__FILE__) + "/../../config/fedora.yml")
-    
-        solrizer.solrize(obj)
-      end
+      ensure_content_models(pid)
+      solrizer.solrize(pid)
     end
   end
   
   desc 'Index a fedora object of the given pid.'
   task :solrize_object => :environment do 
     if ENV['PID']
+      ensure_content_models(ENV['PID'])
       puts "indexing #{ENV['PID'].inspect}"
       solrizer = Solrizer::Solrizer.new
+      ensure_content_models(ENV['PID'])
       solrizer.solrize(ENV['PID'])
       puts "Finished shelving #{ENV['PID']}"
     else
@@ -93,5 +73,32 @@ namespace :solrizer do
     #   solrizer.solrize_objects
     #   puts "Solrizer task complete."
     # end  
+    
+    def ensure_content_models(pid)
+      puts "hello"
+        puts "indexing #{pid}"
+        obj = nil
+        begin
+          obj = ActiveFedora::Base.load_instance(pid)
+        rescue
+        end
+        # puts obj.to_solr.inspect
+        unless obj.nil?
+          model_klazz_array = ActiveFedora::ContentModel.known_models_for( obj )
+          unless model_klazz_array.include? Sdr2Model
+            obj.add_relationship(:has_model, "info:fedora/afmodel:Sdr2Model") 
+            obj.save
+          end
+        
+          # This isn't working and I can't figure out why. 
+          # In order to get it to register the fedora URL I want I have to change the fedora.yml
+          # file that comes with the solrizer gem
+          # It should be able to pick up config/fedora.yml
+          # ENV['RAILS_ROOT']='../../../'
+          # require File.expand_path(File.dirname(__FILE__) + "/../../config/fedora.yml")
+        end
+    end
   
 end
+
+
