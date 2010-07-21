@@ -1,3 +1,8 @@
+# Note: ActiveMQ might be inaccessible due to firewall restrictions. 
+# When you're developing, remember this handy trick:
+# ssh -L 8161:localhost:8161 bess@sdr-fedora-dev.stanford.edu
+# That will allow you to connect to the ActiveMQ service via localhost:8161
+
 namespace :solrizer do
   
   require 'rubygems'
@@ -7,8 +12,20 @@ namespace :solrizer do
   require 'nokogiri'
   require 'open-uri'
   
+  desc 'Read queue'
+  task :queue do
+    require 'stomp'
+    conn = Stomp::Connection.open("", "", "localhost", 61613, false)
+    conn.subscribe("/topic/fedora.apim.update", {:ack => :auto})
+
+    loop do
+    p conn.receive.body
+    end
+    
+  end
+  
   desc 'Index test'
-  task :index => :environment  do
+  task :indexall => :environment  do
     
     solrizer = Solrizer::Solrizer.new()
     
@@ -43,20 +60,18 @@ namespace :solrizer do
     end
   end
   
-    # 
-    # desc 'Index a fedora object of the given pid.'
-    # task :solrize do 
-    #   index_full_text = ENV['FULL_TEXT'] == 'true'
-    #   if ENV['PID']
-    #     puts "indexing #{ENV['PID'].inspect}"
-    #     solrizer = Solrizer::Solrizer.new :index_full_text=> index_full_text
-    #     solrizer.solrize(ENV['PID'])
-    #     puts "Finished shelving #{ENV['PID']}"
-    #   else
-    #     puts "You must provide a pid using the format 'solrizer::solrize_object PID=sample:pid'."
-    #   end
-    # end
-    # 
+  desc 'Index a fedora object of the given pid.'
+  task :solrize_object => :environment do 
+    if ENV['PID']
+      puts "indexing #{ENV['PID'].inspect}"
+      solrizer = Solrizer::Solrizer.new
+      solrizer.solrize(ENV['PID'])
+      puts "Finished shelving #{ENV['PID']}"
+    else
+      puts "You must provide a pid using the format 'solrizer::solrize_object PID=sample:pid'."
+    end
+  end
+    
     # desc 'Index all objects in the repository.'
     # task :solrize_objects do
     #   index_full_text = ENV['FULL_TEXT'] == 'true'
