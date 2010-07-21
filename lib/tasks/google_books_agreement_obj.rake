@@ -2,7 +2,7 @@ require 'lyber_core'
 
 namespace :objects do
   
-  PID = "druid:zn292gq7284"
+  pid = "druid:zn292gq7284"
   
   rels_ext = <<-EOXML
   <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
@@ -27,7 +27,7 @@ namespace :objects do
   </identityMetadata>
   EOXML
   
-  DC = <<-EOXML
+  dc = <<-EOXML
 
 <oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
   <dc:title>SDR Deposit agreement for Google Scanned Books</dc:title>
@@ -109,29 +109,29 @@ namespace :objects do
       
       # Make sure we're starting with a blank object
       begin
-        obj = ActiveFedora::Base.load_instance(PID)
+        obj = ActiveFedora::Base.load_instance(pid)
         obj.delete
       rescue
         $stderr.print $!
       end
       
       # Create a new object
-      obj = ActiveFedora::Base.new(:pid => PID)
+      obj = ActiveFedora::Base.new(:pid => pid)
       
       # Add the agreementWF
-      agreementWFDS = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"agreementWF", :dsLabel=>"agreementWF", :blob=>agreementWF)
+      agreementWFDS = ActiveFedora::Datastream.new(:pid=>pid, :dsid=>"agreementWF", :dsLabel=>"agreementWF", :blob=>agreementWF)
       obj.add_datastream(agreementWFDS)
       
-      contentMetadataDS = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"contentMetadata", :dsLabel=>"contentMetadata", :blob=>contentMetadata)
+      contentMetadataDS = ActiveFedora::Datastream.new(:pid=>pid, :dsid=>"contentMetadata", :dsLabel=>"contentMetadata", :blob=>contentMetadata)
       obj.add_datastream(contentMetadataDS)
       
-      descMetadataDS = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"descMetadata", :dsLabel=>"descMetadata", :blob=>descMetadata)
+      descMetadataDS = ActiveFedora::Datastream.new(:pid=>pid, :dsid=>"descMetadata", :dsLabel=>"descMetadata", :blob=>descMetadata)
       obj.add_datastream(descMetadataDS)
       
-      identityMetadataDS = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"identityMetadata", :dsLabel=>"identityMetadata", :blob=>identityMetadata)
+      identityMetadataDS = ActiveFedora::Datastream.new(:pid=>pid, :dsid=>"identityMetadata", :dsLabel=>"identityMetadata", :blob=>identityMetadata)
       obj.add_datastream(identityMetadataDS)
       
-      dc_ds = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"DC", :dsLabel=>"Dublin Core Record for this object", :blob=>DC)
+      dc_ds = ActiveFedora::Datastream.new(:pid=>pid, :dsid=>"dc", :dsLabel=>"Dublin Core Record for this object", :blob=>dc)
       obj.add_datastream(dc_ds)
       
       # Add the PDF as a managed datastream
@@ -141,9 +141,9 @@ namespace :objects do
       
       obj.save
       
-      puts "The object should be available at #{SEDORA_URI}/get/#{PID}"
+      puts "The object should be available at #{SEDORA_URI}/get/#{pid}"
       
-      # rels_ext_ds = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"RELS-EXT", :dsLabel=>"RELS-EXT", :blob=>rels_ext)
+      # rels_ext_ds = ActiveFedora::Datastream.new(:pid=>pid, :dsid=>"RELS-EXT", :dsLabel=>"RELS-EXT", :blob=>rels_ext)
       # obj.add_datastream(rels_ext_ds)
       
     end
