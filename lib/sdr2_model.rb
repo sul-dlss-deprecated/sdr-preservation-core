@@ -19,7 +19,7 @@ class Sdr2Model < ActiveFedora::Base
     get_format
     
     # These methods require an IDENTITY datastream
-    @identity = Nokogiri::XML(ds['IDENTITY'].content)
+    @identity = Nokogiri::XML(ds['IDENTITY'].content) unless ds['IDENTITY'].nil? 
     unless @identity.nil?
       get_fedora_model
       get_title
