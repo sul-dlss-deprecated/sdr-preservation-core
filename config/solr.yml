@@ -1,0 +1,7 @@
+development:
+  url: http://sdr2admin-dev.stanford.edu/sdrsolr/sdr2-development/
+test: &TEST
+  url: http://localhost:8983/solr/test
+production:
+  url: http://sdr2admin-dev.stanford.edu/sdrsolr/sdr2-development/
+
