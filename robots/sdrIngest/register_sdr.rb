@@ -57,7 +57,9 @@ module SdrIngest
              #puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
              if (process_item(@druids[i]) == nil) 
                @error_count += 1
+               #puts "Errrrrrrrrrrroooooooooorrrrrrrrrrrr"
              else
+               #puts "YESSSSSSSSSSSSSSSSS!!!!"
                @success_count += 1
              end
              i += 1
@@ -114,6 +116,8 @@ module SdrIngest
            Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml) 
            
            puts "DONE : Create new workflow for #{druid}"
+           
+           return true
          
         end  # end process_item
   
