@@ -35,16 +35,10 @@ module SdrIngest
        end
        
        def process_items()
-    
-          # Start the timer
-          #@start_time = Time.new
-          
-          # Initialize the success and error counts
-          #@success_count = 0
-          #@error_count = 0
           
          # Get the druid list
          # First, get_objects_for_workstep(repository, workflow, completed, waiting)
+         
          #puts "getting object list"
          object_list_xml = DorService.get_objects_for_workstep("dor", "googleScannedBookWF", "sdr-ingest-transfer", "sdr-ingest-deposit")
       
@@ -131,6 +125,7 @@ module SdrIngest
   
     end # end of class
 end # end of module 
+
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
