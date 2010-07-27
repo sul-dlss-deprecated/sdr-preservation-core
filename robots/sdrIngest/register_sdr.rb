@@ -24,16 +24,24 @@ module SdrIngest
        attr_accessor :success_count
        attr_accessor :error_count
        
+       def initialize()
+  
+         # Start the timer
+         @start_time = Time.new
+         
+         # Initialize the success and error counts
+         @success_count = 0
+         @error_count = 0
+       end
        
-       
-       def self.start()
+       def process_items()
     
           # Start the timer
-          @start_time = Time.new
+          #@start_time = Time.new
           
           # Initialize the success and error counts
-          @success_count = 0
-          @error_count = 0
+          #@success_count = 0
+          #@error_count = 0
           
          # Get the druid list
          # First, get_objects_for_workstep(repository, workflow, completed, waiting)
@@ -55,7 +63,7 @@ module SdrIngest
              puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
              puts "Processing " + @druids[i]
              #puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-             if (process_item(@druids[i]) == nil) 
+             if (process_druid(@druids[i]) == nil) 
                @error_count += 1
                #puts "Errrrrrrrrrrroooooooooorrrrrrrrrrrr"
              else
@@ -66,14 +74,14 @@ module SdrIngest
            end
       
          end  # end while
-         
          # Print success, error count
          print_stats
+
        end 
   
   
        # Output the batch's timings and other statistics to STDOUT for capture in a log
-       def self.print_stats
+       def print_stats
          @end_time = Time.new
          @elapsed_time = @end_time - @start_time
          puts "\n \n"
@@ -87,7 +95,7 @@ module SdrIngest
   
        # - Creates a *Sedora* object
        # - Initializes the +Deposit+ workflow
-       def self.process_item(druid)
+       def process_druid(druid)
     
           begin
             Fedora::Repository.register(SEDORA_URI)
@@ -95,7 +103,7 @@ module SdrIngest
             raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"  
             return nil
           end
-            puts "DONE : Sedora registration"
+          puts "DONE : Sedora registration"
           
          
           #puts "druid in sedora will be" + druid
@@ -109,15 +117,15 @@ module SdrIngest
             return nil
           end
              
-           puts "DONE : Create new object in Sedora"
+          puts "DONE : Create new object in Sedora"
 
-           # Initialize workflow
-           workflow_xml = File.open(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngest", 'sdrIngestWorkflow.xml'), 'rb') { |f| f.read }
-           Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml) 
+          # Initialize workflow
+          workflow_xml = File.open(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngest", 'sdrIngestWorkflow.xml'), 'rb') { |f| f.read }
+          Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml) 
            
-           puts "DONE : Create new workflow for #{druid}"
+          puts "DONE : Create new workflow for #{druid}"
            
-           return true
+          return true
          
         end  # end process_item
   
@@ -126,6 +134,16 @@ end # end of module
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  SdrIngest::RegisterSdr.start()
+  # If this script is invoked with a specific druid, it will register sdr with that druid only
+  if(ARGV[0])
+    puts "Registering SDR with #{ARGV[0]}"
+    sdr_bootstrap = SdrIngest::RegisterSdr.new()
+    sdr_bootstrap.process_druid(ARGV[0])
+    sdr_bootstrap.print_stats()
+  else
+    sdr_bootstrap = SdrIngest::RegisterSdr.new()
+    sdr_bootstrap.process_items() 
+  end
+  puts "Register SDR done"   
 end
 
