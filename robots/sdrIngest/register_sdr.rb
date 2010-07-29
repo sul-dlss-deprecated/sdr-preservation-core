@@ -133,8 +133,8 @@ if __FILE__ == $0
   if(ARGV[0])
     puts "Registering SDR with #{ARGV[0]}"
     sdr_bootstrap = SdrIngest::RegisterSdr.new()
-    sdr_bootstrap.process_druid(ARGV[0])
-    sdr_bootstrap.print_stats()
+    sdr_bootstrap.process_druid(ARGV[0]) 
+    #sdr_bootstrap.print_stats()
   else
     sdr_bootstrap = SdrIngest::RegisterSdr.new()
     sdr_bootstrap.process_items() 
