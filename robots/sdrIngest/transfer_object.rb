@@ -3,6 +3,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
 require 'lyber_core'
+require 'lyber_core/utils'
 
 module SdrIngest
 
@@ -10,7 +11,7 @@ module SdrIngest
 # - notifies DOR of success by: <b><i>need to be filled in</i></b>
 # - notifies DOR of missing object by: <i><b>need to be filled in</b></i>
 
-  class TransferObject < LyberCore::Robot
+  class TransferObject < LyberCore::Robots::Robot
     
     # the destination object that gets created by running this script
     attr_reader :dest_path
@@ -24,7 +25,7 @@ module SdrIngest
       if File.exists?(@dest_path)
         puts "Object already exists: #{@dest_path}"
       else
-        return FileUtilities.transfer_object(druid, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
+        return LyberCore::Utils::FileUtilities.transfer_object(druid, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
       end
     end
   end
@@ -34,6 +35,6 @@ end
 # This is the equivalent of a java main method
 if __FILE__ == $0
   dm_robot = SdrIngest::TransferObject.new(
-          'sdrIngest', 'transfer-object')
+          'sdrIngestWF', 'transfer-object')
   dm_robot.start
 end
