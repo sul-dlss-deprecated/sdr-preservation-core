@@ -14,7 +14,7 @@ module SdrIngest
 
 
   # Verifies preservation agreement for objects
-  class VerifyAgreement < LyberCore::Robot
+  class VerifyAgreement < LyberCore::Robots::Robot
 
     # the agreement_id of the current workitem
     attr_reader :agreement_id 
@@ -75,7 +75,7 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::VerifyAgreement.new('sdrIngest', 'verify-agreement')
+  dm_robot = SdrIngest::VerifyAgreement.new('sdrIngestWF', 'verify-agreement')
   # If this robot is invoked with a specific druid, it will run for that druid only
   if(ARGV[0])
     puts "Verifying agreement for #{ARGV[0]}"
