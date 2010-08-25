@@ -12,7 +12,7 @@ BAG_INFO_TXT = "bag-info.txt"
 module SdrIngest
 
   # Validates the Bag that has been transferring in SDR's staging area
-  class ValidateBag < LyberCore::Robot
+  class ValidateBag < LyberCore::Robots::Robot
 
     # Ensure the bag exists by checking for the presence of bagit.txt and 
     # bag-info.txt
@@ -82,7 +82,7 @@ end # end of module
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::ValidateBag.new('sdrIngest', 'validate-bag')
+  dm_robot = SdrIngest::ValidateBag.new('sdrIngestWF', 'validate-bag')
   # If this robot is invoked with a specific druid, it will run for that druid only
   if(ARGV[0])
     puts "Validating bagit object for #{ARGV[0]}"
