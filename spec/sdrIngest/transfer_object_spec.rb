@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'rubygems'
 require 'lyber_core'
+require 'lyber_core/utils'
 require 'sdrIngest/transfer_object'
 
 describe SdrIngest::TransferObject do
