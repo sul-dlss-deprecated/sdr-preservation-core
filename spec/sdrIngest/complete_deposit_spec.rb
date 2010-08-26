@@ -8,7 +8,7 @@ require 'sdrIngest/complete_deposit'
 describe SdrIngest::CompleteDeposit do
   
   def setup
-    @complete_robot = SdrIngest::CompleteDeposit.new("sdrIngest","complete-deposit")    
+    @complete_robot = SdrIngest::CompleteDeposit.new("sdrIngestWF","complete-deposit")    
     @complete_robot.bag_directory = SDR2_EXAMPLE_OBJECTS
 
     @objectID = "druid:jc837rq9922"
@@ -82,7 +82,7 @@ describe SdrIngest::CompleteDeposit do
   
   context "basic behavior" do
     it "should be able to process a work item" do
-      complete_robot = SdrIngest::CompleteDeposit.new("sdrIngest","complete-deposit")          
+      complete_robot = SdrIngest::CompleteDeposit.new("sdrIngestWF","complete-deposit")          
       complete_robot.should respond_to(:process_item)
     end
   end
