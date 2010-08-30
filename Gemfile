@@ -3,7 +3,6 @@ source "http://gems.github.com"
 source "http://sulair-rails-dev.stanford.edu"
 
 gem "active-fedora", "1.1.13"
-gem "active-fedora", "1.1.13"
 gem "activesupport", "2.3.8"
 gem "columnize", "0.3.1"
 gem "facets", "2.8.4"
