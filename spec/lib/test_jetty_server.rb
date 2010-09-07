@@ -111,7 +111,7 @@ class TestJettyServer
     def platform_specific_stop
       jruby_raise_error?
       Process.kill('TERM', @pid)
-      `for i in \`ps -o pid,ppid,command -ax | grep jetty | awk '{print $1}'\`; do kill -9 $i; done`
+      `for i in \`ps -o pid,ppid,command ax | grep jetty | awk '{print $1}'\`; do kill -9 $i; done`
       Process.wait
     end
   # end
