@@ -34,6 +34,64 @@ module SdrIngest
          @error_count = 0
        end
 
+       # Output the batch's timings and other statistics to STDOUT for capture in a log
+       def print_stats
+         @end_time = Time.new
+         @elapsed_time = @end_time - @start_time
+         puts "\n"
+         puts "**********************************************"
+         puts "Total time: " + @elapsed_time.to_s + "\n"
+         puts "Completed objects: " + @success_count.to_s + "\n"
+         puts "Errors: " + @error_count.to_s + "\n"
+         puts "**********************************************"
+       end
+
+
+
+
+
+       # - Creates a *Sedora* object
+       # - Initializes the +Deposit+ workflow
+       def process_druid(druid)
+
+          begin
+            Fedora::Repository.register(SEDORA_URI)
+          rescue Errno::ECONNREFUSED => e
+            raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"
+            return nil
+          end
+          puts "DONE : Sedora registration"
+
+
+          #puts "druid in sedora will be" + druid
+          begin
+            obj = ActiveFedora::Base.new(:pid => druid)
+            #puts "save new object in sedora"
+            obj.save
+          rescue Exception => e
+            #raise "error in saving"
+            puts "ERROR : Object cannot be saved in Sedora"
+            return nil
+          end
+
+          puts "DONE : Create new object in Sedora"
+
+          # Initialize workflow
+          workflow_xml = File.open(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngestWF", 'sdrIngestWorkflow.xml'), 'rb') { |f| f.read }
+          Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml)
+
+          puts "DONE : Create new workflow for #{druid}"
+
+          # Dont do this. Creating a new workflow with "completed" status for register-sdr is enough
+          # update register-sdr status to "completed" in sdrIngestWF
+          #result = Dor::WorkflowService.update_workflow_status("sdr", druid, "sdrIngestWF", "register-sdr", "completed")
+          #raise "Update workflow \"register-sdr\" failed." unless result
+
+
+          return true
+
+        end  # end process_item
+
        def process_items()
 
          # Get the druid list
@@ -52,13 +110,16 @@ module SdrIngest
          #puts druids_already_transferred
          # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-        # +++++++++++++++++++++++
+         # +++++++++++++++++++++++
          # druids_already_transferred is the big list of all objects that are waiting for sdr-ingest-deposit to be completed.
          # From this list filter out objects that have already been registered.
          # The last sdr robot complete-deposit sets sdr-ingest-deposit's status to "complete"
          # +++++++++++++++++++++++
+	 druids_already_registered = Array.new
          druids_already_registered_xml = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "register-sdr", "complete-deposit" )
-         druids_already_registered = DorService.get_druids_from_object_list(druids_already_registered_xml)
+	 if (druids_already_registered_xml != nil)
+            druids_already_registered = DorService.get_druids_from_object_list(druids_already_registered_xml)
+	 end
 
 
          # ^^^^^^^^^^^^^ debugging ^^^^^^^^^^^^^
@@ -107,61 +168,6 @@ module SdrIngest
          print_stats
 
        end
-
-       # Output the batch's timings and other statistics to STDOUT for capture in a log
-       def print_stats
-         @end_time = Time.new
-         @elapsed_time = @end_time - @start_time
-         puts "\n"
-         puts "**********************************************"
-         puts "Total time: " + @elapsed_time.to_s + "\n"
-         puts "Completed objects: " + @success_count.to_s + "\n"
-         puts "Errors: " + @error_count.to_s + "\n"
-         puts "**********************************************"
-       end
-
-
-       # - Creates a *Sedora* object
-       # - Initializes the +Deposit+ workflow
-       def process_druid(druid)
-
-          begin
-            Fedora::Repository.register(SEDORA_URI)
-          rescue Errno::ECONNREFUSED => e
-            raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"
-            return nil
-          end
-          puts "DONE : Sedora registration"
-
-
-          #puts "druid in sedora will be" + druid
-          begin
-            obj = ActiveFedora::Base.new(:pid => druid)
-            #puts "save new object in sedora"
-            obj.save
-          rescue Exception => e
-            #raise "error in saving"
-            puts "ERROR : Object cannot be saved in Sedora"
-            return nil
-          end
-
-          puts "DONE : Create new object in Sedora"
-
-          # Initialize workflow
-          workflow_xml = File.open(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngest", 'sdrIngestWorkflow.xml'), 'rb') { |f| f.read }
-          Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml)
-
-          puts "DONE : Create new workflow for #{druid}"
-
-          # Dont do this. Creating a new workflow with "completed" status for register-sdr is enough
-          # update register-sdr status to "completed" in sdrIngestWF
-          #result = Dor::WorkflowService.update_workflow_status("sdr", druid, "sdrIngestWF", "register-sdr", "completed")
-          #raise "Update workflow \"register-sdr\" failed." unless result
-
-
-          return true
-
-        end  # end process_item
 
     end # end of class
 end # end of module
