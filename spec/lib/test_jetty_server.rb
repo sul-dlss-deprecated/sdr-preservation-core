@@ -66,30 +66,30 @@ class TestJettyServer
   def stop
     platform_specific_stop
   end
-  
-  if RUBY_PLATFORM =~ /mswin32/
-    require 'win32/process'
-
-    # start the solr server
-    def platform_specific_start
-      Dir.chdir(@jetty_home) do
-        @pid = Process.create(
-              :app_name         => jetty_command,
-              :creation_flags   => Process::DETACHED_PROCESS,
-              :process_inherit  => false,
-              :thread_inherit   => true,
-              :cwd              => "#{@jetty_home}"
-           ).process_id
-      end
-    end
-
-    # stop a running solr server
-    def platform_specific_stop
-      Process.kill(1, @pid)
-      Process.wait
-    end
-  else # Not Windows
-    
+   #  
+   # if RUBY_PLATFORM =~ /mswin32/
+   #   require 'win32/process'
+   # 
+   #   # start the solr server
+   #   def platform_specific_start
+   #     Dir.chdir(@jetty_home) do
+   #       @pid = Process.create(
+   #             :app_name         => jetty_command,
+   #             :creation_flags   => Process::DETACHED_PROCESS,
+   #             :process_inherit  => false,
+   #             :thread_inherit   => true,
+   #             :cwd              => "#{@jetty_home}"
+   #          ).process_id
+   #     end
+   #   end
+   # 
+   #   # stop a running solr server
+   #   def platform_specific_stop
+   #     Process.kill(1, @pid)
+   #     Process.wait
+   #   end
+   # else # Not Windows
+   #   
     def jruby_raise_error?
       raise 'JRuby requires that you start solr manually, then run "rake spec" or "rake features"' if defined?(JRUBY_VERSION)
     end
@@ -114,7 +114,7 @@ class TestJettyServer
       `for i in \`ps -o pid,ppid,command -ax | grep jetty | awk '{print $1}'\`; do kill -9 $i; done`
       Process.wait
     end
-  end
+  # end
 
 end
 # 
