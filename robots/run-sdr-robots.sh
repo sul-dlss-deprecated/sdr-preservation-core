@@ -1,6 +1,9 @@
 #!/bin/bash
 # run-sdr-robots.sh
-ROBOT_ENVIRONMENT=${1:-development}
+ROBOT_ENVIRONMENT=${1:-test}
+SDR2_OBJECTS=${2:-"/var/sdr2objects"}
+# ROBOT_DIRECTORY=${3:-sdrIngest}
+
 # Test if previous invocation of a script is still active
 function robot_running() {
     robot=$1
@@ -12,7 +15,8 @@ function workspace_free() {
     # On Linux print $3 to get available space
     # On Mac print $4 to get available space
 
-    echo `df -k ${SDR2_HOME}/sdr2/sdr2_example_objects  | tail -1 | awk '{ print $3 }'`
+    echo `df -k ${SDR2_OBJECTS} | tail -1 | awk '{ print $3 }'`
+    #echo `df -k ${SDR2_HOME}/sdr2/sdr2_example_objects  | tail -1 | awk '{ print $3 }'`
 }
 
 
@@ -20,21 +24,22 @@ function workspace_free() {
 function run_all_robots() {
     (cd ${SDR2_HOME}/sdr2/robots/sdrIngest ;
 	echo cwd=`pwd`
-    robot="register_sdr"
-    if [ `robot_running $robot` -eq 0 ]; then
-        echo "running $robot"
-        echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot &
-        sleep 5
-    else
-        echo "$robot already running"
-        ps -ef | grep $robot
-    fi
-    echo ""
+    #robot="register_sdr"
+    #if [ `robot_running $robot` -eq 0 ]; then
+    #    echo "running $robot"
+    #    echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot 
+    #    sleep 5
+    #else
+    #    echo "$robot already running"
+    #    ps -ef | grep $robot
+    #fi
+    #echo ""
 
     robot="transfer_object"
     GB100=100000000
+    GB10=10000000
     if [ `robot_running $robot` -eq 0 ]; then
-        if [ `workspace_free` -gt  ${GB100} ]; then
+        if [ `workspace_free` -gt  ${GB10} ]; then
             echo "running $robot"
             echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot &
              sleep 5
@@ -99,20 +104,21 @@ function echo_execute() {
   echo "*************************  Executing: $@  "
   echo "AT : `date`"
   # Uncomment on Mac
-  $@
+  #$@
   # Comment this on Mac - time -f not supported
   # Supported on Linux
-  #/usr/bin/time -f 'Time elapsed = %E' $@
+  /usr/bin/time -f 'Time elapsed = %E' $@
   result=$?
   echo "Completed at: `date`"
   return $result
 }
 
-# run script every 30 minutes
+# run script every 3 minutes
 while [ 0 ]
 do
 timestamp=`date +%Y%m%d_%H%M%S`
 run_all_robots 
-#| mail -s "run-sdr-robots $timestamp" alpana@stanford.edu
-sleep 1800
+#mail -s "run-sdr-robots $timestamp" alpana@stanford.edu
+echo "RELAUNCH ROBOTS after 3 minutes ..."
+sleep 180
 done
