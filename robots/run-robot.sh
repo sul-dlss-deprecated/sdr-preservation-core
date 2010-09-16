@@ -1,5 +1,5 @@
 #!/bin/sh
-ROBOT_ENVIRONMENT=${1:-development}
+ROBOT_ENVIRONMENT=${1:-test}
 export ROBOT_ENVIRONMENT
 ROBOT=$2
 
