@@ -116,7 +116,8 @@ module SdrIngest
          # The last sdr robot complete-deposit sets sdr-ingest-deposit's status to "complete"
          # +++++++++++++++++++++++
 	 druids_already_registered = Array.new
-         druids_already_registered_xml = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "register-sdr", "complete-deposit" )
+         # druids_already_registered_xml = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "register-sdr", "complete-deposit" )
+         druids_already_registered_xml = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "register-sdr", "" )
 	 if (druids_already_registered_xml != nil)
             druids_already_registered = DorService.get_druids_from_object_list(druids_already_registered_xml)
 	 end
