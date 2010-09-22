@@ -72,7 +72,7 @@ describe SdrIngest::TransferObject do
       FileUtilities.should_receive(:transfer_object).never
 
       # actually call the function we are testing
-      lambda {transfer_robot.process_item(mock_workitem)}.should raise_error(/Object already exists/)
+      lambda {transfer_robot.process_item(mock_workitem)}.should_not raise_error(/Object already exists/)
       
     end
         

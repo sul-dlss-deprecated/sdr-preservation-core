@@ -22,9 +22,9 @@ describe SdrIngest::CompleteDeposit do
     # Make sure we're starting with a blank object
     begin
       @obj = ActiveFedora::Base.load_instance(@mock_workitem.druid)
-      @obj.delete
+      @obj.delete unless obj.nil?
     rescue
-      $stderr.print $!
+      # $stderr.print $!
     end
     
     begin
@@ -73,9 +73,9 @@ describe SdrIngest::CompleteDeposit do
     # Make sure we're starting with a blank object
     begin
       obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
-      obj.delete
+      obj.delete unless obj.nil?
     rescue
-      $stderr.print $!
+      # $stderr.print $!
     end
 
   end

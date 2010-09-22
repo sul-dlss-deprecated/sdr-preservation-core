@@ -11,10 +11,10 @@ describe SdrIngest::ValidateBag do
       @path = File.join(Dir.tmpdir, "lkdjflksdjda")
       @data = File.join(@path, DATA_DIR)
       @bagit = File.join(@path, BAGIT_TXT)
-      @package = File.join(@path, PACKAGE_INFO_TXT)
+      @bag = File.join(@path, BAG_INFO_TXT)
       FileUtils.mkdir_p(@data)
       FileUtils.touch(@bagit)
-      FileUtils.touch(@package)
+      FileUtils.touch(@bag)
     end
 
     after(:each) do
@@ -73,22 +73,23 @@ describe SdrIngest::ValidateBag do
       robot.bag_exists?(@path).should == false
     end
 
-    it "should return false when package_info_txt_file does not exist" do
-      FileUtils.rm_rf(@package)
+    it "should return false when bag_info_txt_file does not exist" do
+      FileUtils.rm_rf(@bag)
 
       robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
       robot.bag_exists?(@path).should == false
     end
 
-    it "should return false when package_info_txt_file is not a file" do
-      FileUtils.rm_rf(@package)
-      FileUtils.mkdir(@package)
+    it "should return false when bag_info_txt_file is not a file" do
+      FileUtils.rm_rf(@bag)
+      FileUtils.mkdir(@bag)
 
       robot = SdrIngest::ValidateBag.new("sdrIngest", "validate-bag")
       robot.bag_exists?(@path).should == false
     end
 
     it "should return true when it is a real bag" do
+      pending("updating bagit gem to support v0.96")
       path = File.join(Dir.tmpdir, "lkdjflksdjfalddfsdfa")
       BagIt::Bag.new(path)
 

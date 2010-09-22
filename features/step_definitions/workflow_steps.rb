@@ -91,10 +91,10 @@ When /^I run the robot "([^"]*)" for the "([^"]*)" step of the "([^"]*)" workflo
   puts "running robot #{robot}"
   dm_robot = ""
   case robot
-  when "GoogleScannedBook::RegisterSdr"
-    require 'googleScannedBook/register_sdr'
-    dm_robot = GoogleScannedBook::RegisterSdr.new(workflow, step)
-    dm_robot.start
+  when "SdrIngest::RegisterSdr"
+    require 'sdrIngest/register_sdr'
+    dm_robot = SdrIngest::RegisterSdr.new()
+    dm_robot.process_items()
   when "SdrIngest::TransferObject"
     require 'sdrIngest/transfer_object'
     dm_robot = SdrIngest::TransferObject.new(workflow, step)
@@ -112,9 +112,9 @@ When /^I run the robot "([^"]*)" for the "([^"]*)" step of the "([^"]*)" workflo
     dm_robot = SdrIngest::PopulateMetadata.new(workflow, step)
     dm_robot.start
   when "SdrIngest::VerifyAgreement"
-    # require 'sdrIngest/verify_agreement'
-    # dm_robot = SdrIngest::VerifyAgreement.new(workflow, step)
-    # dm_robot.start
+     require 'sdrIngest/verify_agreement'
+     dm_robot = SdrIngest::VerifyAgreement.new(workflow, step)
+     dm_robot.start
   when "SdrIngest::CompleteDeposit"
     require 'sdrIngest/complete_deposit'
     dm_robot = SdrIngest::CompleteDeposit.new(workflow, step)

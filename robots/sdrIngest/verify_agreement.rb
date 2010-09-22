@@ -29,13 +29,15 @@ module SdrIngest
     # Finds the object's agreement object in DOR
     def process_druid(druid)
 
-      puts "Druid being processed is " + druid 
+      puts "Druid being processed is #{druid}"  
+      #puts "Druid being processed is " + druid 
 
       # get the agreement id for this object
       @agreement_id ||= get_agreement_id(druid)
+      #puts "Agreement id is #{@agreement_id}"
 
       # check if it is in sedora
-      puts "SEDORA_URI is " + SEDORA_URI
+      #puts "SEDORA_URI is " + SEDORA_URI
       begin
         LyberCore::Connection.get("http://fedoraAdmin:fedoraAdmin@sdr-fedora-dev.stanford.edu:80/fedora/objects/" + "#{@agreement_id}", {})
       #LyberCore::Connection.get(SEDORA_URI + "/objects/" + agreementId, {})
@@ -50,7 +52,8 @@ module SdrIngest
     # Given a druid, get its IDENTITY metadata datastream from Sedora and 
     # extract the agreement_id
     def get_agreement_id(druid)
-
+      
+      #puts "In get_agreement_id "
       # Declare resp outside of the http.start loop so it will be available after the loop ends
       resp = ""
 
