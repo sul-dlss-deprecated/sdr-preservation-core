@@ -5,6 +5,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 require 'dor_service'
 require 'lyber_core'
 require 'active-fedora'
+require 'logger'
 
 module SdrIngest
 
@@ -24,10 +25,18 @@ module SdrIngest
        attr_accessor :success_count
        attr_accessor :error_count
 
+
        def initialize()
+
+	       @logg = Logger.new("registersdr.log")
+	       @logg.level = Logger::DEBUG
+         #@logg = Logger.new(STDOUT)
+         @logg.datetime_format = "%Y-%m-%d %H:%M:%S"
 
          # Start the timer
          @start_time = Time.new
+
+	       @logg.debug("Start time is :   #{@start_time}")
 
          # Initialize the success and error counts
          @success_count = 0
@@ -47,30 +56,33 @@ module SdrIngest
        end
 
 
-
-
-
        # - Creates a *Sedora* object
        # - Initializes the +Deposit+ workflow
        def process_druid(druid)
 
           begin
+	          @logg.debug("About to register #{druid} in SEDORA at #{SEDORA_URI}")
             Fedora::Repository.register(SEDORA_URI)
           rescue Errno::ECONNREFUSED => e
+            @logg.error("Cannot connect to Fedora at url #{SEDORA_URI} : #{e}")
             raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"
             return nil
           end
+          @logg.info("DONE : Sedora registration")
           puts "DONE : Sedora registration"
 
-
-          #puts "druid in sedora will be" + druid
+          @logg.debug("Druid in Sedora will be : #{druid}")
+          # puts "druid in sedora will be" + druid
+        
           begin
             obj = ActiveFedora::Base.new(:pid => druid)
-            #puts "save new object in sedora"
+            # puts "Save #{druid} in Sedora"
+            @logg.debug("Save #{druid} in Sedora")
             obj.save
           rescue Exception => e
             #raise "error in saving"
             puts "ERROR : Object cannot be saved in Sedora"
+            @logg.error("Object cannot be saved in Sedora :  #{e}")
             return nil
           end
 
@@ -79,6 +91,8 @@ module SdrIngest
           # Initialize workflow
           workflow_xml = File.open(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngestWF", 'sdrIngestWorkflow.xml'), 'rb') { |f| f.read }
           Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml)
+
+	        # Add error message here
 
           puts "DONE : Create new workflow for #{druid}"
 
@@ -98,6 +112,8 @@ module SdrIngest
          # First, get_objects_for_workstep(repository, workflow, completed, waiting)
 
          puts "\nGetting list of druids to process ... "
+         @logg.info("Getting list of druids to process ... ")
+
          #puts "getting list of objects that have been transferred"
          druids_already_transferred_list_xml = DorService.get_objects_for_workstep("dor", "googleScannedBookWF", "sdr-ingest-transfer", "sdr-ingest-deposit")
          # Then get the list of druids from the xml returned in the earlier step
@@ -106,6 +122,7 @@ module SdrIngest
          # ^^^^^^^^^^^^^ debugging ^^^^^^^^^^^^^
          #puts "\n \n DRUIDS already transferred length =   "
          #puts druids_already_transferred.length()
+         @logg.debug("Number of objects already transferred :  #{druids_already_transferred.length()}")
          #puts "\n ========  DRUIDS already transferred =========="
          #puts druids_already_transferred
          # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -115,17 +132,18 @@ module SdrIngest
          # From this list filter out objects that have already been registered.
          # The last sdr robot complete-deposit sets sdr-ingest-deposit's status to "complete"
          # +++++++++++++++++++++++
-	 druids_already_registered = Array.new
+	       druids_already_registered = Array.new
          # druids_already_registered_xml = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "register-sdr", "complete-deposit" )
          druids_already_registered_xml = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "register-sdr", "" )
-	 if (druids_already_registered_xml != nil)
+	       if (druids_already_registered_xml != nil)
             druids_already_registered = DorService.get_druids_from_object_list(druids_already_registered_xml)
-	 end
+	        end
 
 
          # ^^^^^^^^^^^^^ debugging ^^^^^^^^^^^^^
          #puts "\n \n DRUIDS already registered  length =   "
          #puts druids_already_registered.length()
+	       @logg.debug("Number of objects already registered :  #{druids_already_registered.length()}")
          #puts " \n \n ========  DRUIDS already registered  =========="
          #puts druids_already_registered
          # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -167,7 +185,7 @@ module SdrIngest
          end  # end while
          # Print success, error count
          print_stats
-
+	       @logg.close
        end
 
     end # end of class
@@ -188,4 +206,3 @@ if __FILE__ == $0
   end
   puts "Register SDR done\n"
 end
-
