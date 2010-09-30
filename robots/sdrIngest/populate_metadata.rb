@@ -15,7 +15,7 @@ require 'lyber_core'
 module SdrIngest
   
   # +PopulateMetadata+ finds a stub object in Sedora and populates its datastreams with the contents from a bagit object.
-  class PopulateMetadata < LyberCore::Robot
+  class PopulateMetadata < LyberCore::Robots::Robot
     
     # the fedora object to operate on
     attr_reader :obj
@@ -120,10 +120,10 @@ if __FILE__ == $0
   # If this robot is invoked with a specific druid, it will populate the metadata for that druid only
   if(ARGV[0])
     puts "Updating metadata for #{ARGV[0]}"
-    dm_robot = SdrIngest::PopulateMetadata.new("sdrIngest","populate-metadata")
+    dm_robot = SdrIngest::PopulateMetadata.new("sdrIngestWF","populate-metadata")
     dm_robot.process_druid(ARGV[0])
   else
-    dm_robot = SdrIngest::PopulateMetadata.new('sdrIngest', 'populate-metadata')
+    dm_robot = SdrIngest::PopulateMetadata.new('sdrIngestWF', 'populate-metadata')
     # puts "workflow = #{dm_robot.workflow}"
     dm_robot.start
   end

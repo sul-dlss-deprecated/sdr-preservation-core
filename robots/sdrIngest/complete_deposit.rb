@@ -11,7 +11,7 @@ require 'nokogiri'
 module SdrIngest
   
   # +CompleteDeposit+ blah blah blah what does it do?   
-  class CompleteDeposit < LyberCore::Robot
+  class CompleteDeposit < LyberCore::Robots::Robot
     attr_reader :obj, :druid
     attr_writer :bag_directory
     
@@ -155,6 +155,6 @@ end
 # This is the equivalent of a java main method
 if __FILE__ == $0
   dm_robot = SdrIngest::CompleteDeposit.new(
-          'sdrIngest', 'complete-deposit')
+          'sdrIngestWF', 'complete-deposit')
   dm_robot.start
 end
