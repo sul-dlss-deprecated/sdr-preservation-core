@@ -7,25 +7,36 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
 require 'lyber_core'
 require 'nokogiri'
+require 'logger'
 
 module SdrIngest
   
-  # +CompleteDeposit+ blah blah blah what does it do?   
+  # CompleteDeposit sends a callback message to DOR notifying the DOR
+  # workflow that the sdrIngest workflow is complete
   class CompleteDeposit < LyberCore::Robots::Robot
-    attr_reader :obj, :druid
+    attr_reader :obj, :druid, :logg
     attr_writer :bag_directory
     
     # Workflow XML as read from the object 
-     attr_reader :obj_wf 
+    attr_reader :obj_wf 
 
-     # Instance variable containing sdr provenance generated from the workflow datastream
-     attr_reader :sdr_prov 
+    # Instance variable containing sdr provenance generated from the workflow datastream
+    attr_reader :sdr_prov 
 
-     # Existing provenance datastream, as read from the object
-     attr_reader :obj_prov
+    # Existing provenance datastream, as read from the object
+    attr_reader :obj_prov
        
     def initialize(string1,string2)
       super(string1,string2)
+      
+      # Initialize logger. 
+      @logg = Logger.new("complete_deposit.log")
+      @logg.level = Logger::DEBUG
+      #@logg = Logger.new(STDOUT)
+      @logg.datetime_format = "%Y-%m-%d %H:%M:%S"
+      @start_time = Time.new
+      @logg.debug("Start time is :   #{@start_time}")
+            
       # by default, get the bags from the SDR_DEPOSIT_DIR
       # this can be explicitly changed if necessary
       @bag_directory = SDR_DEPOSIT_DIR
@@ -34,6 +45,7 @@ module SdrIngest
     def process_item(work_item)
       @druid = work_item.druid
       raise "Cannot load Sedora object." unless get_fedora_object
+      
 
       # Update provenance
       raise "Failed to update provenance to include Deposit completion." unless update_provenance
@@ -139,8 +151,13 @@ module SdrIngest
     def get_fedora_object
       begin
         Fedora::Repository.register(SEDORA_URI)
+        @logg.debug("Registering #{SEDORA_URI}")
+        
         @obj = ActiveFedora::Base.load_instance(@druid)
+        @logg.debug("Loaded druid #{@druid} into object #{@obj}")
+        
       rescue Errno::ECONNREFUSED => e
+        @logg.fatal("Can't connect to Fedora at url #{SEDORA_URI} : #{e}")
         raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"   
         return nil     
       rescue
