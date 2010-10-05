@@ -1,14 +1,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'rubygems'
 require 'lyber_core'
-require 'googleScannedBook/register_sdr'
+require 'sdrIngest/register_sdr'
 
 describe "connect to sedora" do
 
   context "Registering SDR Object" do
   it "should be able to connect to sedora" do
 
-    @robot = GoogleScannedBook::RegisterSdr.new('googleScannedBook', 'register-sdr')
+    #@robot = GoogleScannedBook::RegisterSdr.new('googleScannedBook', 'register-sdr')
+    @robot = SdrIngest::RegisterSdr.new()
     mock_workitem = mock("register_sdr_workitem")
     druid = "sdrtwo:AlpanaTests" + "#{Process.pid}"
     print druid
@@ -28,8 +29,8 @@ describe "connect to sedora" do
 
   context "basic behaviour" do
    it "can be created" do
-      x = GoogleScannedBook::RegisterSdr.new('googleScannedBook', 'register-sdr')
-      x.should be_instance_of(GoogleScannedBook::RegisterSdr)
+      x = SdrIngest::RegisterSdr.new()
+      x.should be_instance_of(SdrIngest::RegisterSdr)
     end
   end
 

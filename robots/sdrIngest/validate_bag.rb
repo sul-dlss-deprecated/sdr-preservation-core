@@ -7,19 +7,19 @@ require 'bagit'
 
 DATA_DIR = "data"
 BAGIT_TXT = "bagit.txt"
-PACKAGE_INFO_TXT = "package-info.txt" 
+BAG_INFO_TXT = "bag-info.txt" 
 
 module SdrIngest
 
   # Validates the Bag that has been transferring in SDR's staging area
-  class ValidateBag < LyberCore::Robot
+  class ValidateBag < LyberCore::Robots::Robot
 
     # Ensure the bag exists by checking for the presence of bagit.txt and 
-    # package-info.txt
+    # bag-info.txt
     def bag_exists?(base_path)
     	data_dir = File.join(base_path, DATA_DIR)
     	bagit_txt_file = File.join(base_path, BAGIT_TXT)
-    	package_info_txt_file = File.join(base_path, PACKAGE_INFO_TXT)
+    	bag_info_txt_file = File.join(base_path, BAG_INFO_TXT)
 
       # base_path must exist and be a directory
       unless File.directory?(base_path)
@@ -39,9 +39,9 @@ module SdrIngest
         return false 
       end
       
-      # package_info_txt_file must exist and be a file
-      unless File.file?(package_info_txt_file)
-        puts "#{package_info_txt_file} does not exist or is not a file"
+      # bag_info_txt_file must exist and be a file
+      unless File.file?(bag_info_txt_file)
+        puts "#{bag_info_txt_file} does not exist or is not a file"
         return false 
       end
       
@@ -82,7 +82,7 @@ end # end of module
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::ValidateBag.new('sdrIngest', 'validate-bag')
+  dm_robot = SdrIngest::ValidateBag.new('sdrIngestWF', 'validate-bag')
   # If this robot is invoked with a specific druid, it will run for that druid only
   if(ARGV[0])
     puts "Validating bagit object for #{ARGV[0]}"

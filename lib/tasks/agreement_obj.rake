@@ -79,6 +79,30 @@ namespace :objects do
   </workflow>
   EOXML
   
+  desc "Import the google books agreement object"
+  task :google_agreement_obj do
+    unless ENV['ROBOT_ENVIRONMENT']
+      puts "You haven't set a value for ROBOT_ENVIRONMENT so I don't know where to build the object."
+      puts "Invoke this script like this: \n ROBOT_ENVIRONMENT=test rake objects:build_agreement_obj"
+    else
+      puts "Building agreement obj in #{ENV['ROBOT_ENVIRONMENT']}"
+      environment = ENV['ROBOT_ENVIRONMENT']
+      require File.expand_path(File.dirname(__FILE__) + "/../../config/environments/#{environment}")
+      puts "Connecting to #{SEDORA_URI}..."
+      Fedora::Repository.register(SEDORA_URI)
+      ActiveFedora::SolrService.register(SOLR_URL)
+      filename = File.expand_path(File.dirname(__FILE__) + '/google_books_agreement.xml')
+      puts "Importing '#{filename}' to #{Fedora::Repository.instance.fedora_url}"
+      file = File.new(filename, "r")
+      result = foxml = Fedora::Repository.instance.ingest(file.read)
+      if result
+        puts "The agreement has been ingested as #{result}"
+      else
+        puts "Failed to ingest the google books agreement"
+      end
+    end
+  end
+  
 
   desc "Build the bootstrap agreement object in the specified Fedora repository"
   task :build_agreement_obj do

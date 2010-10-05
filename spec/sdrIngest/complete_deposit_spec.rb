@@ -8,7 +8,7 @@ require 'sdrIngest/complete_deposit'
 describe SdrIngest::CompleteDeposit do
   
   def setup
-    @complete_robot = SdrIngest::CompleteDeposit.new("sdrIngest","complete-deposit")    
+    @complete_robot = SdrIngest::CompleteDeposit.new("sdrIngestWF","complete-deposit")    
     @complete_robot.bag_directory = SDR2_EXAMPLE_OBJECTS
 
     @objectID = "druid:jc837rq9922"
@@ -22,9 +22,9 @@ describe SdrIngest::CompleteDeposit do
     # Make sure we're starting with a blank object
     begin
       @obj = ActiveFedora::Base.load_instance(@mock_workitem.druid)
-      @obj.delete
+      @obj.delete unless obj.nil?
     rescue
-      $stderr.print $!
+      # $stderr.print $!
     end
     
     begin
@@ -73,17 +73,34 @@ describe SdrIngest::CompleteDeposit do
     # Make sure we're starting with a blank object
     begin
       obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
-      obj.delete
+      obj.delete unless obj.nil?
     rescue
-      $stderr.print $!
+      # $stderr.print $!
     end
 
   end
   
   context "basic behavior" do
     it "should be able to process a work item" do
-      complete_robot = SdrIngest::CompleteDeposit.new("sdrIngest","complete-deposit")          
+      complete_robot = SdrIngest::CompleteDeposit.new("sdrIngestWF","complete-deposit")          
       complete_robot.should respond_to(:process_item)
+    end
+    
+    context "Logging" do
+      require 'logger'
+      
+      it "should have a log file" do
+        complete_robot = SdrIngest::CompleteDeposit.new("sdrIngestWF","complete-deposit")          
+        complete_robot.should respond_to(:logg)
+      end
+      
+      it "should have a settable log level" do
+        complete_robot = SdrIngest::CompleteDeposit.new("sdrIngestWF","complete-deposit")          
+        complete_robot.logg.level.should eql(Logger::DEBUG)
+        complete_robot.logg.level = Logger::ERROR
+        complete_robot.logg.level.should eql(Logger::ERROR)
+      end
+      
     end
   end
     
@@ -234,4 +251,7 @@ describe SdrIngest::CompleteDeposit do
       lambda {@complete_robot.process_item(@mock_workitem)}.should raise_error(/Update workflow "complete-deposit" failed/)
     end
   end
+
+
+
 end

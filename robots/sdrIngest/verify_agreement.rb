@@ -14,7 +14,7 @@ module SdrIngest
 
 
   # Verifies preservation agreement for objects
-  class VerifyAgreement < LyberCore::Robot
+  class VerifyAgreement < LyberCore::Robots::Robot
 
     # the agreement_id of the current workitem
     attr_reader :agreement_id 
@@ -29,32 +29,37 @@ module SdrIngest
     # Finds the object's agreement object in DOR
     def process_druid(druid)
 
-      puts "Druid being processed is " + druid 
+      puts "Druid being processed is #{druid}"  
+      #puts "Druid being processed is " + druid 
 
       # get the agreement id for this object
       @agreement_id ||= get_agreement_id(druid)
+      #puts "Agreement id is #{@agreement_id}"
 
       # check if it is in sedora
-      puts "SEDORA_URI is " + SEDORA_URI
+      #puts "SEDORA_URI is " + SEDORA_URI
       begin
-        LyberCore::Connection.get("http://fedoraAdmin:fedoraAdmin@sdr-fedora-dev.stanford.edu:80/fedora/objects/" + "#{@agreement_id}", {})
-      #LyberCore::Connection.get(SEDORA_URI + "/objects/" + agreementId, {})
+        #LyberCore::Connection.get("http://fedoraAdmin:fedoraAdmin@sedora-test.stanford.edu/fedora/objects/" + "#{@agreement_id}", {})
+        LyberCore::Connection.get("http://sedora-test.stanford.edu/fedora/objects/" + "#{@agreement_id}", {})
+        puts "Agreement is available in Sedora at http://sedora-test.stanford.edu/fedora/objects/" + "#{@agreement_id}"
+        #LyberCore::Connection.get(SEDORA_URI + "/objects/" +"#{@agreement_id}", {})
       rescue Net::HTTPServerException
         # If agreement object is not in Sedora then throw an exception
-        raise "Couldn't find agreement object #{@agreement_id} in sedora"
+        raise "Couldn't find agreement object #{@agreement_id} in Sedora"
       rescue
-        raise "Something went wrong."
+        raise "Connecting to SEDORA in verify-agreement fails"
       end
     end
 
     # Given a druid, get its IDENTITY metadata datastream from Sedora and 
     # extract the agreement_id
     def get_agreement_id(druid)
-
+      
+      #puts "In get_agreement_id "
       # Declare resp outside of the http.start loop so it will be available after the loop ends
       resp = ""
 
-      http = Net::HTTP.new("sdr-fedora-dev.stanford.edu", 443)
+      http = Net::HTTP.new("sedora-test.stanford.edu", 443)
       http.use_ssl = true
       http.start do |http|
          req = Net::HTTP::Get.new("/fedora/objects/#{druid}/datastreams/IDENTITY/content", {"User-Agent" =>
@@ -64,7 +69,7 @@ module SdrIngest
          resp = response.body
       end
       doc = Nokogiri::XML(resp)
-      puts doc.xpath("//agreementId/text()") 
+      #puts doc.xpath("//agreementId/text()") 
       doc.xpath("//agreementId/text()")
     end
   end
@@ -72,7 +77,7 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::VerifyAgreement.new('sdrIngest', 'verify-agreement')
+  dm_robot = SdrIngest::VerifyAgreement.new('sdrIngestWF', 'verify-agreement')
   # If this robot is invoked with a specific druid, it will run for that druid only
   if(ARGV[0])
     puts "Verifying agreement for #{ARGV[0]}"

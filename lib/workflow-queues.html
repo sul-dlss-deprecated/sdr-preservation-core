@@ -1,0 +1,181 @@
+<html> 
+  <head> 
+  <!-- link rel="stylesheet" type="text/css" href="http://code.google.com/css/dev_docs.css" --> 
+  <script type="text/javascript">
+    function createRequestObject() {  
+      // find the correct xmlHTTP, works with IE, FF and Opera
+      var xmlhttp;
+      try {
+        xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+      } catch(e) {
+          try {
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+          } catch(e) {
+            xmlhttp = null;
+          }
+      }
+      if (!xmlhttp && typeof XMLHttpRequest!="undefined") {
+        xmlhttp = new XMLHttpRequest();
+      }
+      return xmlhttp;
+    }
+
+    function getElem(id) {
+      if (document.getElementById) {
+        return document.getElementById(id);
+      } else if (document.all) {
+        return document.all[id];
+      }
+    }
+
+    function getObjCnt(query, objId) {
+      var http = createRequestObject();
+      //queryFix = query.replace(/&/g,'%26');
+      http.open("GET", "../cgi-bin/sdrWorkflowScanDev.php?" + query, true);
+      http.onreadystatechange = function() {
+        if ((http.readyState == 4) && (http.status == 200)) {
+          var response = http.responseXML.documentElement;
+          if (result = response.getElementsByTagName('result').item(0).firstChild.nodeValue) {
+	      var obj = getElem(objId);
+	      obj.parentNode.innerHTML += " (" + result + ")";
+	      result = null;
+          }
+        }
+      }
+      http.send(null);
+    }
+
+ </script>
+  <style type="text/css"> 
+     .thumbnail { float: left; width: 65em; border: 1px solid #999; 
+               margin: 1em 1em 1em 1em; padding: 2px; text-align: left;} 
+     .thumbnail img { border: 1px solid #aaa; } 
+     .thumbnail p { margin:0em 2em 0em 0em; } 
+     .clearboth { clear: both; } 
+ 
+ body {
+	background-image:url(http://library.stanford.edu/images/__o__/sulair_logo.gif);
+	background-repeat:no-repeat;
+	font-family:Arial,Veranda,sans-serif;
+	font-size:90%;
+	margin:0;
+	padding:107px 0 0 28px;
+}
+table {
+	border-collapse:collapse;
+	border-spacing:0;
+	width: 60em;
+}
+th {
+	font-weight: normal !important;
+	font-size:0.8em;
+	padding:5px;
+	color: #ffffff;
+	background-color: #918873 !important;
+	border-top:1px solid #C2B7A1;
+	border-left:1px solid #EDE8DD;
+	border-right:1px solid #EDE8DD;
+	border-bottom:1px solid #EDE8DD;
+}
+td  {
+	border-left:1px solid #EDE8DD;
+	border-right:1px solid #EDE8DD;
+	border-bottom:1px solid #C2B7A1;
+	font-size:0.8em;
+	padding:5px;
+}
+h2 {
+	color: #990000;
+	font-weight: normal;
+	}
+a {	
+	color: #2E4F81;
+}
+ 
+  </style> 
+
+  <title>Status of SDR workflow queues</title> 
+  </head> 
+  <body> 
+
+<! IMG SRC="images/red_header_bg.jpg" width=100% height=25>
+
+<h2><font color=#770000>Status of SDR workflow queues</font></h2> 
+      
+ <b>Workflow: sdrIngestWF : Deposit Phase</b>
+<p>
+<table border=1 cellspacing=0 cellpadding=3>
+<tr bgcolor=#990000>
+
+	<th colspan=2><font color=white face="Arial">Step</font></th>
+	<th><font color=white face="Arial">Current queue</font></th>
+	<th><font color=white face="Arial">Errors</font></th>
+	<th><font color=white face="Arial">Total completed</font></th>
+</tr>
+<tr>
+<td>1</td><td>Register new objects in SDR</td>
+<td>complicated !</td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&error=register-sdr" id="sdr_register_object_error">register-sdr</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&completed=register-sdr" id="sdr_register_object_total">register-sdr</a></td>
+</tr>
+<tr>
+<td>2</td><td>Transfer DOR bags to SDR workspace</td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&waiting=transfer-object&completed=register-sdr" id="sdr_transfer_object_cur">transfer-object</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&error=transfer-object" id="sdr_transfer_object_error">transfer-object</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&completed=transfer-object" id="sdr_transfer_object_total">transfer-object</a></td>
+</tr>
+<tr>
+<td>3</td><td>Validate transferred bags</td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&waiting=validate-bag&completed=transfer-object" id="sdr_validate_bag_cur">validate-bag</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&error=validate-bag" id="sdr_validate_bag_error">validate-bag</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&completed=validate-bag" id="sdr_validate_bag_total">validate-bag</a></td>
+</tr>
+<tr>
+<td>4</td><td>Populate Sedora with metadata from the transferred bags</td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&waiting=populate-metadata&completed=validate-bag" id="sdr_populate_metadata_cur">populate-metadata</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&error=populate-metadata" id="sdr_populate_metadata_error">populate-metadata</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&completed=populate-metadata" id="sdr_populate_metadata_total">populate-metadata</a></td>
+</tr>
+<tr>
+<td>5</td><td>Verify if Agreement for SDR objects exists in Sedora</td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&waiting=verify-agreement&completed=populate-metadata" id="sdr_verify_agreement_cur">verify-agreement</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&error=verify-agreement" id="sdr_verify_agreement_error">verify-agreement</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&completed=verify-agreement" id="sdr_verify_agreement_total">verify-agreement</a></td>
+</tr>
+<tr>
+<td>6</td><td>Mark Deposit phase as complete</td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&waiting=complete-deposit&completed=verify-agreement" id="sdr_complete_deposit_cur">complete-deposit</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&error=complete-deposit" id="sdr_complete_deposit_error">complete-deposit</a></td>
+<td><a href="https://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&completed=complete-deposit" id="sdr_complete_deposit_total">complete-deposit</a></td>
+</tr>
+</table>
+
+<script type="text/javascript">
+  getObjCnt("workflow=sdrIngestWF&error=register-sdr", "sdr_register_object_error");
+  getObjCnt("workflow=sdrIngestWF&completed=register-sdr", "sdr_register_object_total");
+  
+  getObjCnt("workflow=sdrIngestWF&waiting=transfer-object&completed=register-sdr", "sdr_transfer_object_cur");
+  getObjCnt("workflow=sdrIngestWF&error=transfer-object", "sdr_transfer_object_error");
+  getObjCnt("workflow=sdrIngestWF&completed=transfer-object", "sdr_transfer_object_total");
+  
+  getObjCnt("workflow=sdrIngestWF&waiting=validate-bag&completed=transfer-object", "sdr_validate_bag_cur");
+  getObjCnt("workflow=sdrIngestWF&error=validate-bag", "sdr_validate_bag_error");
+  getObjCnt("workflow=sdrIngestWF&completed=validate-bag", "sdr_validate_bag_total");
+  
+  getObjCnt("workflow=sdrIngestWF&waiting=populate-metadata&completed=validate-bag", "sdr_populate_metadata_cur");
+  getObjCnt("workflow=sdrIngestWF&error=populate-metadata", "sdr_populate_metadata_error");
+  getObjCnt("workflow=sdrIngestWF&completed=populate-metadata", "sdr_populate_metadata_total");
+  
+  getObjCnt("workflow=sdrIngestWF&waiting=verify-agreement&completed=populate-metadata", "sdr_verify_agreement_cur");
+  getObjCnt("workflow=sdrIngestWF&error=verify-agreement", "sdr_verify_agreement_error");
+  getObjCnt("workflow=sdrIngestWF&completed=verify-agreement", "sdr_verify_agreement_total");
+  
+  getObjCnt("workflow=sdrIngestWF&waiting=complete-deposit&completed=verify-agreement", "sdr_complete_deposit_cur");
+  getObjCnt("workflow=sdrIngestWF&error=complete-deposit", "sdr_complete_deposit_error");
+  getObjCnt("workflow=sdrIngestWF&completed=complete-deposit", "sdr_complete_deposit_total");
+  
+</script>
+
+</body> 
+</html>      
+

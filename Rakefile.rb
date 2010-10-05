@@ -15,7 +15,9 @@ task :default  => :test
 desc "Set up environment variables. Unless otherwise specified ROBOT_ENVIRONMENT defaults to local"
 task :environment do
    environment = ENV['ROBOT_ENVIRONMENT'] || "local"
+   RAILS_ENV = environment
    require File.expand_path(File.dirname(__FILE__) + "/config/environments/#{environment}")  
+   ActiveFedora::SolrService.register( SOLR_URL )
 end
 
 desc  "Run all of the rspec examples and generate the rdocs and rcov report"

@@ -17,7 +17,7 @@ Feature: Deposit an object into Sedora
  	
 	# ##################################################
 	# Robot 1: register-sdr
-	When I run the robot "GoogleScannedBook::RegisterSdr" for the "register-sdr" step of the "googleScannedBook" workflow
+	When I run the robot "SdrIngest::RegisterSdr" for the "register-sdr" step of the "sdrIngest" workflow
 	Then that object should exist in SEDORA
 	And it should have a SEDORA workflow datastream where "register-sdr" is "completed"
 	And it should have a SEDORA workflow datastream where "transfer-object" is "waiting"

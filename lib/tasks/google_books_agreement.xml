@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<foxml:digitalObject VERSION="1.1" PID="druid:zn292gq7284"
+xmlns:foxml="info:fedora/fedora-system:def/foxml#"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="info:fedora/fedora-system:def/foxml# http://www.fedora.info/definitions/1/0/foxml1-1.xsd">
+<foxml:objectProperties>
+<foxml:property NAME="info:fedora/fedora-system:def/model#state" VALUE="Active"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#label" VALUE="SDR Deposit agreement for Google Scanned Books"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#ownerId" VALUE="dor"/>
+<foxml:property NAME="info:fedora/fedora-system:def/model#createdDate" VALUE="2009-11-24T23:28:55.394Z"/>
+<foxml:property NAME="info:fedora/fedora-system:def/view#lastModifiedDate" VALUE="2010-07-12T22:38:51.846Z"/>
+</foxml:objectProperties>
+<foxml:datastream ID="AUDIT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="AUDIT.0" LABEL="Audit Trail for this object" CREATED="2009-11-24T23:28:55.394Z" MIMETYPE="text/xml" FORMAT_URI="info:fedora/fedora-system:format/xml.fedora.audit">
+<foxml:xmlContent>
+<audit:auditTrail xmlns:audit="info:fedora/fedora-system:def/audit#">
+<audit:record ID="AUDREC1">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>dor</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-04-08T21:50:07.288Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC2">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>dor</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-04-08T21:50:37.447Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC3">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>identityMetadata</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-04-08T21:51:51.235Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC4">
+<audit:process type="Fedora API-M"/>
+<audit:action>purgeDatastream</audit:action>
+<audit:componentID>dor</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-04-08T21:52:04.870Z</audit:date>
+<audit:justification>Purged datastream (ID=dor), versions ranging from the beginning of time to the end of time.  This resulted in the permanent removal of 1 datastream version(s) (2010-04-08T14:50:37.447Z) and all associated audit records.</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC5">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>identityMetadata</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-05-27T04:45:10.817Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC6">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>identityMetadata</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-08T16:36:09.772Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC7">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>descMetadata</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-08T16:37:19.279Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC8">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>descMetadata</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-08T16:37:57.399Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC9">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByValue</audit:action>
+<audit:componentID>descMetadata</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-08T16:57:40.999Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC10">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>contentMetadata</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-08T16:59:02.362Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC11">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>agreementWF</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-08T17:02:40.719Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC12">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByReference</audit:action>
+<audit:componentID>agreementWF</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-08T17:03:49.603Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC13">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByReference</audit:action>
+<audit:componentID>agreementWF</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-12T22:12:02.750Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC14">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByReference</audit:action>
+<audit:componentID>agreementWF</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-12T22:13:45.501Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC15">
+<audit:process type="Fedora API-M"/>
+<audit:action>modifyDatastreamByReference</audit:action>
+<audit:componentID>agreementWF</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-12T22:31:09.060Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+<audit:record ID="AUDREC16">
+<audit:process type="Fedora API-M"/>
+<audit:action>purgeDatastream</audit:action>
+<audit:componentID>agreementWF</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-12T22:38:48.118Z</audit:date>
+<audit:justification>Purged datastream (ID=agreementWF), versions ranging from the beginning of time to the end of time.  This resulted in the permanent removal of 1 datastream version(s) (2010-07-12T15:31:09.060Z) and all associated audit records.</audit:justification>
+</audit:record>
+<audit:record ID="AUDREC17">
+<audit:process type="Fedora API-M"/>
+<audit:action>addDatastream</audit:action>
+<audit:componentID>agreementWF</audit:componentID>
+<audit:responsibility>fedoraAdmin</audit:responsibility>
+<audit:date>2010-07-12T22:38:51.846Z</audit:date>
+<audit:justification></audit:justification>
+</audit:record>
+</audit:auditTrail>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="DC" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="DC1.0" LABEL="Dublin Core Record for this object" CREATED="2009-11-24T23:28:55.489Z" MIMETYPE="text/xml" FORMAT_URI="http://www.openarchives.org/OAI/2.0/oai_dc/" SIZE="689">
+<foxml:xmlContent>
+<oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd">
+  <dc:title>SDR Deposit agreement for Google Scanned Books</dc:title>
+  <dc:identifier>sulair:SDR_DepositAgreement_GoogleBooks</dc:identifier>
+  <dc:identifier>0a5690af-73ec-415e-aab7-6e2d3bd490a9</dc:identifier>
+  <dc:identifier>sulair:SDR_DepositAgreement_GoogleBooks</dc:identifier>
+  <dc:identifier>Agreement : GoogleBooks</dc:identifier>
+  <dc:identifier>druid:zn292gq7284</dc:identifier>
+</oai_dc:dc>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="RELS-EXT" STATE="A" CONTROL_GROUP="X" VERSIONABLE="true">
+<foxml:datastreamVersion ID="RELS-EXT.0" LABEL="RDF Statements about this object" CREATED="2009-11-24T23:28:55.489Z" MIMETYPE="application/rdf+xml" FORMAT_URI="info:fedora/fedora-system:FedoraRELSExt-1.0" SIZE="414">
+<foxml:xmlContent>
+<rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#">              <rdf:Description rdf:about="info:fedora/druid:zn292gq7284">                <fedora-model:hasModel rdf:resource="info:fedora/dor:agreement"></fedora-model:hasModel>              </rdf:Description>        </rdf:RDF>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="identityMetadata" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="identityMetadata.2" LABEL="Identity Metadata" CREATED="2010-07-08T16:36:09.772Z" MIMETYPE="text/xml" SIZE="598">
+<foxml:xmlContent>
+<identityMetadata>
+  <objectId>druid:zn292gq7284</objectId>
+  <objectType>agreement</objectType>
+  <objectAdminClass>Agreement</objectAdminClass>
+  <objectLabel>Agreement object for GoogleBooks</objectLabel>
+  <objectCreator>DOR</objectCreator>
+  <citationTitle>Agreement object for GoogleBooks</citationTitle>
+  <citationCreator>SDR staff</citationCreator>
+  <otherId name="uuid">0a5690af-73ec-415e-aab7-6e2d3bd490a9</otherId>
+  <sourceId source="sulair">SULAIR_agreement_agreement</sourceId>
+  <agreementId>druid:zn292gq7284</agreementId>
+  <tag>Agreements : Version 1</tag>
+</identityMetadata>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="descMetadata" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="descMetadata.2" LABEL="Descriptive Metadata" CREATED="2010-07-08T16:57:40.999Z" MIMETYPE="text/xml" SIZE="543">
+<foxml:xmlContent>
+<mods version="3.3">
+  <titleInfo>
+    <title>SDR Operating Agreement for Google Scanned Books</title>
+  </titleInfo>
+  <name type="corporate">
+    <namePart>Stanford University Libraries, Stanford Digital Repository</namePart>
+    <role>
+      <text>creator</text>
+    </role>
+  </name>
+  <typeOfResource>text</typeOfResource>
+  <genre>internal document</genre>
+  <originInfo>
+    <publisher>Stanford University Libraries</publisher>
+    <dateIssued>2010</dateIssued>
+  </originInfo>
+  <language authority="iso639-2b">eng</language>
+</mods>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="contentMetadata" STATE="A" CONTROL_GROUP="X" VERSIONABLE="false">
+<foxml:datastreamVersion ID="contentMetadata.0" LABEL="Content Metadata" CREATED="2010-07-08T16:59:02.362Z" MIMETYPE="text/xml" SIZE="964">
+<foxml:xmlContent>
+<contentMetadata objectId="druid:zn292gq7284" type="agreement">
+  <resource data="content" id="deposit_agreement" type="document">
+    <file deliver="no" format="TEXT" id="OpLvlAgrmt_GoogleBooks.docx" mimetype="application/msword" preserve="yes" shelve="yes" size="22912">
+      <location type="url">http://stacks.stanford.edu/file/OpLvlAgrmt_GoogleBooks.pdf</location>
+      <checksum type="md5">733eb4024ac121a7bd36c90caf0cee1f</checksum>
+      <checksum type="sha1">449bc271e9667f650f71c1fd33c11ccfd688e790</checksum>
+    </file>
+    <file deliver="no" format="PDF" id="OpLvlAgrmt_GoogleBooks.pdf" mimetype="application/pdf" preserve="yes" shelve="yes" size="94226">
+      <location type="url">http://stacks.stanford.edu/file/OpLvlAgrmt_GoogleBooks.pdf</location>
+      <checksum type="md5">1e4958a50c2e88c7e53e128d789b2bcf</checksum>
+      <checksum type="sha1">77331f3b19c277a498446e0440031cb1dd26266d</checksum>
+    </file>
+  </resource>
+</contentMetadata>
+</foxml:xmlContent>
+</foxml:datastreamVersion>
+</foxml:datastream>
+<foxml:datastream ID="agreementWF" STATE="A" CONTROL_GROUP="E" VERSIONABLE="false">
+<foxml:datastreamVersion ID="agreementWF.0" LABEL="Workflow" CREATED="2010-07-12T22:38:51.846Z" MIMETYPE="application/xml">
+<foxml:contentLocation TYPE="URL" REF="http://lyberservices-dev.stanford.edu/workflow/dor/objects/druid:zn292gq7284/workflows/agreementWF"/>
+</foxml:datastreamVersion>
+</foxml:datastream>
+</foxml:digitalObject>
