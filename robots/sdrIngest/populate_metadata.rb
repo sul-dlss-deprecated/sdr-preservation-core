@@ -5,6 +5,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
 require 'lyber_core'
+require 'logger'
 
 #:title:The SdrIngest Workflow
 #= The SdrIngest Workflow
@@ -39,11 +40,18 @@ module SdrIngest
       # by default, get the bags from the SDR_DEPOSIT_DIR
       # this can be explicitly changed if necessary
       @bag_directory = SDR_DEPOSIT_DIR
+      
+      # Logging information
+      @logg = Logger.new("populate_metadata.log")
+      @logg.level = Logger::DEBUG
+      @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
+                          t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
     end
 
     # Override the robot LyberCore::Robot.process_item method.
     # * Makes use of the Robot Framework FileUtilities.
     def process_item(work_item)
+      @logg.debug("Enter process_item")
       # Identifiers
       @druid = work_item.druid
     
@@ -76,11 +84,15 @@ module SdrIngest
     # fetch the fedora object from the repository so we can attach datastreams to it
     # throw an error if we can't find the object
     def get_fedora_object
+      @logg.debug("Connecting to #{SEDORA_URI}...")
       # puts "Connecting to #{SEDORA_URI}..."
       begin
         Fedora::Repository.register(SEDORA_URI)
         @obj = ActiveFedora::Base.load_instance(@druid)
       rescue Errno::ECONNREFUSED => e
+        @logg.error("Can't connect to Fedora at url #{SEDORA_URI} : #{e.inspect}")
+        @logg.error( "#{e.backtrace}")
+        
         raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"   
         return nil     
       rescue

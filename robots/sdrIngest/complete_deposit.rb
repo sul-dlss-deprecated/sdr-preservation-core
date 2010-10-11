@@ -157,7 +157,9 @@ module SdrIngest
         @logg.debug("Loaded druid #{@druid} into object #{@obj}")
         
       rescue Errno::ECONNREFUSED => e
-        @logg.fatal("Can't connect to Fedora at url #{SEDORA_URI} : #{e}")
+        @logg.fatal("Can't connect to Fedora at url #{SEDORA_URI} : #{e.inspect}")
+        @logg.error( "#{e.backtrace}")
+        
         raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"   
         return nil     
       rescue

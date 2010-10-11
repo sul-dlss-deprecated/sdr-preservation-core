@@ -4,6 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
 require 'lyber_core'
 require 'lyber_core/utils'
+require 'logger'
 
 module SdrIngest
 
@@ -15,13 +16,24 @@ module SdrIngest
     
     # the destination object that gets created by running this script
     attr_reader :dest_path
+    
+    def initialize(string1,string2)
+      super(string1,string2)
+
+      @logg = Logger.new("transfer_object.log")
+      @logg.level = Logger::DEBUG
+      @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
+                          t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
+    end
 
     # Override the robot LyberCore::Robot.process_item method.
     # * Makes use of the Robot Framework FileUtilities.
     def process_item(work_item)
+      @logg.debug("Enter process_item")
       # Identifiers
       druid = work_item.druid
       @dest_path = File.join(SDR_DEPOSIT_DIR,druid)
+      @logg.debug("dest_path is : #{@dest_path}")
       if File.exists?(@dest_path)
         puts "Object already exists: #{@dest_path}"
       else

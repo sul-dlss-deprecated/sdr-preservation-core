@@ -9,6 +9,8 @@ require 'net/https'
 require "rexml/document"
 require 'rubygems'
 require 'nokogiri'
+require 'logger'
+
 
 module SdrIngest
 
@@ -18,6 +20,17 @@ module SdrIngest
 
     # the agreement_id of the current workitem
     attr_reader :agreement_id 
+    
+    # Override the LyberCore::Robot initialize method so we can set object attributes during initialization
+    def initialize(string1,string2)
+      super(string1,string2)
+      
+      # Logging information
+      @logg = Logger.new("verify_agreement.log")
+      @logg.level = Logger::DEBUG
+      @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
+                          t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
+    end
 
     # Extract the druid and pass it along to process_druid
     # This allows the robot to accept either a work_item or a druid
@@ -31,10 +44,12 @@ module SdrIngest
 
       puts "Druid being processed is #{druid}"  
       #puts "Druid being processed is " + druid 
+      @logg.debug("Druid being processed is #{druid}")
 
       # get the agreement id for this object
       @agreement_id ||= get_agreement_id(druid)
       #puts "Agreement id is #{@agreement_id}"
+      @logg.debug("Agreement id is #{@agreement_id}")
 
       # check if it is in sedora
       #puts "SEDORA_URI is " + SEDORA_URI

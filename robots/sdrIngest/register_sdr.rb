@@ -28,10 +28,15 @@ module SdrIngest
 
        def initialize()
 
-	       @logg = Logger.new("registersdr.log")
+         #logfile = "#{LOGDIR}/register_sdr.log"
+	       #@logg = Logger.new(File.join("#{LOGDIR}","register_sdr.log"))
+	       @logg = Logger.new("register_sdr.log")
+         #@logg = Logger.new(logfile)
 	       @logg.level = Logger::DEBUG
          #@logg = Logger.new(STDOUT)
-         @logg.datetime_format = "%Y-%m-%d %H:%M:%S"
+         #@logg.datetime_format = "%Y-%m-%d %H:%M:%S"
+         @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
+                            t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
 
          # Start the timer
          @start_time = Time.new
@@ -64,7 +69,8 @@ module SdrIngest
 	          @logg.debug("About to register #{druid} in SEDORA at #{SEDORA_URI}")
             Fedora::Repository.register(SEDORA_URI)
           rescue Errno::ECONNREFUSED => e
-            @logg.error("Cannot connect to Fedora at url #{SEDORA_URI} : #{e}")
+            @logg.error("Cannot connect to Fedora at url #{SEDORA_URI} : #{e.inspect}")
+            @logg.error("#{e.backtrace}")
             raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"
             return nil
           end
@@ -82,7 +88,8 @@ module SdrIngest
           rescue Exception => e
             #raise "error in saving"
             puts "ERROR : Object cannot be saved in Sedora"
-            @logg.error("Object cannot be saved in Sedora :  #{e}")
+            @logg.error("Object cannot be saved in Sedora :  #{e.report}")
+            @logg.error("#{e.backtrace}")
             return nil
           end
 

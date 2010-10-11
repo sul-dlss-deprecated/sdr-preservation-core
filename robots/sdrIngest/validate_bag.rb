@@ -4,6 +4,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
 require 'lyber_core'
 require 'bagit'
+require 'logger'
 
 DATA_DIR = "data"
 BAGIT_TXT = "bagit.txt"
@@ -14,10 +15,22 @@ module SdrIngest
   # Validates the Bag that has been transferring in SDR's staging area
   class ValidateBag < LyberCore::Robots::Robot
 
+    def initialize(string1,string2)
+       super(string1,string2)
+
+       @logg = Logger.new("validate_bag.log")
+       @logg.level = Logger::DEBUG
+       @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
+                           t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
+    end
+      
+      
     # Ensure the bag exists by checking for the presence of bagit.txt and 
     # bag-info.txt
     def bag_exists?(base_path)
     	data_dir = File.join(base_path, DATA_DIR)
+    	@logg.debug("data dir is : #{data_dir}")
+    	
     	bagit_txt_file = File.join(base_path, BAGIT_TXT)
     	bag_info_txt_file = File.join(base_path, BAG_INFO_TXT)
 
