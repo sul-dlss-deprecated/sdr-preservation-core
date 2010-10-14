@@ -42,7 +42,7 @@ module SdrIngest
         # filename is druid.tar
         filename = druid + ".tar"
         @logg.debug("Tar file name being transferred is : #{filename}")
-        return LyberCore::Utils::FileUtilities.transfer_object(filename, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
+        LyberCore::Utils::FileUtilities.transfer_object(filename, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
         # TODO catch exceptions 
         @logg.debug("#{filename}  transferred to #{SDR_DEPOSIT_DIR}")
         
