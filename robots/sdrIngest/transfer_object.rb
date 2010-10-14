@@ -48,9 +48,9 @@ module SdrIngest
         
         # now untar the file directly in SDR_UNPACK_SERVER(sdr-thumper5)
         # e.g ssh sdr-thumper5 "cd ~/target/sdr2objects; tar xf 4177.tar"
-        unpack-command = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf filename\""
-        @logg.debug("Unpack command is :  #{unpack-command}")
-        status = system(unpack-command)
+        unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename}\""
+        @logg.debug("Unpack command is :  #{unpackcommand}")
+        status = system(unpackcommand)
         @logg.debug("Return from untar is : #{status}")
         
       end
