@@ -2,7 +2,8 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
-require 'dor_service'
+#require 'dor_service'
+require 'dlss_service'
 require 'lyber_core'
 require 'active-fedora'
 require 'logger'
