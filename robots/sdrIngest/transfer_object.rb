@@ -6,6 +6,7 @@ require 'lyber_core'
 require 'lyber_core/utils'
 require 'logger'
 
+
 module SdrIngest
 
 # +TransferObject+ Transfers objects from DOR workspace to SDR's staging area.  
@@ -25,6 +26,7 @@ module SdrIngest
       @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
                           t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
     end
+  	
 
     # Override the robot LyberCore::Robot.process_item method.
     # * Makes use of the Robot Framework FileUtilities.
@@ -37,7 +39,20 @@ module SdrIngest
       if File.exists?(@dest_path)
         puts "Object already exists: #{@dest_path}"
       else
-        return LyberCore::Utils::FileUtilities.transfer_object(druid, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
+        # filename is druid.tar
+        filename = druid + ".tar"
+        @logg.debug("Tar file name being transferred is : #{filename}")
+        return LyberCore::Utils::FileUtilities.transfer_object(filename, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
+        # TODO catch exceptions 
+        @logg.debug("#{filename}  transferred to #{SDR_DEPOSIT_DIR}")
+        
+        # now untar the file directly in SDR_UNPACK_SERVER(sdr-thumper5)
+        # e.g ssh sdr-thumper5 "cd ~/target/sdr2objects; tar xf 4177.tar"
+        unpack-command = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf filename\""
+        @logg.debug("Unpack command is :  #{unpack-command}")
+        status = system(unpack-command)
+        @logg.debug("Return from untar is : #{status}")
+        
       end
     end
   end
