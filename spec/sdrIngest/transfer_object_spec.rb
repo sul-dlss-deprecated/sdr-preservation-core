@@ -33,7 +33,7 @@ describe SdrIngest::TransferObject do
       LyberCore::Utils::FileUtilities.stub!(:transfer_object).and_return(true)
       
       # verify that FileUtilies.transfer_obejct is called
-      LyberCore::Utils::FileUtilities.should_receive(:transfer_object).with("druid:123", DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR).once
+      LyberCore::Utils::FileUtilities.should_receive(:transfer_object).with("druid:123.tar", DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR).once
 
       # actually call the function we are testing
       transfer_robot.process_item(mock_workitem).should == true
@@ -51,7 +51,7 @@ describe SdrIngest::TransferObject do
       LyberCore::Utils::FileUtilities.stub!(:transfer_object).and_raise("rsync failed")
       
       # verify that FileUtilies.transfer_obejct is called
-      LyberCore::Utils::FileUtilities.should_receive(:transfer_object).with("druid:123", DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR).once
+      LyberCore::Utils::FileUtilities.should_receive(:transfer_object).with("druid:123.tar", DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR).once
 
       # actually call the function we are testing
       lambda {transfer_robot.process_item(mock_workitem)}.should raise_error
