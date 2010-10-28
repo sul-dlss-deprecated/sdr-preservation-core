@@ -26,16 +26,18 @@ module SdrIngest
     # Existing provenance datastream, as read from the object
     attr_reader :obj_prov
        
-    def initialize(string1,string2)
-      super(string1,string2)
+    def initialize()
+      super('sdrIngestWF', 'complete-deposit',
+        :logfile => '/tmp/complete-deposit.log', 
+        :loglevel => Logger::INFO,
+        :options => ARGV[0])
+
+      @env = ENV['ROBOT_ENVIRONMENT']
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
+      LyberCore::Log.debug("Process ID is : #{$PID}")
       
-      # Initialize logger. 
-      @logg = Logger.new("complete_deposit.log")
-      @logg.level = Logger::DEBUG
-      #@logg = Logger.new(STDOUT)
-      @logg.datetime_format = "%Y-%m-%d %H:%M:%S"
       @start_time = Time.new
-      @logg.debug("Start time is :   #{@start_time}")
+      LyberCore::Log.debug("Start time is :   #{@start_time}")
             
       # by default, get the bags from the SDR_DEPOSIT_DIR
       # this can be explicitly changed if necessary
@@ -43,10 +45,11 @@ module SdrIngest
     end
     
     def process_item(work_item)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
+      
       @druid = work_item.druid
       raise "Cannot load Sedora object." unless get_fedora_object
       
-
       # Update provenance
       raise "Failed to update provenance to include Deposit completion." unless update_provenance
 
@@ -74,6 +77,7 @@ module SdrIngest
     # * Adds events as child of "what"
     # * Saves the entire build up as an XML string in "sdr_prov"
     def create_sdr_provenance
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter create_sdr_provenance")
       # Create the "agent" for SDR
       doc_frag = Nokogiri::XML::DocumentFragment.parse <<-EOXML
             <agent>
@@ -109,6 +113,8 @@ module SdrIngest
       
       # Put the results in "sdr_prov" so it can be tested
       @sdr_prov = doc_frag.to_s
+      LyberCore::Log.debug("sdr_prov stanza is : #{@sdr_prov}")
+      
     end
    
     # make_new_prov
@@ -136,6 +142,7 @@ module SdrIngest
       ex_prov_node.add_child(sdr_prov_node)
       
       @obj_prov = ex_prov_node.to_xml
+      LyberCore::Log.debug("Created sdr_prov as a child node in provenanceMetadata")
     end
     
     def update_prov_datastream
@@ -144,23 +151,25 @@ module SdrIngest
       ds = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>ds_id, :dsLabel=>ds_id, :blob=>@obj_prov)
       @obj.add_datastream(ds)
       @obj.save
+      LyberCore::Log.debug("Updated provenanceMetadata datastream")
     end
     
     # fetch the fedora object from the repository so we can attach datastreams to it
     # throw an error if we can't find the object
     def get_fedora_object
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter get_fedora_object")
       begin
         Fedora::Repository.register(SEDORA_URI)
-        @logg.debug("Registering #{SEDORA_URI}")
+        LyberCore::Log.debug("Registering #{SEDORA_URI}")
         
         @obj = ActiveFedora::Base.load_instance(@druid)
-        @logg.debug("Loaded druid #{@druid} into object #{@obj}")
+        LyberCore::Log.debug("Loaded druid #{@druid} into object #{@obj}")
         
       rescue Errno::ECONNREFUSED => e
-        @logg.fatal("Can't connect to Fedora at url #{SEDORA_URI} : #{e.inspect}")
-        @logg.error( "#{e.backtrace}")
+        LyberCore::Log.fatal("Cannot connect to Fedora at url #{SEDORA_URI} : #{e.inspect}")
+        LyberCore::Log.fatal( "#{e.backtrace.join("\n")}")
         
-        raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"   
+        raise RuntimeError, "Cannot connect to Fedora at url #{SEDORA_URI} : #{e}"  
         return nil     
       rescue
         return nil
@@ -173,7 +182,6 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::CompleteDeposit.new(
-          'sdrIngestWF', 'complete-deposit')
+  dm_robot = SdrIngest::CompleteDeposit.new()
   dm_robot.start
 end

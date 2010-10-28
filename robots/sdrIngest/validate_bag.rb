@@ -15,13 +15,16 @@ module SdrIngest
   # Validates the Bag that has been transferring in SDR's staging area
   class ValidateBag < LyberCore::Robots::Robot
 
-    def initialize(string1,string2)
-       super(string1,string2)
+    def initialize()
+        super('sdrIngestWF', 'validate-bag',
+          :logfile => '/tmp/validate-bag.log', 
+          :loglevel => Logger::INFO,
+          :options => ARGV[0])
 
-       @logg = Logger.new("validate_bag.log")
-       @logg.level = Logger::DEBUG
-       @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
-                           t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
+        @env = ENV['ROBOT_ENVIRONMENT']
+        LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
+        LyberCore::Log.debug("Process ID is : #{$PID}")
+    
     end
       
       
@@ -29,7 +32,7 @@ module SdrIngest
     # bag-info.txt
     def bag_exists?(base_path)
     	data_dir = File.join(base_path, DATA_DIR)
-    	@logg.debug("data dir is : #{data_dir}")
+    	LyberCore::Log.debug("data dir is : #{data_dir}")
     	
     	bagit_txt_file = File.join(base_path, BAGIT_TXT)
     	bag_info_txt_file = File.join(base_path, BAG_INFO_TXT)
@@ -66,13 +69,15 @@ module SdrIngest
     # This makes testing from the command line easier, as you can validate
     # a specific item instead of relying on the work queue 
     def process_druid(druid)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_druid")
       dest_path = File.join(SDR_DEPOSIT_DIR,druid)
+      LyberCore::Log.debug("dest_path is : #{dest_path}")
       
       if not bag_exists?(dest_path) 
         raise "bag does not exist at: #{dest_path}"
       else
         bag = BagIt::Bag.new dest_path
-     	if not bag.valid?
+     	  if not bag.valid?
           raise "bag not valid: #{dest_path}"
         end
       end
@@ -84,6 +89,7 @@ module SdrIngest
     # Extract the druid and pass it along to process_druid
     # This allows the robot to accept either a work_item or a druid
     def process_item(work_item)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       druid = work_item.druid
       process_druid(druid)
     end
@@ -95,7 +101,7 @@ end # end of module
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::ValidateBag.new('sdrIngestWF', 'validate-bag')
+  dm_robot = SdrIngest::ValidateBag.new()
   # If this robot is invoked with a specific druid, it will run for that druid only
   if(ARGV[0])
     puts "Validating bagit object for #{ARGV[0]}"

@@ -4,55 +4,66 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
 require 'lyber_core'
 require 'lyber_core/utils'
-require 'logger'
+require 'English'
 
+#require 'logger'
 
 module SdrIngest
 
-# +TransferObject+ Transfers objects from DOR workspace to SDR's staging area.  
+# +TransferObject+ Transfers objects from DOR workspace to SDR's staging area.
 # - notifies DOR of success by: <b><i>need to be filled in</i></b>
 # - notifies DOR of missing object by: <i><b>need to be filled in</b></i>
 
   class TransferObject < LyberCore::Robots::Robot
-    
+
     # the destination object that gets created by running this script
     attr_reader :dest_path
-    
-    def initialize(string1,string2)
-      super(string1,string2)
+    attr_reader :env
 
-      @logg = Logger.new("transfer_object.log")
-      @logg.level = Logger::DEBUG
-      @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
-                          t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
+    # Initialize the robot by calling LyberCore::Robots::Robot.new
+    # with the workflow name and the workflow step
+    def initialize()
+      super('sdrIngestWF', 'transfer-object',
+        :logfile => '/tmp/transfer-object.log', 
+        :loglevel => Logger::INFO,
+        :options => ARGV[0])
+
+      @env = ENV['ROBOT_ENVIRONMENT']
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
+      LyberCore::Log.debug("Process ID is : #{$PID}")
     end
-  	
+
 
     # Override the robot LyberCore::Robot.process_item method.
     # * Makes use of the Robot Framework FileUtilities.
     def process_item(work_item)
-      @logg.debug("Enter process_item")
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       # Identifiers
       druid = work_item.druid
       @dest_path = File.join(SDR_DEPOSIT_DIR,druid)
-      @logg.debug("dest_path is : #{@dest_path}")
+      LyberCore::Log.debug("dest_path is : #{@dest_path}")
       if File.exists?(@dest_path)
         puts "Object already exists: #{@dest_path}"
       else
         # filename is druid.tar
         filename = druid + ".tar"
-        @logg.debug("Tar file name being transferred is : #{filename}")
+        LyberCore::Log.debug("Tar file name being transferred is : #{filename}")
         LyberCore::Utils::FileUtilities.transfer_object(filename, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
-        # TODO catch exceptions 
-        @logg.debug("#{filename}  transferred to #{SDR_DEPOSIT_DIR}")
-        
-        # now untar the file directly in SDR_UNPACK_SERVER(sdr-thumper5)
+        # TODO catch exceptions
+        LyberCore::Log.debug("#{filename}  transferred to #{SDR_DEPOSIT_DIR}")
+
+
+        # if env = sdr-services-test then untar the file directly in SDR_UNPACK_SERVER(sdr-thumper5)
         # e.g ssh sdr-thumper5 "cd ~/target/sdr2objects; tar xf 4177.tar"
-        unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename}\""
-        @logg.debug("Unpack command is :  #{unpackcommand}")
-        status = system(unpackcommand)
-        @logg.debug("Return from untar is : #{status}")
-        
+        if (@env == "sdr-services-test")
+            unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename} --force-local\""
+        else
+            unpackcommand = "cd #{SDR_UNPACK_DIR}; tar xf #{filename} --force-local"
+        end
+        LyberCore::Log.debug("Unpack command is :  #{unpackcommand}")
+        #    status = system(unpackcommand)
+        # LyberCore::Log.debug("Return from untar is : #{status}")
+
       end
     end
   end
@@ -61,7 +72,8 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::TransferObject.new(
-          'sdrIngestWF', 'transfer-object')
-  dm_robot.start
+    dm_robot = SdrIngest::TransferObject.new()
+    dm_robot.start
 end
+
+

@@ -23,19 +23,22 @@ module SdrIngest
     attr_reader :agreement_id 
     
     # Override the LyberCore::Robot initialize method so we can set object attributes during initialization
-    def initialize(string1,string2)
-      super(string1,string2)
-      
-      # Logging information
-      @logg = Logger.new("verify_agreement.log")
-      @logg.level = Logger::DEBUG
-      @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
-                          t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
+    def initialize()
+      super('sdrIngestWF', 'verify-agreement',
+        :logfile => '/tmp/verify-agreement.log', 
+        :loglevel => Logger::INFO,
+        :options => ARGV[0])
+
+      @env = ENV['ROBOT_ENVIRONMENT']
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
+      LyberCore::Log.debug("Process ID is : #{$PID}")
     end
+  
 
     # Extract the druid and pass it along to process_druid
     # This allows the robot to accept either a work_item or a druid
     def process_item(work_item)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       druid = work_item.druid
       process_druid(druid)
     end
@@ -43,22 +46,22 @@ module SdrIngest
     # Finds the object's agreement object in DOR
     def process_druid(druid)
 
-      puts "Druid being processed is #{druid}"  
-      #puts "Druid being processed is " + druid 
-      @logg.debug("Druid being processed is #{druid}")
+      LyberCore::Log.debug("Druid being processed is #{druid}")
+      puts "Druid being processed is " + druid 
 
       # get the agreement id for this object
       @agreement_id ||= get_agreement_id(druid)
       #puts "Agreement id is #{@agreement_id}"
-      @logg.debug("Agreement id is #{@agreement_id}")
+      LyberCore::Log.debug("Agreement id is #{@agreement_id}")
 
       # check if it is in sedora
-      #puts "SEDORA_URI is " + SEDORA_URI
+      LyberCore::Log.debug( "SEDORA_URI is " + SEDORA_URI)
       begin
         #LyberCore::Connection.get("http://fedoraAdmin:fedoraAdmin@sedora-test.stanford.edu/fedora/objects/" + "#{@agreement_id}", {})
-        LyberCore::Connection.get("http://sedora-test.stanford.edu/fedora/objects/" + "#{@agreement_id}", {})
-        puts "Agreement is available in Sedora at http://sedora-test.stanford.edu/fedora/objects/" + "#{@agreement_id}"
-        #LyberCore::Connection.get(SEDORA_URI + "/objects/" +"#{@agreement_id}", {})
+        #LyberCore::Connection.get("http://sedora-test.stanford.edu/fedora/objects/" + "#{@agreement_id}", {})
+        
+        LyberCore::Connection.get(SEDORA_URI + "/objects/" +"#{@agreement_id}", {})
+        LyberCore::Log.debug("Agreement is available in Sedora at http://sedora-test.stanford.edu/fedora/objects/" + "#{@agreement_id}")
       rescue Net::HTTPServerException
         # If agreement object is not in Sedora then throw an exception
         raise "Couldn't find agreement object #{@agreement_id} in Sedora"
@@ -85,7 +88,7 @@ module SdrIngest
          resp = response.body
       end
       doc = Nokogiri::XML(resp)
-      #puts doc.xpath("//agreementId/text()") 
+      LyberCore::Log.debug(doc.xpath("//agreementId/text()") )
       doc.xpath("//agreementId/text()")
     end
   end
@@ -93,7 +96,7 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::VerifyAgreement.new('sdrIngestWF', 'verify-agreement')
+  dm_robot = SdrIngest::VerifyAgreement.new()
   # If this robot is invoked with a specific druid, it will run for that druid only
   if(ARGV[0])
     puts "Verifying agreement for #{ARGV[0]}"
