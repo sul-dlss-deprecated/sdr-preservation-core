@@ -15,12 +15,16 @@ describe "connect to sedora" do
     print druid
     mock_workitem.stub!(:druid).and_return(druid)
 
+    puts "About to register"
     Fedora::Repository.register(SEDORA_URI)
+    puts "Done register"
 
 
     begin
+      puts "About to save "
       obj = ActiveFedora::Base.new(:pid => mock_workitem.druid)
       obj.save
+      puts "Done save "
     rescue
       $stderr.print $!
     end

@@ -11,7 +11,7 @@ describe SdrIngest::TransferObject do
     
     it "should be able to tell us what directory it's creating" do
       # create new transferObject
-      transfer_robot = SdrIngest::TransferObject.new( "sdrIngestWF", "transfer-object")
+      transfer_robot = SdrIngest::TransferObject.new()
       # mock out a workitem
       mock_workitem = mock("workitem")
       # return druid:123 when work_item.druid is called
@@ -23,7 +23,7 @@ describe SdrIngest::TransferObject do
       
     it "should return true if it is a successful transfer" do
       # create new transferObject
-      transfer_robot = SdrIngest::TransferObject.new( "sdrIngestWF", "transfer-object")
+      transfer_robot = SdrIngest::TransferObject.new()
       # mock out a workitem
       mock_workitem = mock("workitem")
       # return druid:123 when work_item.druid is called
@@ -41,7 +41,7 @@ describe SdrIngest::TransferObject do
       
     it "should raise and error if transfer fails" do
       # create new transferObject
-      transfer_robot = SdrIngest::TransferObject.new( "sdrIngestWF", "transfer-object")
+      transfer_robot = SdrIngest::TransferObject.new()
       # mock out a workitem
       mock_workitem = mock("workitem")
       # return druid:123 when work_item.druid is called
@@ -59,7 +59,7 @@ describe SdrIngest::TransferObject do
     
     it "should not transfer a pre-existing object of the same druid" do
       # create new transferObject
-      transfer_robot = SdrIngest::TransferObject.new( "sdrIngestWF", "transfer-object")
+      transfer_robot = SdrIngest::TransferObject.new()
       # mock out a workitem
       mock_workitem = mock("workitem")
 

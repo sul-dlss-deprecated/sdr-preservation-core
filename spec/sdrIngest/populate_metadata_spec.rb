@@ -9,7 +9,7 @@ context "Populating Metadata" do
   
   def setup
     
-    @robot = SdrIngest::PopulateMetadata.new("sdrIngestWF","populate-metadata")    
+    @robot = SdrIngest::PopulateMetadata.new()    
     @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
     mock_workitem = mock("populate_metadata_workitem")
     mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
@@ -52,7 +52,7 @@ context "Populating Metadata" do
   
   context "basic behavior" do
    it "can be created" do
-      r = SdrIngest::PopulateMetadata.new("sdrIngestWF","populate-metadata")
+      r = SdrIngest::PopulateMetadata.new()
       r.should be_instance_of(SdrIngest::PopulateMetadata)
     end
   end
