@@ -29,10 +29,12 @@ module SdrIngest
 
        def initialize()
 
-	       @logg = Logger.new("register_sdr.log")
+	       @logg = Logger.new("/tmp/register-sdr.log")
 	       @logg.level = Logger::DEBUG
-         @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
-                            t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
+         #@logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
+          #                  t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
+         @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) :: %s\n" % [s, 
+                            t.strftime("%Y-%m-%d %H:%M:%S"), p, m]}
 
          # Start the timer
          @start_time = Time.new

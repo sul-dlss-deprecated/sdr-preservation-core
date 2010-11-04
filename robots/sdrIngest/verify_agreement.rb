@@ -10,7 +10,8 @@ require 'net/https'
 require "rexml/document"
 require 'rubygems'
 require 'nokogiri'
-require 'logger'
+#require 'logger'
+require 'English'
 
 
 module SdrIngest
@@ -21,6 +22,7 @@ module SdrIngest
 
     # the agreement_id of the current workitem
     attr_reader :agreement_id 
+    attr_reader :env
     
     # Override the LyberCore::Robot initialize method so we can set object attributes during initialization
     def initialize()
@@ -32,6 +34,7 @@ module SdrIngest
       @env = ENV['ROBOT_ENVIRONMENT']
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
       LyberCore::Log.debug("Process ID is : #{$PID}")
+      puts DOR_URI
     end
   
 

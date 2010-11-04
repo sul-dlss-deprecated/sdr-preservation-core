@@ -5,6 +5,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 require 'lyber_core'
 require 'bagit'
 require 'logger'
+require 'English'
 
 DATA_DIR = "data"
 BAGIT_TXT = "bagit.txt"

@@ -10,6 +10,8 @@ else
   environment = 'local'
 end
 
+puts "loading environment #{environment}"
+
 require File.expand_path(File.dirname(__FILE__) + "/../config/environments/#{environment}")
   
 ROBOT_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")

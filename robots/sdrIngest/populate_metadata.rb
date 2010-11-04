@@ -6,6 +6,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
 require 'lyber_core'
 require 'logger'
+require 'English'
 
 #:title:The SdrIngest Workflow
 #= The SdrIngest Workflow
