@@ -5,8 +5,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../boot')
 require 'lyber_core'
 require 'lyber_core/utils'
 require 'English'
-
-#require 'logger'
+require 'logger'
 
 module SdrIngest
 
@@ -61,6 +60,8 @@ module SdrIngest
         rescue   => e
           LyberCore::Log.error("Error in transferring object : #{e.inspect}")
           LyberCore::Log.error("#{e.backtrace.join("\n")}")
+          
+          # TODO: what do we want to do here ? raise or continue ?
           raise e
         end
         

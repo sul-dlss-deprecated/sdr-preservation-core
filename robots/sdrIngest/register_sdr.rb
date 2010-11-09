@@ -37,15 +37,14 @@ module SdrIngest
 	       #@logg.level = Logger::DEBUG
          #@logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
           #                  t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
-         #@logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) :: %s\n" % [s, 
-         #                   t.strftime("%Y-%m-%d %H:%M:%S"), p, m]}
+   
 
          # Start the timer
          @start_time = Time.new
          @env = ENV['ROBOT_ENVIRONMENT']
          
 	       LyberCore::Log.debug("Start time is :   #{@start_time}")
-	       #puts "set start time"
+	
 	       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
          LyberCore::Log.debug("Process ID is : #{$PID}")
          puts DOR_URI
@@ -59,12 +58,11 @@ module SdrIngest
        def print_stats
          @end_time = Time.new
          @elapsed_time = @end_time - @start_time
-         puts "\n"
-         puts "**********************************************"
-         puts "Total time: " + @elapsed_time.to_s + "\n"
-         puts "Completed objects: " + @success_count.to_s + "\n"
-         puts "Errors: " + @error_count.to_s + "\n"
-         puts "**********************************************"
+         LyberCore::Log.info("**********************************************")
+         LyberCore::Log.info("Total time: " + @elapsed_time.to_s)
+         LyberCore::Log.info("Completed objects: " + @success_count.to_s)
+         LyberCore::Log.info("Errors: " + @error_count.to_s)
+         LyberCore::Log.info("**********************************************")
        end
 
 
@@ -107,6 +105,7 @@ module SdrIngest
             Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml)
             # looks like there is no exception raised by WorkflowService yet ? when it is do :
           rescue Exception => e
+            puts "ERROR : Cannot create workflow for #{druid}"
             LyberCore::Log.fatal("Cannot create workflow #{workflow_xml} : #{e.inspect}")
             LyberCore::Log.fatal("#{e.backtrace.join("\n")}")
             raise RuntimeError, "Cannot create workflow #{workflow_xml} : #{e}" 
@@ -136,7 +135,8 @@ module SdrIngest
          begin
            druids_already_transferred_list_xml = DorService.get_objects_for_workstep("dor", "googleScannedBookWF", "sdr-ingest-transfer", "sdr-ingest-deposit")
          rescue => e
-           puts e.message
+           LyberCore::Log.info("There are either no objects available, or we cannot get the list of objects that have been transferred : #{e.inspect}")
+           LyberCore::Log.info("#{e.backtrace.join("\n")}")
            raise e
          end
            
@@ -144,7 +144,8 @@ module SdrIngest
          begin
            druids_already_transferred = DorService.get_druids_from_object_list(druids_already_transferred_list_xml)
          rescue => e
-           puts e.message
+           LyberCore::Log.error("Cannot get list of druids from the transferred object list : #{e.inspect}")
+           LyberCore::Log.error("#{e.backtrace.join("\n")}")
            raise e
          end
 
@@ -166,19 +167,14 @@ module SdrIngest
          begin
            druids_already_registered_xml = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "register-sdr", "" )
          rescue => e
-           puts e.message
-           raise e
+           LyberCore::Log.info("There are no objects that have already been registered : #{e.inspect}")
+           #LyberCore::Log.error("#{e.backtrace.join("\n")}")
+           #raise e
          end
          
-	       if (druids_already_registered_xml != nil)
-           begin
-             druids_already_registered = DorService.get_druids_from_object_list(druids_already_registered_xml)
-           rescue => e
-             puts e.message
-             raise e
-           end
+         if (druids_already_registered_xml != nil)
+           druids_already_registered = DorService.get_druids_from_object_list(druids_already_registered_xml)
          end
-
 
          # ^^^^^^^^^^^^^ debugging ^^^^^^^^^^^^^
          #puts "\n \n DRUIDS already registered  length =   "
@@ -196,7 +192,9 @@ module SdrIngest
          # ( In Ruby, this is a simple "set difference", unlike most other languages : newlist = x - y )
          # +++++++++++++++++++++++
          @druids = druids_already_transferred - druids_already_registered
-
+         
+         LyberCore::Log.debug("Number of druids to process :  #{@druids.length.to_s}")
+	       
          puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
          puts "About to process " + @druids.length.to_s  + " druids"
 
