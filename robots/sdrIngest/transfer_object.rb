@@ -27,6 +27,8 @@ module SdrIngest
         :logfile => '/tmp/transfer-object.log', 
         :loglevel => Logger::INFO,
         :options => ARGV[0])
+        
+        # have to be able to change logfile and loglevel from config option or command line
 
       @env = ENV['ROBOT_ENVIRONMENT']
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
@@ -39,7 +41,13 @@ module SdrIngest
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       # Identifiers
-      druid = work_item.druid
+      begin
+        druid = work_item.druid
+      rescue => e
+        # more information needed
+        LyberCore::Log.error("Cannot get a druid from the workflow")
+        raise e
+      end
       @dest_path = File.join(SDR_DEPOSIT_DIR,druid)
       LyberCore::Log.debug("dest_path is : #{@dest_path}")
       if File.exists?(@dest_path)
@@ -48,10 +56,15 @@ module SdrIngest
         # filename is druid.tar
         filename = druid + ".tar"
         LyberCore::Log.debug("Tar file name being transferred is : #{filename}")
-        LyberCore::Utils::FileUtilities.transfer_object(filename, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
-        # TODO catch exceptions
-        LyberCore::Log.debug("#{filename}  transferred to #{SDR_DEPOSIT_DIR}")
-
+        begin
+          LyberCore::Utils::FileUtilities.transfer_object(filename, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
+        rescue   => e
+          LyberCore::Log.error("Error in transferring object : #{e.inspect}")
+          LyberCore::Log.error("#{e.backtrace.join("\n")}")
+          raise e
+        end
+        
+        LyberCore::Log.debug("#{filename} transferred to #{SDR_DEPOSIT_DIR}")
 
         # if env = sdr-services-test then untar the file directly in SDR_UNPACK_SERVER(sdr-thumper5)
         # e.g ssh sdr-thumper5 "cd ~/target/sdr2objects; tar xf 4177.tar"
@@ -61,8 +74,8 @@ module SdrIngest
             unpackcommand = "cd #{SDR_UNPACK_DIR}; tar xf #{filename} --force-local"
         end
         LyberCore::Log.debug("Unpack command is :  #{unpackcommand}")
-        #    status = system(unpackcommand)
-        # LyberCore::Log.debug("Return from untar is : #{status}")
+        status = system(unpackcommand)
+        LyberCore::Log.debug("Return from untar is : #{status}")
 
       end
     end
@@ -72,8 +85,13 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
+  begin
     dm_robot = SdrIngest::TransferObject.new()
     dm_robot.start
+  rescue => e
+    puts e.message
+  end
+  puts "Transfer Object done\n"
 end
 
 

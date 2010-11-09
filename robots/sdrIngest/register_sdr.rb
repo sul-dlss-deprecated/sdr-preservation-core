@@ -29,17 +29,26 @@ module SdrIngest
 
        def initialize()
 
-	       @logg = Logger.new("/tmp/register-sdr.log")
-	       @logg.level = Logger::DEBUG
+         # Take the logfile and level from a config option or command line later
+         LyberCore::Log.set_logfile("/tmp/register-sdr.log")
+         LyberCore::Log.set_level(Logger::DEBUG)
+	       
+	       #@logg = Logger.new("/tmp/register-sdr.log")
+	       #@logg.level = Logger::DEBUG
          #@logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s, 
           #                  t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
-         @logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) :: %s\n" % [s, 
-                            t.strftime("%Y-%m-%d %H:%M:%S"), p, m]}
+         #@logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) :: %s\n" % [s, 
+         #                   t.strftime("%Y-%m-%d %H:%M:%S"), p, m]}
 
          # Start the timer
          @start_time = Time.new
-
-	       @logg.debug("Start time is :   #{@start_time}")
+         @env = ENV['ROBOT_ENVIRONMENT']
+         
+	       LyberCore::Log.debug("Start time is :   #{@start_time}")
+	       #puts "set start time"
+	       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
+         LyberCore::Log.debug("Process ID is : #{$PID}")
+         puts DOR_URI
 
          # Initialize the success and error counts
          @success_count = 0
@@ -64,40 +73,44 @@ module SdrIngest
        def process_druid(druid)
 
           begin
-	          @logg.debug("About to register #{druid} in SEDORA at #{SEDORA_URI}")
+	          LyberCore::Log.debug("About to register #{druid} in SEDORA at #{SEDORA_URI}")
             Fedora::Repository.register(SEDORA_URI)
           rescue Errno::ECONNREFUSED => e
-            @logg.error("Cannot connect to Fedora at url #{SEDORA_URI} : #{e.inspect}")
-            @logg.error("#{e.backtrace.join("\n")}")
+            LyberCore::Log.fatal("Cannot connect to Fedora at url #{SEDORA_URI} : #{e.inspect}")
+            LyberCore::Log.fatal("#{e.backtrace.join("\n")}")
             raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"
-            return nil
+            #return nil
           end
-          @logg.info("DONE : Sedora registration")
+          LyberCore::Log.info("DONE : Sedora registration")
           puts "DONE : Sedora registration"
 
-          @logg.debug("Druid in Sedora will be : #{druid}")
-          # puts "druid in sedora will be" + druid
+          LyberCore::Log.debug("Druid in Sedora will be : #{druid}")
         
           begin
             obj = ActiveFedora::Base.new(:pid => druid)
-            # puts "Save #{druid} in Sedora"
-            @logg.debug("Save #{druid} in Sedora")
+            LyberCore::Log.debug("Save #{druid} in Sedora")
             obj.save
           rescue Exception => e
             #raise "error in saving"
             puts "ERROR : Object cannot be saved in Sedora"
-            @logg.error("Object cannot be saved in Sedora :  #{e.inspect}")
-            @logg.error("#{e.backtrace.join("\n")}")
-            return nil
+            LyberCore::Log.fatal("Object cannot be saved in Sedora :  #{e.inspect}")
+            LyberCore::Log.fatal("#{e.backtrace.join("\n")}")
+            raise RuntimeError, "Object cannot be saved in Sedora"
+            #return nil
           end
 
           puts "DONE : Create new object in Sedora"
 
           # Initialize workflow
           workflow_xml = File.open(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngestWF", 'sdrIngestWorkflow.xml'), 'rb') { |f| f.read }
-          Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml)
-
-	        # Add error message here
+          begin
+            Dor::WorkflowService.create_workflow('sdr', druid, 'sdrIngestWF', workflow_xml)
+            # looks like there is no exception raised by WorkflowService yet ? when it is do :
+          rescue Exception => e
+            LyberCore::Log.fatal("Cannot create workflow #{workflow_xml} : #{e.inspect}")
+            LyberCore::Log.fatal("#{e.backtrace.join("\n")}")
+            raise RuntimeError, "Cannot create workflow #{workflow_xml} : #{e}" 
+          end
 
           puts "DONE : Create new workflow for #{druid}"
 
@@ -117,17 +130,28 @@ module SdrIngest
          # First, get_objects_for_workstep(repository, workflow, completed, waiting)
 
          puts "\nGetting list of druids to process ... "
-         @logg.info("Getting list of druids to process ... ")
+         LyberCore::Log.info("Getting list of druids to process ... ")
 
          #puts "getting list of objects that have been transferred"
-         druids_already_transferred_list_xml = DorService.get_objects_for_workstep("dor", "googleScannedBookWF", "sdr-ingest-transfer", "sdr-ingest-deposit")
+         begin
+           druids_already_transferred_list_xml = DorService.get_objects_for_workstep("dor", "googleScannedBookWF", "sdr-ingest-transfer", "sdr-ingest-deposit")
+         rescue => e
+           puts e.message
+           raise e
+         end
+           
          # Then get the list of druids from the xml returned in the earlier step
-         druids_already_transferred = DorService.get_druids_from_object_list(druids_already_transferred_list_xml)
+         begin
+           druids_already_transferred = DorService.get_druids_from_object_list(druids_already_transferred_list_xml)
+         rescue => e
+           puts e.message
+           raise e
+         end
 
          # ^^^^^^^^^^^^^ debugging ^^^^^^^^^^^^^
          #puts "\n \n DRUIDS already transferred length =   "
          #puts druids_already_transferred.length()
-         @logg.debug("Number of objects already transferred :  #{druids_already_transferred.length()}")
+         LyberCore::Log.debug("Number of objects already transferred :  #{druids_already_transferred.length()}")
          #puts "\n ========  DRUIDS already transferred =========="
          #puts druids_already_transferred
          # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -139,16 +163,27 @@ module SdrIngest
          # +++++++++++++++++++++++
 	       druids_already_registered = Array.new
          # druids_already_registered_xml = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "register-sdr", "complete-deposit" )
-         druids_already_registered_xml = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "register-sdr", "" )
+         begin
+           druids_already_registered_xml = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "register-sdr", "" )
+         rescue => e
+           puts e.message
+           raise e
+         end
+         
 	       if (druids_already_registered_xml != nil)
-            druids_already_registered = DorService.get_druids_from_object_list(druids_already_registered_xml)
-	        end
+           begin
+             druids_already_registered = DorService.get_druids_from_object_list(druids_already_registered_xml)
+           rescue => e
+             puts e.message
+             raise e
+           end
+         end
 
 
          # ^^^^^^^^^^^^^ debugging ^^^^^^^^^^^^^
          #puts "\n \n DRUIDS already registered  length =   "
          #puts druids_already_registered.length()
-	       @logg.debug("Number of objects already registered :  #{druids_already_registered.length()}")
+	       LyberCore::Log.debug("Number of objects already registered :  #{druids_already_registered.length()}")
          #puts " \n \n ========  DRUIDS already registered  =========="
          #puts druids_already_registered
          # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -177,20 +212,22 @@ module SdrIngest
              puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
              puts "Processing " + @druids[i]
              #puts "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-             if (process_druid(@druids[i]) == nil)
+             begin
+               process_druid(@druids[i])
+               @success_count += 1
+               #puts "YESSSSSSSSSSSSSSSSS!!!!"
+             rescue
                @error_count += 1
                #puts "Errrrrrrrrrrroooooooooorrrrrrrrrrrr"
-             else
-               #puts "YESSSSSSSSSSSSSSSSS!!!!"
-               @success_count += 1
              end
              i += 1
            end
-
          end  # end while
          # Print success, error count
          print_stats
-	       @logg.close
+         
+         #should we close log here ? if we see reason not to, comment the following line
+	       LyberCore::Log.close
        end
 
     end # end of class
@@ -200,14 +237,18 @@ end # end of module
 # This is the equivalent of a java main method
 if __FILE__ == $0
   # If this script is invoked with a specific druid, it will register sdr with that druid only
-  if(ARGV[0])
-    puts "Registering SDR with #{ARGV[0]}"
-    sdr_bootstrap = SdrIngest::RegisterSdr.new()
-    sdr_bootstrap.process_druid(ARGV[0])
-    #sdr_bootstrap.print_stats()
-  else
-    sdr_bootstrap = SdrIngest::RegisterSdr.new()
-    sdr_bootstrap.process_items()
+  begin 
+    if(ARGV[0])
+      puts "Registering SDR with #{ARGV[0]}"
+      sdr_bootstrap = SdrIngest::RegisterSdr.new()
+      sdr_bootstrap.process_druid(ARGV[0])
+      #sdr_bootstrap.print_stats()
+    else
+      sdr_bootstrap = SdrIngest::RegisterSdr.new()
+      sdr_bootstrap.process_items()
+    end
+  rescue => e
+    puts e.message
   end
   puts "Register SDR done\n"
 end

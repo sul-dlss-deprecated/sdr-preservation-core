@@ -10,7 +10,7 @@ require 'net/https'
 require "rexml/document"
 require 'rubygems'
 require 'nokogiri'
-#require 'logger'
+require 'logger'
 require 'English'
 
 
