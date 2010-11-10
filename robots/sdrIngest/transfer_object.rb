@@ -76,7 +76,10 @@ module SdrIngest
         end
         LyberCore::Log.debug("Unpack command is :  #{unpackcommand}")
         status = system(unpackcommand)
+        
         LyberCore::Log.debug("Return from untar is : #{status}")
+        if (status != true)
+          raise "Cannot execute #{unpackcommand}"
 
       end
     end
