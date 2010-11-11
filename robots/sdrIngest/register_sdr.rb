@@ -224,8 +224,6 @@ module SdrIngest
          # Print success, error count
          print_stats
          
-         #should we close log here ? if we see reason not to, comment the following line
-	       LyberCore::Log.close
        end
 
     end # end of class
