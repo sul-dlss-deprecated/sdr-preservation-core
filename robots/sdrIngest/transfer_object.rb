@@ -93,7 +93,7 @@ if __FILE__ == $0
     dm_robot = SdrIngest::TransferObject.new()
     dm_robot.start
   rescue => e
-    puts e.message
+    puts "ERROR : " + e.message
   end
   puts "Transfer Object done\n"
 end
