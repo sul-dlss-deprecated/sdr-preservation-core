@@ -246,7 +246,7 @@ if __FILE__ == $0
       sdr_bootstrap.process_items()
     end
   rescue => e
-    puts e.message
+    puts "ERROR : " + e.message
   end
   puts "Register SDR done\n"
 end
