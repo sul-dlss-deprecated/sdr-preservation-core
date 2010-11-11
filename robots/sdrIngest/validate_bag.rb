@@ -19,12 +19,14 @@ module SdrIngest
     def initialize()
         super('sdrIngestWF', 'validate-bag',
           :logfile => '/tmp/validate-bag.log', 
-          :loglevel => Logger::INFO,
+          :loglevel => Logger::DEBUG,
           :options => ARGV[0])
 
         @env = ENV['ROBOT_ENVIRONMENT']
         LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
         LyberCore::Log.debug("Process ID is : #{$PID}")
+        
+        # TODO : check if DR_URI or WORKFLOW_URI is set
     
     end
       
@@ -40,25 +42,25 @@ module SdrIngest
 
       # base_path must exist and be a directory
       unless File.directory?(base_path)
-        puts "#{base_path} does not exist or is not a directory"
+        LyberCore::Log.error("#{base_path} does not exist or is not a directory")
         return false 
       end
       
       # data_dir must exist and be a directory 
       unless File.directory?(data_dir)
-        puts "#{data_dir} does not exist or is not a directory"
+        LyberCore::Log.error("#{data_dir} does not exist or is not a directory")
         return false 
       end
       
       # The bagit text file must exist and be a file
       unless File.file?(bagit_txt_file)
-        puts "#{bagit_txt_file} does not exist or is not a file"
+        LyberCore::Log.error("#{bagit_txt_file} does not exist or is not a file")
         return false 
       end
       
       # bag_info_txt_file must exist and be a file
       unless File.file?(bag_info_txt_file)
-        puts "#{bag_info_txt_file} does not exist or is not a file"
+        LyberCore::Log.error("#{bag_info_txt_file} does not exist or is not a file")
         return false 
       end
       
@@ -91,8 +93,14 @@ module SdrIngest
     # This allows the robot to accept either a work_item or a druid
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      druid = work_item.druid
-      process_druid(druid)
+      begin
+        druid = work_item.druid
+        process_druid(druid)
+      rescue Exception => e
+        LyberCore::Log.error("Error processing  #{druid}")
+        LyberCore::Log.error("#{e.backtrace.join("\n")}")
+        raise e
+      end
     end
   
   end # end of class
@@ -102,13 +110,17 @@ end # end of module
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::ValidateBag.new()
-  # If this robot is invoked with a specific druid, it will run for that druid only
-  if(ARGV[0])
-    puts "Validating bagit object for #{ARGV[0]}"
-    dm_robot.process_druid(ARGV[0])
-  else
-    dm_robot.start
+  begin
+    dm_robot = SdrIngest::ValidateBag.new()
+    # If this robot is invoked with a specific druid, it will run for that druid only
+    if(ARGV[0])
+      puts "Validating bagit object for #{ARGV[0]}"
+      dm_robot.process_druid(ARGV[0])
+    else
+      dm_robot.start
+    end
+  rescue Exception => e
+    puts "ERROR : " + e.message
   end
-  puts "Done."
+  puts "Validate Bag Done\n"
 end
