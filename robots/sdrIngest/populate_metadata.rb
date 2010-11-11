@@ -135,14 +135,18 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::PopulateMetadata.new()
-  # If this robot is invoked with a specific druid, it will populate the metadata for that druid only
-  if(ARGV[0])
-    LyberCore::Log.debug("Updating metadata for #{ARGV[0]}")
-    dm_robot.process_druid(ARGV[0])
-  else
-    LyberCore::Log.debug("workflow = #{dm_robot.workflow}")
-    dm_robot.start
+  begin
+    dm_robot = SdrIngest::PopulateMetadata.new()
+    # If this robot is invoked with a specific druid, it will populate the metadata for that druid only
+    if(ARGV[0])
+      LyberCore::Log.debug("Updating metadata for #{ARGV[0]}")
+      dm_robot.process_druid(ARGV[0])
+    else
+      LyberCore::Log.debug("workflow = #{dm_robot.workflow}")
+      dm_robot.start
+    end
+  rescue
+    puts "ERROR : " + e.message
   end
-  puts "Done."
+  puts "Populate Metadata done\n"
 end
