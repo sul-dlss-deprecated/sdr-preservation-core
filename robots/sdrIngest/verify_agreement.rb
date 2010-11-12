@@ -43,7 +43,7 @@ module SdrIngest
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       begin
         druid = work_item.druid
-      rescue => e
+      rescue Exception => e
         # more information needed
         LyberCore::Log.error("Cannot get a druid from the workflow")
         LyberCore::Log.error("#{e.backtrace.join("\n")}")
@@ -52,7 +52,7 @@ module SdrIngest
       
       begin
         process_druid(druid)
-      rescue => e
+      rescue Exception => e
         LyberCore::Log.error("Error processing druid  #{druid}")
         LyberCore::Log.error("#{e.backtrace.join("\n")}")
         raise e
@@ -71,7 +71,7 @@ module SdrIngest
         @agreement_id ||= get_agreement_id(druid)
         #puts "Agreement id is #{@agreement_id}"
         LyberCore::Log.debug("Agreement id is #{@agreement_id}")
-      rescue => e
+      rescue Exception => e
           LyberCore::Log.error("Error getting an agreement id for  #{druid}")
           LyberCore::Log.error("#{e.backtrace.join("\n")}")
           raise e
@@ -118,7 +118,7 @@ module SdrIngest
         doc = Nokogiri::XML(resp)
         LyberCore::Log.debug(doc.xpath("//agreementId/text()") )
         doc.xpath("//agreementId/text()")
-      rescue => e
+      rescue Exception => e
         LyberCore::Log.error("Error getting an agreement from  #{SEDORA_URI}")
         LyberCore::Log.error("#{e.backtrace.join("\n")}")
         raise e
@@ -139,7 +139,8 @@ if __FILE__ == $0
       LyberCore::Log.debug("About to start robot")
       dm_robot.start
     end
-  rescue => e
+  rescue Exception => e
+    LyberCore::Log.error("#{e.inspect}")
     puts "ERROR : " + e.message
   end
   puts "Verify Agreement done\n"

@@ -97,7 +97,7 @@ module SdrIngest
         druid = work_item.druid
         process_druid(druid)
       rescue Exception => e
-        LyberCore::Log.error("Error processing  #{druid}")
+        LyberCore::Log.error("Error processing  #{druid} : #{e.message} ")
         LyberCore::Log.error("#{e.backtrace.join("\n")}")
         raise e
       end
@@ -120,6 +120,7 @@ if __FILE__ == $0
       dm_robot.start
     end
   rescue Exception => e
+    LyberCore::Log.error("#{e.inspect} + #{e.backtrace.join("\n")}")
     puts "ERROR : " + e.message
   end
   puts "Validate Bag Done\n"

@@ -145,8 +145,10 @@ if __FILE__ == $0
       LyberCore::Log.debug("workflow = #{dm_robot.workflow}")
       dm_robot.start
     end
-  rescue
+  rescue Exception => e
     puts "ERROR : " + e.message
+    LyberCore::Log.error("Error in Populate Metadata :  #{e.message} + #{e.inspect}")
+    LyberCore::Log.error("#{e.backtrace.join("\n")}")
   end
   puts "Populate Metadata done\n"
 end

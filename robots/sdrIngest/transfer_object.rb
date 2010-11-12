@@ -42,7 +42,7 @@ module SdrIngest
       # Identifiers
       begin
         druid = work_item.druid
-      rescue => e
+      rescue Exception => e
         # more information needed
         LyberCore::Log.error("Cannot get a druid from the workflow")
         raise e
@@ -50,14 +50,14 @@ module SdrIngest
       @dest_path = File.join(SDR_DEPOSIT_DIR,druid)
       LyberCore::Log.debug("dest_path is : #{@dest_path}")
       if File.exists?(@dest_path)
-        puts "Object already exists: #{@dest_path}"
+        LyberCore::Log.info("Object already exists: #{@dest_path}")
       else
         # filename is druid.tar
         filename = druid + ".tar"
         LyberCore::Log.debug("Tar file name being transferred is : #{filename}")
         begin
           LyberCore::Utils::FileUtilities.transfer_object(filename, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
-        rescue   => e
+        rescue Exception => e
           LyberCore::Log.error("Error in transferring object : #{e.inspect}")
           LyberCore::Log.error("#{e.backtrace.join("\n")}")
           
@@ -98,7 +98,8 @@ if __FILE__ == $0
   begin
     dm_robot = SdrIngest::TransferObject.new()
     dm_robot.start
-  rescue => e
+  rescue Exception => e
+    LyberCore::Log.error("#{e.message}" + "#{e.backtrace.join("\n")}")
     puts "ERROR : " + e.message + e.backtrace.join("\n")
   end
   puts "Transfer Object done\n"
