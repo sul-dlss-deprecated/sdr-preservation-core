@@ -70,7 +70,7 @@ module SdrIngest
         # if env = sdr-services-test then untar the file directly in SDR_UNPACK_SERVER(sdr-thumper5)
         # e.g ssh sdr-thumper5 "cd ~/target/sdr2objects; tar xf 4177.tar"
         if (@env == "sdr-services-test" || @env == "sdr-services")
-            unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename}"
+            unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename}\""
           
             # force-local does not seem to work, nor is needed on SunOS
             # unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename} --force-local\""
