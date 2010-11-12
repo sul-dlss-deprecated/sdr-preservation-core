@@ -24,7 +24,7 @@ module SdrIngest
     def initialize()
       super('sdrIngestWF', 'transfer-object',
         :logfile => '/tmp/transfer-object.log', 
-        :loglevel => Logger::INFO,
+        :loglevel => Logger::DEBUG,
         :options => ARGV[0])
         
         # have to be able to change logfile and loglevel from config option or command line
@@ -69,16 +69,21 @@ module SdrIngest
 
         # if env = sdr-services-test then untar the file directly in SDR_UNPACK_SERVER(sdr-thumper5)
         # e.g ssh sdr-thumper5 "cd ~/target/sdr2objects; tar xf 4177.tar"
-        if (@env == "sdr-services-test")
-            unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename} --force-local\""
+        if (@env == "sdr-services-test" || @env == "sdr-services")
+            unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename}"
+          
+            # force-local does not seem to work, nor is needed on SunOS
+            # unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename} --force-local\""
         else
             unpackcommand = "cd #{SDR_UNPACK_DIR}; tar xf #{filename} --force-local"
         end
         LyberCore::Log.debug("Unpack command is :  #{unpackcommand}")
-        status = system(unpackcommand)
         
+        status = system(unpackcommand)
+          
         LyberCore::Log.debug("Return from untar is : #{status}")
         if (status != true)
+          LyberCore::Log.error("#{unpackcommand} fails")
           raise "Cannot execute #{unpackcommand}"
         end
 
@@ -94,7 +99,7 @@ if __FILE__ == $0
     dm_robot = SdrIngest::TransferObject.new()
     dm_robot.start
   rescue => e
-    puts "ERROR : " + e.message
+    puts "ERROR : " + e.message + e.backtrace.join("\n")
   end
   puts "Transfer Object done\n"
 end
