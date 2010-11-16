@@ -98,6 +98,7 @@ module SdrIngest
           end
 
           puts "DONE : Create new object in Sedora"
+          LyberCore::Log.info("DONE : Create new object in Sedora")
 
           # Initialize workflow
           workflow_xml = File.open(File.join(File.dirname(__FILE__), "..", "..", "config", "workflows", "sdrIngestWF", 'sdrIngestWorkflow.xml'), 'rb') { |f| f.read }
@@ -112,6 +113,7 @@ module SdrIngest
           end
 
           puts "DONE : Create new workflow for #{druid}"
+          LyberCore::Log.info("DONE : Create new workflow for #{druid}")
 
           # Dont do this. Creating a new workflow with "completed" status for register-sdr is enough
           # update register-sdr status to "completed" in sdrIngestWF
