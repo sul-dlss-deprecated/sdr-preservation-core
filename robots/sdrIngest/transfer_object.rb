@@ -83,8 +83,10 @@ module SdrIngest
           
         LyberCore::Log.debug("Return from untar is : #{status}")
         if (status == true)
-          # TODO remove the tar file
-          numfiles = File.delete(filename) 
+          # remove the tar file
+          file = File.join(SDR_DEPOSIT_DIR, filename)
+          LyberCore::Log.debug("File to be deleted is : #{file} ")
+          numfiles = File.delete(file)
           if (numfiles >= 1)
             LyberCore::Log.debug("File : #{filename} now deleted")
           else
