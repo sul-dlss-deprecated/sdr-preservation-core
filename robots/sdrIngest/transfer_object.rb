@@ -82,7 +82,15 @@ module SdrIngest
         status = system(unpackcommand)
           
         LyberCore::Log.debug("Return from untar is : #{status}")
-        if (status != true)
+        if (status == true)
+          # TODO remove the tar file
+          numfiles = File.delete(filename) 
+          if (numfiles >= 1)
+            LyberCore::Log.debug("File : #{filename} now deleted")
+          else
+            LyberCore::Log.error("There was an error deleting #{filename}")
+          end 
+        else
           LyberCore::Log.error("#{unpackcommand} fails")
           raise "Cannot execute #{unpackcommand}"
         end
