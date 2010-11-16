@@ -105,7 +105,25 @@ module SdrIngest
           event = Nokogiri::XML::Node.new 'event', doc_frag
           event['who'] = 'SDR-robot:' + pname
           event['when'] = process['datetime']
-          event.content = pname
+          
+          LyberCore::Log.debug("Process name is : #{pname}")
+          
+          case pname
+            when "register-sdr"
+              event.content = "Druid #{@druid} has been registered in Sedora"
+            when "transfer-object"
+              event.content = "Druid #{@druid} has been transfered"
+            when "validate-bag"
+              event.content = "Druid #{@druid} has been validated"
+            when "populate-metadata"
+              event.content = "Metadata for druid #{@druid} has been populated in Sedora"
+            when "verify-agreement"
+              event.content = "Agreement for druid #{@druid} exists in Sedora"
+          end
+          
+          LyberCore::Log.debug("Event content is : #{event.content}")
+          
+          #event.content = pname
     
           what.add_child(event)
         end
