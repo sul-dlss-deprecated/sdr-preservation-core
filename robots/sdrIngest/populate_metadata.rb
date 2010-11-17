@@ -69,9 +69,10 @@ module SdrIngest
     def process_druid(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_druid")
       @druid = druid
-    
-      raise IOError, "Can't find a bag at #{@bag}" unless self.bag_exists?
-      raise IOError, "Can't load sedora object for #{@druid}" unless self.get_fedora_object
+      
+      raise IOError, "Can't find a bag at #{@bag} : #{e.inspect} " unless self.bag_exists?
+      raise IOError, "Can't load sedora object for #{@druid} : #{e.inspect} \n  #{e.backtrace.join("\n")}" unless self.get_fedora_object
+      
       self.populate_identity_metadata
       self.populate_provenance_metadata
       self.populate_content_metadata
@@ -98,9 +99,10 @@ module SdrIngest
         LyberCore::Log.error( "#{e.backtrace}")
         
         raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"   
-        return nil     
-      rescue
-        return nil
+        #return nil     
+      rescue Exception => e
+        raise e
+        #return nil
       end
     end
     
