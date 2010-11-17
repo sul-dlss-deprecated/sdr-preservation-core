@@ -110,15 +110,15 @@ module SdrIngest
           
           case pname
             when "register-sdr"
-              event.content = "Druid #{@druid} has been registered in Sedora"
+              event.content = "#{@druid} has been registered in Sedora"
             when "transfer-object"
-              event.content = "Druid #{@druid} has been transfered"
+              event.content = "#{@druid} has been transferred"
             when "validate-bag"
-              event.content = "Druid #{@druid} has been validated"
+              event.content = "#{@druid} has been validated"
             when "populate-metadata"
-              event.content = "Metadata for druid #{@druid} has been populated in Sedora"
+              event.content = "Metadata for #{@druid} has been populated in Sedora"
             when "verify-agreement"
-              event.content = "Agreement for druid #{@druid} exists in Sedora"
+              event.content = "Agreement for #{@druid} exists in Sedora"
           end
           
           LyberCore::Log.debug("Event content is : #{event.content}")
