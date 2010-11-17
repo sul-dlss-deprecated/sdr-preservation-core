@@ -58,8 +58,8 @@ module SdrIngest
       # Identifiers
       @druid = work_item.druid
     
-      raise IOError, "Can't find a bag at #{@bag}" unless self.bag_exists?
-      raise IOError, "Can't load sedora object for #{@druid}" unless self.get_fedora_object
+      raise IOError, "Can't find a bag at #{@bag} : #{e.inspect} " unless self.bag_exists?
+      raise IOError, "Can't load sedora object for #{@druid} : #{e.inspect} \n  #{e.backtrace.join("\n")}" unless self.get_fedora_object
       self.populate_identity_metadata
       self.populate_provenance_metadata
       self.populate_content_metadata
