@@ -22,18 +22,21 @@ function workspace_free() {
 
 # Run all the google robots
 function run_all_robots() {
+
+    kinit -k -t /var/sdr2service/sulair-lyberservices service/sulair-lyberservices && aklog
+
     (cd ${SDR2_HOME}/sdr2/robots/sdrIngest ;
 	echo cwd=`pwd`
-    #robot="register_sdr"
-    #if [ `robot_running $robot` -eq 0 ]; then
-    #    echo "running $robot"
-    #    echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot 
-    #    sleep 5
-    #else
-    #    echo "$robot already running"
-    #    ps -ef | grep $robot
-    #fi
-    #echo ""
+    robot="register_sdr"
+    if [ `robot_running $robot` -eq 0 ]; then
+        echo "running $robot"
+        echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot 
+        sleep 5
+    else
+        echo "$robot already running"
+        ps -ef | grep $robot
+    fi
+    echo ""
 
     robot="transfer_object"
     GB100=100000000
@@ -119,6 +122,6 @@ do
 timestamp=`date +%Y%m%d_%H%M%S`
 run_all_robots 
 #mail -s "run-sdr-robots $timestamp" alpana@stanford.edu
-echo "RELAUNCH ROBOTS after 3 minutes ..."
-sleep 180
+echo "RELAUNCH ROBOTS after 100 seconds ..."
+sleep 100
 done
