@@ -85,23 +85,6 @@ describe SdrIngest::CompleteDeposit do
       complete_robot = SdrIngest::CompleteDeposit.new()          
       complete_robot.should respond_to(:process_item)
     end
-    
-    context "Logging" do
-      require 'logger'
-      
-      it "should have a log file" do
-        complete_robot = SdrIngest::CompleteDeposit.new()          
-        complete_robot.should respond_to(:logg)
-      end
-      
-      it "should have a settable log level" do
-        complete_robot = SdrIngest::CompleteDeposit.new()          
-        complete_robot.logg.level.should eql(Logger::DEBUG)
-        complete_robot.logg.level = Logger::ERROR
-        complete_robot.logg.level.should eql(Logger::ERROR)
-      end
-      
-    end
   end
     
   context "can load Sedora object with corresponding druid" do
