@@ -193,7 +193,7 @@ context "Populating Metadata" do
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       @robot.process_item(mock_workitem)
-      expected_datastreams = ['IDENTITY', 'PROVENANCE', 'CONTENTMD', 'DC']
+      expected_datastreams = ['identityMetadata', 'provenanceMetadata', 'contentMetadata', 'DC']
       expected_datastreams.each { |dsid| 
         (@robot.obj.datastreams.keys.include? dsid).should eql(true) 
       }
@@ -203,7 +203,7 @@ context "Populating Metadata" do
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       @robot.process_item(mock_workitem)
-      expected_datastreams = ['IDENTITY', 'PROVENANCE', 'CONTENTMD', 'DC']
+      expected_datastreams = ['identityMetadata', 'provenanceMetadata', 'contentMetadata', 'DC']
       expected_datastreams.each { |dsid| 
         (@robot.obj.datastreams[dsid].attributes[:dsLabel]).should_not be_nil
         (@robot.obj.datastreams[dsid].attributes[:dsLabel]).length.should_not eql(0)
