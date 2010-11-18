@@ -27,7 +27,7 @@ module SdrIngest
     def initialize()
       super('sdrIngestWF', 'verify-agreement',
         :logfile => '/tmp/verify-agreement.log', 
-        :loglevel => Logger::DEBUG,
+        :loglevel => Logger::INFO,
         :options => ARGV[0])
 
       @env = ENV['ROBOT_ENVIRONMENT']
