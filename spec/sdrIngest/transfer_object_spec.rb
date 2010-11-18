@@ -9,7 +9,15 @@ describe SdrIngest::TransferObject do
 
   context "transfer" do
     
+    it "should create the unpack command correct" do
+      pending "We should split the creation of the unpack command into a separate method so we can test it"
+    end
+    
     it "should be able to tell us what directory it's creating" do
+      pending "Once we have a create_unpack_command method, we can stub the tar command"
+      # transfer_robot.should_receive("create_unpack_command").and_return("foo")
+      # transfer_robot.should_receive("system").with("foo").and_return(true)
+      
       # create new transferObject
       transfer_robot = SdrIngest::TransferObject.new()
       # mock out a workitem
@@ -17,11 +25,13 @@ describe SdrIngest::TransferObject do
       # return druid:123 when work_item.druid is called
       mock_workitem.stub!(:druid).and_return("druid:123")
       LyberCore::Utils::FileUtilities.stub!(:transfer_object).and_return(true)
+      transfer_robot.should_receive("system").with("")
       transfer_robot.process_item(mock_workitem).should == true
       transfer_robot.dest_path.should == File.join(SDR_DEPOSIT_DIR,"druid:123")
     end
       
     it "should return true if it is a successful transfer" do
+      pending 
       # create new transferObject
       transfer_robot = SdrIngest::TransferObject.new()
       # mock out a workitem

@@ -141,12 +141,12 @@ context "Populating Metadata" do
     end    
       
     # If we query sedora with a druid and don't get anything back, raise an IOError
-    it "raises an IOError if it can't load an object with the given druid" do
+    it "raises an ActiveFedora::ObjectNotFoundError if it can't load an object with the given druid" do
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
       obj.delete
-      lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /sedora/)   
+      lambda { @robot.process_item(mock_workitem) }.should raise_exception(ActiveFedora::ObjectNotFoundError)   
     end
   end
 
@@ -193,7 +193,7 @@ context "Populating Metadata" do
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       @robot.process_item(mock_workitem)
-      expected_datastreams = ['IDENTITY', 'PROVENANCE', 'CONTENTMD', 'DC']
+      expected_datastreams = ['identityMetadata', 'provenanceMetadata', 'contentMetadata', 'DC']
       expected_datastreams.each { |dsid| 
         (@robot.obj.datastreams.keys.include? dsid).should eql(true) 
       }
@@ -203,7 +203,7 @@ context "Populating Metadata" do
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       @robot.process_item(mock_workitem)
-      expected_datastreams = ['IDENTITY', 'PROVENANCE', 'CONTENTMD', 'DC']
+      expected_datastreams = ['identityMetadata', 'provenanceMetadata', 'contentMetadata', 'DC']
       expected_datastreams.each { |dsid| 
         (@robot.obj.datastreams[dsid].attributes[:dsLabel]).should_not be_nil
         (@robot.obj.datastreams[dsid].attributes[:dsLabel]).length.should_not eql(0)

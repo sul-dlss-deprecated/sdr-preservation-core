@@ -3,11 +3,12 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'rubygems'
 require 'lyber_core'
 require 'sdrIngest/verify_agreement'
+require 'fakeweb'
 
 describe SdrIngest::VerifyAgreement do 
     context "initial state" do
       before :all do
-        ENV['ROBOT_ENVIRONMENT'] = 'sdr-services-test'
+        ENV['ROBOT_ENVIRONMENT'] = 'test'
         @robot = SdrIngest::VerifyAgreement.new()
       end
   
@@ -44,21 +45,12 @@ describe SdrIngest::VerifyAgreement do
       end
     
       it "returns a valid value for env" do
-        @robot.env.should eql('dev')
-        #puts @robot.env
-      
+        @robot.env.should eql('test')      
       end
     
       it "should load the config file for ROBOT_ENVIRONMENT" do
-          ENV['ROBOT_ENVIRONMENT'] = 'sdr-services-test'
-          puts ENV['ROBOT_ENVIRONMENT']
-          Object.send(:remove_const, :DOR_URI)
-          robot = SdrIngest::VerifyAgreement.new()
-          puts robot.env
-          
-          DOR_URI.should eql('http://dor-test.stanford.edu/dor')
-          WORKFLOW_URI.should eql('http://lyberservices-test.stanford.edu/workflow')
-          puts DOR_URI
+          DOR_URI.should eql('http://dor-dev.stanford.edu/dor')
+          WORKFLOW_URI.should eql('http://lyberservices-dev.stanford.edu/workflow')
       end
         
         # @robot = SdrIngest::VerifyAgreement.new()
@@ -70,15 +62,18 @@ describe SdrIngest::VerifyAgreement do
         #                  
       
     
-    # it "should raise an error if it cannot get a druid value" do
-    #       FakeWeb.allow_net_connect = false
-    #         FakeWeb.register_uri(:get, %r|lyberservices-test\.stanford\.edu/|, 
-    #           :body => "",
-    #           :status => ["500", "Error encountered"])
-    #       
-    #       lambda{ DorService.get_datastream(druid, ds_id) }.should raise_exception(/Encountered unknown error/)
-    #       
-    #     end
+    it "should raise an error if it cannot get a druid value" do
+      pending
+        druid = "foo:bar"
+        ds_id = "fake_datastream"
+          FakeWeb.allow_net_connect = false
+            FakeWeb.register_uri(:get, %r|dor-dev\.stanford\.edu/|, 
+              :body => "",
+              :status => ["500", "Error encountered"])
+          
+          lambda{ DorService.get_datastream(druid, ds_id) }.should raise_exception(/Encountered unknown error/)
+          
+        end
       
     
   end

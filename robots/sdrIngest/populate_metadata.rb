@@ -38,7 +38,7 @@ module SdrIngest
     # Override the LyberCore::Robot initialize method so we can set object attributes during initialization
     def initialize()
       super('sdrIngestWF', 'populate-metadata',
-        :logfile => '/tmp/populate-metadata.log', 
+        :logfile => "#{ROBOT_ROOT}/log/populate-metadata.log", 
         :loglevel => Logger::INFO,
         :options => ARGV[0])
 
@@ -58,8 +58,8 @@ module SdrIngest
       # Identifiers
       @druid = work_item.druid
     
-      raise IOError, "Can't find a bag at #{@bag} : #{e.inspect} " unless self.bag_exists?
-      raise IOError, "Can't load sedora object for #{@druid} : #{e.inspect} \n  #{e.backtrace.join("\n")}" unless self.get_fedora_object
+      raise IOError, "Can't find a bag at #{@bag}" unless self.bag_exists?
+      raise IOError, "Can't load sedora object for #{@druid}" unless self.get_fedora_object
       self.populate_identity_metadata
       self.populate_provenance_metadata
       self.populate_content_metadata
@@ -120,15 +120,15 @@ module SdrIngest
     end
     
     def populate_identity_metadata
-      @identity_metadata = populate_metadata('identityMetadata.xml','IDENTITY')
+      @identity_metadata = populate_metadata('identityMetadata.xml','identityMetadata')
     end
     
     def populate_provenance_metadata
-      @provenance_metadata = populate_metadata('provenanceMetadata.xml','PROVENANCE')
+      @provenance_metadata = populate_metadata('provenanceMetadata.xml','provenanceMetadata')
     end
     
     def populate_content_metadata
-      @content_metadata = populate_metadata('contentMetadata.xml','CONTENTMD')
+      @content_metadata = populate_metadata('contentMetadata.xml','contentMetadata')
     end
     
   end

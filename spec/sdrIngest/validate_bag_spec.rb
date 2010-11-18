@@ -2,6 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'rubygems'
 require 'lyber_core'
 require 'sdrIngest/validate_bag'
+require 'tmpdir'
 
 describe SdrIngest::ValidateBag do 
 
