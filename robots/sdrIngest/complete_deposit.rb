@@ -143,7 +143,7 @@ module SdrIngest
     # * Saves the end result as an XML string in "obj_prov"
     def make_new_prov
       # Retrieve existing provenance
-      @obj_prov = @obj.datastreams['PROVENANCE'].content
+      @obj_prov = @obj.datastreams['provenanceMetadata'].content
       if (@obj_prov != nil && !@obj_prov.eql?('')) then
         ex_prov_frag = Nokogiri::XML @obj_prov 
       else
@@ -164,7 +164,7 @@ module SdrIngest
     end
     
     def update_prov_datastream
-      ds_id = 'PROVENANCE'
+      ds_id = 'provenanceMetadata'
       ActiveFedora::Datastream.delete(@obj.pid, ds_id)
       ds = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>ds_id, :dsLabel=>ds_id, :blob=>@obj_prov)
       @obj.add_datastream(ds)
