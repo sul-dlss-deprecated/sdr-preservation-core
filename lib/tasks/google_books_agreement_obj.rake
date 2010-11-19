@@ -135,16 +135,16 @@ namespace :objects do
       obj.add_datastream(dc_ds)
       
       # Add the PDF as a managed datastream
-      #file = File.new(File.expand_path(File.dirname(__FILE__) << '/' << 'OpLvlAgrmt_Agreements_v01.pdf'))
-      #file_ds = ActiveFedora::Datastream.new(:dsID => "PDF", :dsLabel => 'PDF of Uber-Agreement', :controlGroup => 'M', :blob => file)
-      #obj.add_datastream(file_ds)
+      file = File.new(File.expand_path(File.dirname(__FILE__) << '/' << 'OpLvlAgrmt_Agreements_v01.pdf'))
+      file_ds = ActiveFedora::Datastream.new(:dsID => "PDF", :dsLabel => 'PDF of Uber-Agreement', :controlGroup => 'M', :blob => file)
+      obj.add_datastream(file_ds)
       
       obj.save
       
       puts "The object should be available at #{SEDORA_URI}/get/#{pid}"
       
-      # rels_ext_ds = ActiveFedora::Datastream.new(:pid=>pid, :dsid=>"RELS-EXT", :dsLabel=>"RELS-EXT", :blob=>rels_ext)
-      # obj.add_datastream(rels_ext_ds)
+      rels_ext_ds = ActiveFedora::Datastream.new(:pid=>pid, :dsid=>"RELS-EXT", :dsLabel=>"RELS-EXT", :blob=>rels_ext)
+      obj.add_datastream(rels_ext_ds)
       
     end
   end
