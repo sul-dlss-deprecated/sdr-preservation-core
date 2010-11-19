@@ -55,7 +55,7 @@ describe SdrIngest::CompleteDeposit do
           </what>
         </agent>
       }
-      prov_ds = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'PROVENANCE', :dsLabel=>'PROVENANCE', :blob=>prov_str)  
+      prov_ds = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>'provenanceMetadata', :dsLabel=>'provenanceMetadata', :blob=>prov_str)  
       @obj.add_datastream(prov_ds)
       @obj.save
     rescue
@@ -195,7 +195,7 @@ describe SdrIngest::CompleteDeposit do
     it "updates Sedora Provenance Datastream with the SDR provenance added" do
       @complete_robot.process_item(@mock_workitem)  
       
-      prov_ds = @complete_robot.obj.datastreams['PROVENANCE']
+      prov_ds = @complete_robot.obj.datastreams['provenanceMetaData']
       prov_read_back = prov_ds.content
       
       prov_read_back.should_not be_nil
