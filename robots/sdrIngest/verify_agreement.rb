@@ -109,7 +109,7 @@ module SdrIngest
         http = Net::HTTP.new("#{SEDORA_URI_BASE}", 443)
         http.use_ssl = true
         http.start do |http|
-           req = Net::HTTP::Get.new("/fedora/objects/#{druid}/datastreams/IDENTITY/content", {"User-Agent" =>
+           req = Net::HTTP::Get.new("/fedora/objects/#{druid}/datastreams/identityMetadata/content", {"User-Agent" =>
                                      "RubyLicious 0.2"})
            req.basic_auth(SEDORA_USER, SEDORA_PASS)
            response = http.request(req)
