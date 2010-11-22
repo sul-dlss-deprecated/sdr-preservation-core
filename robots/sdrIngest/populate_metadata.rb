@@ -38,7 +38,7 @@ module SdrIngest
     # Override the LyberCore::Robot initialize method so we can set object attributes during initialization
     def initialize()
       super('sdrIngestWF', 'populate-metadata',
-        :logfile => "#{ROBOT_ROOT}/log/populate-metadata.log", 
+        :logfile => "#{LOGDIR}/populate-metadata.log", 
         :loglevel => Logger::INFO,
         :options => ARGV[0])
 
