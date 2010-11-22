@@ -14,7 +14,7 @@ module SdrIngest
   # CompleteDeposit sends a callback message to DOR notifying the DOR
   # workflow that the sdrIngest workflow is complete
   class CompleteDeposit < LyberCore::Robots::Robot
-    attr_reader :obj, :druid, :logg
+    attr_reader :obj, :druid
     attr_writer :bag_directory
     
     # Workflow XML as read from the object 
@@ -28,7 +28,7 @@ module SdrIngest
        
     def initialize()
       super('sdrIngestWF', 'complete-deposit',
-        :logfile => '/tmp/complete-deposit.log', 
+        :logfile => "#{LOGDIR}/complete-deposit.log", 
         :loglevel => Logger::INFO,
         :options => ARGV[0])
 
