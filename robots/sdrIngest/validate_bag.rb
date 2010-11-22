@@ -18,8 +18,8 @@ module SdrIngest
 
     def initialize()
         super('sdrIngestWF', 'validate-bag',
-          :logfile => '/tmp/validate-bag.log', 
-          :loglevel => Logger::DEBUG,
+          :logfile => "#{LOGDIR}/validate-bag.log", 
+          :loglevel => Logger::INFO,
           :options => ARGV[0])
 
         @env = ENV['ROBOT_ENVIRONMENT']
