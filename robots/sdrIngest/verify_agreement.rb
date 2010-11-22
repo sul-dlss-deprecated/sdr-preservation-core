@@ -26,7 +26,7 @@ module SdrIngest
     # Override the LyberCore::Robot initialize method so we can set object attributes during initialization
     def initialize()
       super('sdrIngestWF', 'verify-agreement',
-        :logfile => '/tmp/verify-agreement.log', 
+        :logfile => "#{LOGDIR}/verify-agreement.log", 
         :loglevel => Logger::INFO,
         :options => ARGV[0])
 
