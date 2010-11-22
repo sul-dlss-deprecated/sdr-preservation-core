@@ -23,8 +23,8 @@ module SdrIngest
     # with the workflow name and the workflow step
     def initialize()
       super('sdrIngestWF', 'transfer-object',
-        :logfile => "#{ROBOT_ROOT}/log/transfer-object.log", 
-        :loglevel => Logger::DEBUG,
+        :logfile => "#{LOGDIR}/transfer-object.log", 
+        :loglevel => Logger::INFO,
         :options => ARGV[0])
         
         # have to be able to change logfile and loglevel from config option or command line
