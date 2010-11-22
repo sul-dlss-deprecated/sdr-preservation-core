@@ -30,8 +30,8 @@ module SdrIngest
        def initialize()
 
          # Take the logfile and level from a config option or command line later
-         LyberCore::Log.set_logfile("/tmp/register-sdr.log")
-         LyberCore::Log.set_level(Logger::DEBUG)
+         LyberCore::Log.set_logfile("#{LOGDIR}/register-sdr.log")
+         LyberCore::Log.set_level(Logger::INFO)
 	       
 	       #@logg = Logger.new("/tmp/register-sdr.log")
 	       #@logg.level = Logger::DEBUG
