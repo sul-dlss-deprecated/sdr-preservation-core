@@ -7,7 +7,7 @@ require 'rubygems'
 if(ENV.include?('ROBOT_ENVIRONMENT'))
   environment = ENV['ROBOT_ENVIRONMENT']
 else
-  environment = 'local'
+  environment = 'development'
 end
 
 puts "loading environment #{environment}"
