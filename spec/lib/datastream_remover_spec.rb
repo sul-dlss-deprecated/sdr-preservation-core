@@ -70,9 +70,7 @@ describe DatastreamRemover do
       foo = RestClient.get "#{@repository_url}/objects/#{@fixture_pid}/datastreams/#{datastream_name}?versionable=false"
       foo.code.should eql(200)
       dr.removeDatastream(datastream_name, batch_size, "fixture")
-      # RestClient.delete 'http://fedoraAdmin:fedoraAdmin@localhost:8983/fedora/objects/fixture:contentmd_removal/datastreams/contentMetadata?versionable=false'
-      lambda { RestClient.get "#{@repository_url}/objects/#{@fixture_pid}/datastreams/#{datastream_name}?versionable=false" }.should raise_exception(/404/)
-      
+      lambda { RestClient.get "#{@repository_url}/objects/#{@fixture_pid}/datastreams/#{datastream_name}?versionable=false" }.should raise_exception(/404/)      
     end
     
     it "fetches an initial batch of PIDs" do

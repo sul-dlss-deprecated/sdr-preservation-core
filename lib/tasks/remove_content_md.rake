@@ -4,10 +4,10 @@ namespace :cleanup do
   
   desc "Iterate through all the druids in a repository and remove the content metadata datastream"
   task :remove_content_md do
-    repository_url = "http://fedoraAdmin:fedoraAdmin@127.0.0.1:8983/fedora"
+    repository_url = "http://fedoraAdmin:fedoraAdminTest@localhost:8080/fedora"
     datastream_name = "contentMetadata"
-    batch_size = 1
-    pid_namespace = "fixture"
+    batch_size = 100
+    pid_namespace = "druid"
     
     dr = DatastreamRemover.new(repository_url)
     dr.removeDatastream(datastream_name, batch_size, pid_namespace)
