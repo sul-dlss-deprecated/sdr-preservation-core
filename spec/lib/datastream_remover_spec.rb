@@ -3,6 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'rubygems'
 require 'active-fedora'
 require 'rest-client'
+
 require File.join(File.dirname(__FILE__), "..", "..", "lib", "datastream_remover.rb")
 ENABLE_SOLR_UPDATES = false
 
@@ -23,7 +24,6 @@ describe DatastreamRemover do
       # 
       # # make sure we're starting with a fresh object
       begin
-      #   puts "Deleting #{@fixture_pid}"
         obj = ActiveFedora::Base.load_instance(@fixture_pid)
         RestClient.delete "#{@repository_url}/objects/#{@fixture_pid}"
       rescue ActiveFedora::ObjectNotFoundError
@@ -34,13 +34,12 @@ describe DatastreamRemover do
         $stderr.print $!
       end
       
-      puts "Importing '#{@fixture_pid}' to #{Fedora::Repository.instance.fedora_url}"
       file = File.new(@fixture_filename, "r")
       result = foxml = Fedora::Repository.instance.ingest(file.read)
       if result
-        puts "The fixture has been ingested as #{result}"  
+        # puts "The fixture has been ingested as #{result}"  
       else
-        puts "Failed to ingest the fixture."
+        raise "Failed to ingest the fixture."
       end
       
     end
@@ -63,9 +62,34 @@ describe DatastreamRemover do
       dr.class.should eql(DatastreamRemover)
     end
     
+    it "removes a datastream" do
+      datastream_name = "contentMetadata"
+      batch_size = 1
+      pid_namespace = 
+      dr = DatastreamRemover.new(@repository_url)
+      foo = RestClient.get "#{@repository_url}/objects/#{@fixture_pid}/datastreams/#{datastream_name}?versionable=false"
+      foo.code.should eql(200)
+      dr.removeDatastream(datastream_name, batch_size, "fixture")
+      # RestClient.delete 'http://fedoraAdmin:fedoraAdmin@localhost:8983/fedora/objects/fixture:contentmd_removal/datastreams/contentMetadata?versionable=false'
+      lambda { RestClient.get "#{@repository_url}/objects/#{@fixture_pid}/datastreams/#{datastream_name}?versionable=false" }.should raise_exception(/404/)
+      
+    end
+    
     it "fetches an initial batch of PIDs" do
       dr = DatastreamRemover.new(@repository_url)
-      first_batch = dr.fetch_first_batch(1,"fixture")
+      fedora_query_fixture = File.join(File.dirname(__FILE__),"..","fixtures","fedora_query_results.xml")
+      first_batch = dr.fetch_batch(1,"fixture")
+      first_batch.length.should eql(1)
+      first_batch[0].should eql(@fixture_pid)
+    end
+    
+    it "extracts an array of pids from the fedora response" do
+      fedora_query_fixture = File.join(File.dirname(__FILE__),"..","fixtures","fedora_query_results.xml")
+      doc = Nokogiri::XML(File.open(fedora_query_fixture))
+      dr = DatastreamRemover.new(@repository_url)
+      pid_array = dr.extract_pid_array(doc)
+      pid_array[0].should eql("druid:mh502qk0176")
+      pid_array.length.should eql(4)
     end
     
     it "extracts a session token from the fedora response" do
@@ -74,12 +98,6 @@ describe DatastreamRemover do
       dr = DatastreamRemover.new(@repository_url)
       token = dr.extract_session_token(doc)
       token.should eql("bfe62bf233befbff0b9952f44d97f938")
-    end
-    
-    it "generates a list of objects that have a content metadata datastream" do
-      dr = DatastreamRemover.new(@repository_url)
-      removed_array = dr.removeDatastream("contentMetadata",1,"fixture") 
-      removed_array.length.should eql(2)
     end
     
   end
