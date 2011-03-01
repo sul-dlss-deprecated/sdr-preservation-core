@@ -16,7 +16,8 @@ require 'English'
 #:include:config/workflows/sdrIngest/sdrIngestWorkflow.xml
 module SdrIngest
   
-  # +PopulateMetadata+ finds a stub object in Sedora and populates its datastreams with the contents from a bagit object.
+  # PopulateMetadata finds a stub object in Sedora and 
+  # populates its datastreams with the contents from a bagit object.
   class PopulateMetadata < LyberCore::Robots::Robot
     
     # the fedora object to operate on
@@ -33,7 +34,7 @@ module SdrIngest
     attr_writer :bag_directory
     
     # Accessor method for datastream
-    attr_reader :identity_metadata, :content_metadata, :provenance_metadata
+    attr_reader :identity_metadata, :provenance_metadata
     
     # Override the LyberCore::Robot initialize method so we can set object attributes during initialization
     def initialize()
@@ -62,7 +63,6 @@ module SdrIngest
       raise IOError, "Can't load sedora object for #{@druid}" unless self.get_fedora_object
       self.populate_identity_metadata
       self.populate_provenance_metadata
-      self.populate_content_metadata
       @obj.save
     end
     
@@ -75,7 +75,6 @@ module SdrIngest
       
       self.populate_identity_metadata
       self.populate_provenance_metadata
-      self.populate_content_metadata
       @obj.save
     end
     
@@ -125,10 +124,6 @@ module SdrIngest
     
     def populate_provenance_metadata
       @provenance_metadata = populate_metadata('provenanceMetadata.xml','provenanceMetadata')
-    end
-    
-    def populate_content_metadata
-      @content_metadata = populate_metadata('contentMetadata.xml','contentMetadata')
     end
     
   end
