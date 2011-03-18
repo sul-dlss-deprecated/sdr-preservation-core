@@ -6,6 +6,7 @@ require 'lyber_core'
 require 'lyber_core/utils'
 require 'English'
 require 'logger'
+require 'fileutils'
 
 module SdrIngest
 
@@ -47,7 +48,8 @@ module SdrIngest
         LyberCore::Log.error("Cannot get a druid from the workflow")
         raise e
       end
-      @dest_path = File.join(SDR_DEPOSIT_DIR,druid)
+      bag_parent_dir = SdrDeposit.local_bag_parent_dir(druid)
+      @dest_path = File.join(bag_parent_dir,druid)
       LyberCore::Log.debug("dest_path is : #{@dest_path}")
       if File.exists?(@dest_path)
         LyberCore::Log.info("Object already exists: #{@dest_path}")
@@ -56,7 +58,8 @@ module SdrIngest
         filename = druid + ".tar"
         LyberCore::Log.debug("Tar file name being transferred is : #{filename}")
         begin
-          LyberCore::Utils::FileUtilities.transfer_object(filename, DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR)
+          FileUtils.mkdir_p bag_parent_dir
+          LyberCore::Utils::FileUtilities.transfer_object(filename, DOR_WORKSPACE_DIR, bag_parent_dir)
         rescue Exception => e
           LyberCore::Log.error("Error in transferring object : #{e.inspect}")
           LyberCore::Log.error("#{e.backtrace.join("\n")}")
@@ -65,17 +68,15 @@ module SdrIngest
           raise e
         end
         
-        LyberCore::Log.debug("#{filename} transferred to #{SDR_DEPOSIT_DIR}")
+        LyberCore::Log.debug("#{filename} transferred to #{bag_parent_dir}")
 
         # if env = sdr-services-test then untar the file directly in SDR_UNPACK_SERVER(sdr-thumper5)
         # e.g ssh sdr-thumper5 "cd ~/target/sdr2objects; tar xf 4177.tar"
         if (@env == "sdr-services-test" || @env == "sdr-services")
-            unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename}\""
-          
-            # force-local does not seem to work, nor is needed on SunOS
-            # unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{SDR_UNPACK_DIR}; tar xf #{filename} --force-local\""
+            unpack_dir = SdrDeposit.remote_bag_parent_dir(druid)
+            unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{unpack_dir}; tar xf #{filename}\""
         else
-            unpackcommand = "cd #{SDR_UNPACK_DIR}; tar xf #{filename} --force-local"
+            unpackcommand = "cd #{unpack_dir}; tar xf #{filename} --force-local"
         end
         LyberCore::Log.debug("Unpack command is :  #{unpackcommand}")
         
@@ -84,7 +85,7 @@ module SdrIngest
         LyberCore::Log.debug("Return from untar is : #{status}")
         if (status == true)
           # remove the tar file
-          file = File.join(SDR_DEPOSIT_DIR, filename)
+          file = File.join(bag_parent_dir, filename)
           LyberCore::Log.debug("File to be deleted is : #{file} ")
           numfiles = File.delete(file)
           if (numfiles >= 1)

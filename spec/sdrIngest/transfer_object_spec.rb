@@ -22,46 +22,49 @@ describe SdrIngest::TransferObject do
       transfer_robot = SdrIngest::TransferObject.new()
       # mock out a workitem
       mock_workitem = mock("workitem")
-      # return druid:123 when work_item.druid is called
-      mock_workitem.stub!(:druid).and_return("druid:123")
+      # return druid:ab123cd4567 when work_item.druid is called
+      mock_workitem.stub!(:druid).and_return("druid:ab123cd4567")
       LyberCore::Utils::FileUtilities.stub!(:transfer_object).and_return(true)
       transfer_robot.should_receive("system").with("")
       transfer_robot.process_item(mock_workitem).should == true
-      transfer_robot.dest_path.should == File.join(SDR_DEPOSIT_DIR,"druid:123")
+      druid="druid:ab123cd4567"
+      transfer_robot.dest_path.should == SdrDeposit.local_bag_path(druid)
     end
       
     it "should return true if it is a successful transfer" do
-      pending 
+      pending
+      druid = 'druid:ab123cd4567'
       # create new transferObject
       transfer_robot = SdrIngest::TransferObject.new()
       # mock out a workitem
       mock_workitem = mock("workitem")
-      # return druid:123 when work_item.druid is called
-      mock_workitem.stub!(:druid).and_return("druid:123")
+      # return druid:ab123cd4567 when work_item.druid is called
+      mock_workitem.stub!(:druid).and_return(druid)
       
       File.stub!(:exists?).and_return(false)
       LyberCore::Utils::FileUtilities.stub!(:transfer_object).and_return(true)
       
       # verify that FileUtilies.transfer_obejct is called
-      LyberCore::Utils::FileUtilities.should_receive(:transfer_object).with("druid:123.tar", DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR).once
+      LyberCore::Utils::FileUtilities.should_receive(:transfer_object).with("#{druid}.tar", DOR_WORKSPACE_DIR, SdrDeposit.local_bag_parent_dir(druid)).once
 
       # actually call the function we are testing
       transfer_robot.process_item(mock_workitem).should == true
     end
       
-    it "should raise and error if transfer fails" do
+    it "should raise an error if transfer fails" do
+      druid = 'druid:ab123cd4567'
       # create new transferObject
       transfer_robot = SdrIngest::TransferObject.new()
       # mock out a workitem
       mock_workitem = mock("workitem")
-      # return druid:123 when work_item.druid is called
-      mock_workitem.stub!(:druid).and_return("druid:123")
+      # return druid:ab123cd4567 when work_item.druid is called
+      mock_workitem.stub!(:druid).and_return(druid)
       
       File.stub!(:exists?).and_return(false)
       LyberCore::Utils::FileUtilities.stub!(:transfer_object).and_raise("rsync failed")
       
       # verify that FileUtilies.transfer_obejct is called
-      LyberCore::Utils::FileUtilities.should_receive(:transfer_object).with("druid:123.tar", DOR_WORKSPACE_DIR, SDR_DEPOSIT_DIR).once
+      LyberCore::Utils::FileUtilities.should_receive(:transfer_object).with("#{druid}.tar", DOR_WORKSPACE_DIR, SdrDeposit.local_bag_parent_dir(druid)).once
 
       # actually call the function we are testing
       lambda {transfer_robot.process_item(mock_workitem)}.should raise_error
@@ -73,8 +76,8 @@ describe SdrIngest::TransferObject do
       # mock out a workitem
       mock_workitem = mock("workitem")
 
-      objId = "druid:123"
-      # return druid:123 when work_item.druid is called
+      objId = "druid:ab123cd4567"
+      # return druid:ab123cd4567 when work_item.druid is called
       mock_workitem.stub!(:druid).and_return(objId)
       
       File.stub!(:exists?).and_return(true)

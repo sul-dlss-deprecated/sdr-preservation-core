@@ -165,7 +165,7 @@ end
 # ##################################################
 
 Then /^there should be a properly named bagit object in SDR_DEPOSIT_DIR$/ do
-  bagit_object = File.join(SDR_DEPOSIT_DIR, testpid)
+  bagit_object = File.join(SdrDeposit.local_bag_parent_dir(testpid), testpid)
   (File.exists? bagit_object).should == true
   (File.directory? bagit_object).should == true
 end

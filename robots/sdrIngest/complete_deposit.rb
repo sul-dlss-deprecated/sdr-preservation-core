@@ -15,8 +15,7 @@ module SdrIngest
   # workflow that the sdrIngest workflow is complete
   class CompleteDeposit < LyberCore::Robots::Robot
     attr_reader :obj, :druid
-    attr_writer :bag_directory
-    
+
     # Workflow XML as read from the object 
     attr_reader :obj_wf 
 
@@ -39,9 +38,6 @@ module SdrIngest
       @start_time = Time.new
       LyberCore::Log.debug("Start time is :   #{@start_time}")
             
-      # by default, get the bags from the SDR_DEPOSIT_DIR
-      # this can be explicitly changed if necessary
-      @bag_directory = SDR_DEPOSIT_DIR
     end
     
     def process_item(work_item)

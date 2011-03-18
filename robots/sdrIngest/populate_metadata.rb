@@ -28,11 +28,7 @@ module SdrIngest
     
     # the druid of the current workitem
     attr_reader :druid 
-    
-    # The directory to read bags from, mostly used for testing
-    attr_reader :bag_directory
-    attr_writer :bag_directory
-    
+
     # Accessor method for datastream
     attr_reader :identity_metadata, :provenance_metadata
     
@@ -47,9 +43,6 @@ module SdrIngest
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
       LyberCore::Log.debug("Process ID is : #{$PID}")
       
-      # by default, get the bags from the SDR_DEPOSIT_DIR
-      # this can be explicitly changed if necessary
-      @bag_directory = SDR_DEPOSIT_DIR
     end
 
     # Override the robot LyberCore::Robot.process_item method.
@@ -81,7 +74,7 @@ module SdrIngest
     # Check to see if the bagit directory exists.
     # It does not check the validity of the bag, it assumes this has already happened.
     def bag_exists?
-      @bag = @bag_directory + '/' + self.druid
+      @bag = SdrDeposit.local_bag_path(self.druid)
       File.directory? @bag
     end
     

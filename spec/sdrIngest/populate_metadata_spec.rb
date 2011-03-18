@@ -10,7 +10,6 @@ context "Populating Metadata" do
   def setup
     
     @robot = SdrIngest::PopulateMetadata.new()    
-    @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
     mock_workitem = mock("populate_metadata_workitem")
     mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
     
@@ -73,25 +72,11 @@ context "Populating Metadata" do
       @robot.should respond_to(:bag_exists?)
     end
     
-    it "knows where to look for the bag object" do
-      @robot.should respond_to(:bag_directory)
-    end
-    
-    it "looks in SDR_DEPOSIT_DIR by default" do
-      @robot.bag_directory.should eql(SDR_DEPOSIT_DIR)
-    end
-    
-    it "allows us to change the location of bag_directory" do
-      @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
-      @robot.bag_directory.should eql(SDR2_EXAMPLE_OBJECTS)
-    end
-    
     it "finds a bag corresponding to the workitem's druid" do
       setup
       
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
-      @robot.bag_directory = SDR2_EXAMPLE_OBJECTS
       @robot.process_item(mock_workitem)
       @robot.bag_exists?.should eql(true)
       (File.directory? @robot.bag).should eql(true)
@@ -99,8 +84,14 @@ context "Populating Metadata" do
     
     it "raises an IOError if it can't find a bagit object for the given druid" do
       mock_workitem = mock("populate_metadata_workitem")
-      mock_workitem.stub!(:druid).and_return("druid:obviously_fake")      
+      mock_workitem.stub!(:druid).and_return("druid:zz999zz9999")
       lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /Can\'t find a bag/)
+    end
+
+    it "raises an RuntimeError if the specified druid has an invalid syntax" do
+      mock_workitem = mock("populate_metadata_workitem")
+      mock_workitem.stub!(:druid).and_return("druid:obviously_fake")
+      lambda { @robot.process_item(mock_workitem) }.should raise_exception(RuntimeError, /Identifier has invalid suri syntax/)
     end
   end
 

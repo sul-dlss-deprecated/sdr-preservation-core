@@ -9,7 +9,6 @@ describe SdrIngest::CompleteDeposit do
   
   def setup
     @complete_robot = SdrIngest::CompleteDeposit.new()    
-    @complete_robot.bag_directory = SDR2_EXAMPLE_OBJECTS
 
     @objectID = "druid:jc837rq9922"
     
@@ -109,7 +108,7 @@ describe SdrIngest::CompleteDeposit do
     
     it "should raise an error if the Sedora obj with corresponding druid cannot be loaded" do
       mock_workitem = mock("complete_deposit_workitem")
-      mock_workitem.stub!(:druid).and_return("druid:123")
+      mock_workitem.stub!(:druid).and_return("druid:ab123cd4567")
       
       lambda {@complete_robot.process_item(mock_workitem)}.should raise_error(/Sedora/)
     end  

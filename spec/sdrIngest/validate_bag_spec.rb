@@ -106,7 +106,7 @@ describe SdrIngest::ValidateBag do
       it "should raise error when bag does not exist" do
         robot = SdrIngest::ValidateBag.new()
         mock_workitem = mock("workitem")
-        mock_workitem.stub!(:druid).and_return("druid:123")
+        mock_workitem.stub!(:druid).and_return("druid:ab123cd4567")
 
         lambda {robot.process_item(mock_workitem)}.should raise_error
       end
@@ -114,7 +114,7 @@ describe SdrIngest::ValidateBag do
       it "should return nil when bag is valid" do
         robot = SdrIngest::ValidateBag.new()
         mock_workitem = mock("workitem")
-        mock_workitem.stub!(:druid).and_return("druid:123")
+        mock_workitem.stub!(:druid).and_return("druid:ab123cd4567")
         mock_bag = mock("bag")
 	robot.stub!(:bag_exists?).and_return(true)
         BagIt::Bag.stub!(:new).and_return(mock_bag)
@@ -126,7 +126,7 @@ describe SdrIngest::ValidateBag do
       it "should raise error when bag is not valid" do
         robot = SdrIngest::ValidateBag.new()
         mock_workitem = mock("workitem")
-        mock_workitem.stub!(:druid).and_return("druid:123")
+        mock_workitem.stub!(:druid).and_return("druid:ab123cd4567")
         mock_bag = mock("bag")
 	robot.stub!(:bag_exists?).and_return(true)
         BagIt::Bag.stub!(:new).and_return(mock_bag)
