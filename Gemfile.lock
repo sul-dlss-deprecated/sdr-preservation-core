@@ -43,7 +43,7 @@ GEM
       rubyforge (>= 2.0.0)
     json_pure (1.4.6)
     linecache (0.43)
-    lyber-core (0.9.6.2)
+    lyber-core (0.9.6.3)
       actionpack
       active-fedora (>= 1.2.6)
       bagit (>= 0.1.0)
@@ -118,7 +118,7 @@ DEPENDENCIES
   jeweler (= 1.4.0)
   json_pure (= 1.4.6)
   linecache (= 0.43)
-  lyber-core (= 0.9.6.2)
+  lyber-core (= 0.9.6.3)
   mime-types (= 1.16)
   multipart-post (= 1.0.1)
   nokogiri (= 1.4.3.1)

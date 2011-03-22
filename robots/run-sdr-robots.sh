@@ -1,127 +1,111 @@
 #!/bin/bash
 # run-sdr-robots.sh
-ROBOT_ENVIRONMENT=${1:-test}
-SDR2_OBJECTS=${2:-"/var/sdr2objects"}
-# ROBOT_DIRECTORY=${3:-sdrIngest}
 
-# Test if previous invocation of a script is still active
-function robot_running() {
-    robot=$1
-    echo  `ps -ef | grep ${robot}.rb | grep -v 'grep' | wc -l`
-}
+source $HOME/.bashrc
+echo $PATH
 
-# Test available free disk space
-function workspace_free() {
-    # On Linux print $3 to get available space
-    # On Mac print $4 to get available space
+# Location of shell scripts
+# http://hustoknow.blogspot.com/2011/01/what-bashsource-does.html
+SHELL_SCRIPT_HOME=`dirname $BASH_SOURCE`
 
-    echo `df -k ${SDR2_OBJECTS} | tail -1 | awk '{ print $3 }'`
-    #echo `df -k ${SDR2_HOME}/sdr2/sdr2_example_objects  | tail -1 | awk '{ print $3 }'`
-}
+source ${SHELL_SCRIPT_HOME}/../.rvmrc
+rvm list gemsets
+# rvm info
 
+# Location of global environment scripts
+ENVIRONMENT_HOME=${SHELL_SCRIPT_HOME}/../config/environments
 
-# Run all the google robots
-function run_all_robots() {
+# Location of robot scripts
+ROBOT_SCRIPT_HOME=${SHELL_SCRIPT_HOME}/sdrIngest
 
-    kinit -k -t /var/sdr2service/sulair-lyberservices service/sulair-lyberservices && aklog
+# The name of the current computer without the domain
+HOST=`hostname -s`
 
-    (cd ${SDR2_HOME}/sdr2/robots/sdrIngest ;
-	echo cwd=`pwd`
-    robot="register_sdr"
-    if [ `robot_running $robot` -eq 0 ]; then
-        echo "running $robot"
-        echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot 
-        sleep 5
+# Number of Bytes in 100GB and 10GB
+GB100=100000000
+GB10=10000000
+
+# Make sure a value is set for ROBOT_ENVIRONMENT
+if [[ "$ROBOT_ENVIRONMENT" == "" ]]; then
+    # Variable has not been previously set
+    if [[ -f ${ENVIRONMENT_HOME}/${HOST}.rb ]]; then
+        # using enviroment based on hostname
+        ROBOT_ENVIRONMENT=${HOST}
     else
-        echo "$robot already running"
-        ps -ef | grep $robot
+        # default is test
+        ROBOT_ENVIRONMENT="test"
     fi
-    echo ""
+fi
 
-    robot="transfer_object"
-    GB100=100000000
-    GB10=10000000
-    if [ `robot_running $robot` -eq 0 ]; then
-        if [ `workspace_free` -gt  ${GB10} ]; then
-            echo "running $robot"
-            echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot &
-             sleep 5
+# WORKSPACE filesystem
+if [[ "$ROBOT_ENVIRONMENT" == "test" ]]; then
+    WORKSPACE=/
+else
+    WORKSPACE=/services-disk
+fi
+
+function run_robot() {
+    ROBOT=${1}
+    ROBOT_SCRIPT=${ROBOT_SCRIPT_HOME}/${ROBOT}
+    if [[ -f ${ROBOT_SCRIPT} ]]; then
+        if [[ `ps -ef | grep ${ROBOT} | grep -v 'grep' | wc -l` -eq 0 ]]; then
+            echo "running $*"
+            ruby ${ROBOT_SCRIPT_HOME}/$* &
+            sleep 5
+            echo ""
         else
-            echo "$robot" not run
-            echo "Available free workspace has dropped below 100 GB"
+            echo "${ROBOT} already running"
+            ps -ef | grep ${ROBOT} | grep -v 'grep' 
         fi
     else
-        echo "$robot already running"
-        ps -ef | grep $robot
+	    echo "Robot script not found: ${ROBOT_SCRIPT}"
     fi
-    echo ""
-
-    robot="validate_bag"
-    if [ `robot_running $robot` -eq 0 ]; then
-        echo "running $robot"
-        echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot &
-        sleep 5
-    else
-        echo "$robot already running"
-        ps -ef | grep $robot
-    fi
-    echo ""
-
-    robot="populate_metadata"
-    if [ `robot_running $robot` -eq 0 ]; then
-	echo "running $robot"
-        echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot &
-        sleep 5
-    else
-        echo "$robot already running"
-        ps -ef | grep $robot
-    fi
-    echo ""
-
-    robot="verify_agreement"
-    if [ `robot_running $robot` -eq 0 ]; then
-	echo "running $robot"
-        echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot &
-        sleep 5
-    else
-        echo "$robot already running"
-        ps -ef | grep $robot
-    fi
-    echo ""
-
-    robot="complete_deposit"
-    if [ `robot_running $robot` -eq 0 ]; then
-	echo "running $robot"
-        echo_execute ../run-robot.sh $ROBOT_ENVIRONMENT $robot &
-        sleep 5
-    else
-        echo "$robot already running"
-        ps -ef | grep $robot
-    fi
-    echo ""
-    )
 }
 
-function echo_execute() {
-  echo
-  echo "*************************  Executing: $@  "
-  echo "AT : `date`"
-  # Uncomment on Mac
-  #$@
-  # Comment this on Mac - time -f not supported
-  # Supported on Linux
-  /usr/bin/time -f 'Time elapsed = %E' $@
-  result=$?
-  echo "Completed at: `date`"
-  return $result
+function run_robot_if_space() {
+    MIN_SPACE=$1
+    if [[ ( "$MIN_SPACE" =~ ^[0-9]+$ ) ]]; then
+        if [[ `df ${WORKSPACE} 2>/dev/null | wc -l` -gt 0 ]]; then
+            FREE_SPACE=`df -k  ${WORKSPACE}| tail -1 | awk '{ print $3 }'`
+            if [ $FREE_SPACE -ge  $MIN_SPACE ]; then
+                shift
+                run_robot $*
+            else
+                echo "${ROBOT} not run. Filesystem ${WORKSPACE} has dropped below ${MIN_SPACE}"
+                return
+            fi
+        else
+            echo "Not a filesystem: ${WORKSPACE}"
+        fi
+    else
+        echo "Mininum space specification not a number: $MIN_SPACE"
+    fi
 }
 
-# run script every 3 minutes
-while [ 0 ]
-do
-timestamp=`date +%Y%m%d_%H%M%S`
-run_all_robots 
-#mail -s "run-sdr-robots $timestamp" alpana@stanford.edu
-echo "RELAUNCH ROBOTS after 100 seconds ..."
-sleep 100
-done
+
+# Run all the google robots every 100 seconds in test or 1800 seconds in prod
+function run_all_robots() {
+    run_robot register_sdr.rb
+    run_robot_if_space GB10 transfer_object.rb
+    run_robot validate_bag.rb
+    run_robot populate_metadata.rb
+    run_robot verify_agreement.rb
+    run_robot complete_deposit.rb
+}
+
+
+if  [[ "$1" != "" ]]; then
+    # Make sure there is an environment script file
+    if [[ -f ${ENVIRONMENT_HOME}/${ROBOT_ENVIRONMENT}.rb ]]; then
+        export ROBOT_ENVIRONMENT
+        kinit -k -t /var/sdr2service/sulair-lyberservices service/sulair-lyberservices && aklog
+        if [[ "$1" == "all" ]]; then
+            run_all_robots
+        else
+            run_robot $*
+        fi
+    else
+        echo "ERROR: environment script not found - ${ENVIRONMENT_HOME}/${ROBOT_ENVIRONMENT}.rb"
+    fi
+fi
+

@@ -14,6 +14,6 @@ puts "loading environment #{environment}"
 
 require File.expand_path(File.dirname(__FILE__) + "/../config/environments/#{environment}")
   
-ROBOT_ROOT = File.expand_path(File.dirname(__FILE__) + "/..")
+ROBOT_ROOT = File.expand_path(File.dirname(__FILE__) + "/..") unless defined?(ROBOT_ROOT)
 
 require 'sdr_deposit'
