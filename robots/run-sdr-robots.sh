@@ -2,7 +2,7 @@
 # run-sdr-robots.sh
 
 source $HOME/.bashrc
-echo $PATH
+# echo $PATH
 
 # Location of shell scripts
 # http://hustoknow.blogspot.com/2011/01/what-bashsource-does.html
@@ -36,6 +36,7 @@ if [[ "$ROBOT_ENVIRONMENT" == "" ]]; then
         ROBOT_ENVIRONMENT="test"
     fi
 fi
+echo "ROBOT_ENVIRONMENT = $ROBOT_ENVIRONMENT"
 
 # WORKSPACE filesystem
 if [[ "$ROBOT_ENVIRONMENT" == "test" ]]; then
@@ -43,6 +44,7 @@ if [[ "$ROBOT_ENVIRONMENT" == "test" ]]; then
 else
     WORKSPACE=/services-disk
 fi
+echo "WORKSPACE = $WORKSPACE"
 
 function run_robot() {
     ROBOT=${1}
@@ -86,7 +88,7 @@ function run_robot_if_space() {
 # Run all the google robots every 100 seconds in test or 1800 seconds in prod
 function run_all_robots() {
     run_robot register_sdr.rb
-    run_robot_if_space GB10 transfer_object.rb
+    run_robot_if_space $GB10 transfer_object.rb
     run_robot validate_bag.rb
     run_robot populate_metadata.rb
     run_robot verify_agreement.rb
