@@ -73,7 +73,7 @@ module SdrIngest
     # a specific item instead of relying on the work queue 
     def process_druid(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_druid")
-      dest_path = File.join(SdrDeposit.local_bag_parent_dir(druid),druid)
+      dest_path = SdrDeposit.local_bag_path(druid)
       LyberCore::Log.debug("dest_path is : #{dest_path}")
       
       if not bag_exists?(dest_path) 

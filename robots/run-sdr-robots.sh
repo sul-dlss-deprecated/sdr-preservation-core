@@ -48,7 +48,7 @@ function run_robot() {
     ROBOT=${1}
     ROBOT_SCRIPT=${ROBOT_SCRIPT_HOME}/${ROBOT}
     if [[ -f ${ROBOT_SCRIPT} ]]; then
-        if [[ `ps -ef | grep ${ROBOT} | grep -v 'grep' | wc -l` -eq 0 ]]; then
+        if [[ `ps -ef | grep ${ROBOT} | grep -v 'run-sdr-robots.sh' | grep -v 'grep' | wc -l` -eq 0 ]]; then
             echo "running $*"
             ruby ${ROBOT_SCRIPT_HOME}/$* &
             sleep 5
