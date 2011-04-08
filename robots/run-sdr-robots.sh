@@ -53,7 +53,7 @@ function run_robot() {
         if [[ `ps -ef | grep ${ROBOT} | grep -v 'run-sdr-robots.sh' | grep -v 'grep' | wc -l` -eq 0 ]]; then
             echo "running $*"
             ruby ${ROBOT_SCRIPT_HOME}/$* &
-            sleep 5
+            sleep 60
             echo ""
         else
             echo "${ROBOT} already running"
@@ -87,12 +87,12 @@ function run_robot_if_space() {
 
 # Run all the google robots every 100 seconds in test or 1800 seconds in prod
 function run_all_robots() {
-    run_robot register_sdr.rb
-    run_robot_if_space $GB10 transfer_object.rb
-    run_robot validate_bag.rb
-    run_robot populate_metadata.rb
-    run_robot verify_agreement.rb
     run_robot complete_deposit.rb
+    run_robot verify_agreement.rb
+    run_robot populate_metadata.rb
+    run_robot validate_bag.rb
+    run_robot_if_space $GB10 transfer_object.rb
+    # run_robot register_sdr.rb
 }
 
 
