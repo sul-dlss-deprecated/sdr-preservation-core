@@ -62,8 +62,8 @@ function report_activity() {
             cat status/${robot}.errors >> $errall
         fi
 	done
-    comm -23 $errall $errold >> $errnew
-    if [[ `cat $errnew | wc -l` -gt 0 ]]; then
+    comm -23 $errall $errold > $errnew
+    if [[ -s $errnew ]]; then
        printf "\n======== ERROR DETAIL ==========\n\n" >> $rptout
        tail -1 $errnew >> $rptout
     fi
