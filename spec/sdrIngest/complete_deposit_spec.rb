@@ -20,10 +20,8 @@ describe SdrIngest::CompleteDeposit do
     
     # Make sure we're starting with a blank object
     begin
-      @obj = ActiveFedora::Base.load_instance(@mock_workitem.druid)
-      @obj.delete unless obj.nil?
-    rescue
-      # $stderr.print $!
+      ActiveFedora::Base.load_instance(@mock_workitem.druid).delete
+    rescue ActiveFedora::ObjectNotFoundError
     end
     
     begin
