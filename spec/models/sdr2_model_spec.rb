@@ -12,6 +12,10 @@ describe Sdr2Model do
       ActiveFedora::SolrService.register(SOLR_URL)
       filename = File.expand_path(File.dirname(__FILE__) + '/../fixtures/fixture_fixture1.foxml.xml')
       file = File.new(filename, "r")
+      begin
+        Sdr2Model.load_instance(pid).delete
+      rescue ActiveFedora::ObjectNotFoundError
+      end
       result = foxml = Fedora::Repository.instance.ingest(file.read)
       @obj = Sdr2Model.load_instance(pid)
       @solr_doc = @obj.to_solr
