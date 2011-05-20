@@ -9,5 +9,5 @@ coverage.data
 hydra-jetty
 hydra-jetty/*
 config/environments/passwords.rb
-
-
+.yardoc
+doc/*
