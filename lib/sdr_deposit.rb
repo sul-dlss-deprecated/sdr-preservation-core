@@ -1,12 +1,9 @@
 class SdrDeposit
     # Returns the pair tree directory structure based on the given object identifier.
     # The object identifier must be in the SURI format, otherwise an exception is raised:
-    #
-    #     e.g. druid:aannnaannnn 
-    #
-    #       where 'a' is an alphabetic character
-    #       where 'n' is a numeric character
-    #
+    # e.g. druid:aannnaannnn 
+    # where 'a' is an alphabetic character
+    # where 'n' is a numeric character
     def SdrDeposit.suri_pair_tree(suri)
       syntax_msg = "Identifier has invalid suri syntax: #{suri}"
       raise syntax_msg + "nil or empty" if suri.to_s.empty?
