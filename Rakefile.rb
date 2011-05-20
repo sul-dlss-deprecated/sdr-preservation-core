@@ -10,7 +10,9 @@ require 'jettywrapper'
 # Import external rake tasks
 Dir.glob('lib/tasks/*.rake').each { |r| import r }
 
-task :default  => :test
+task :default  => :spec
+task :hudson  => [:test_with_jetty, :yard]
+
 
 desc "Set up environment variables. Unless otherwise specified ROBOT_ENVIRONMENT defaults to local"
 task :environment do
@@ -18,16 +20,6 @@ task :environment do
    RAILS_ENV = environment
    require File.expand_path(File.dirname(__FILE__) + "/config/environments/#{environment}")  
    ActiveFedora::SolrService.register( SOLR_URL )
-end
-
-desc  "Run all of the rspec examples and generate the rdocs and rcov report"
-task "test" do
-  Rake::Task["examples"].invoke
-end
-
-desc "Run RSpec examples"
-Spec::Rake::SpecTask.new('examples') do |t|
-  t.spec_files = FileList['spec/**/*.rb']
 end
 
 desc "Run RSpec with RCov"
@@ -38,28 +30,43 @@ Spec::Rake::SpecTask.new('spec') do |t|
 end
 
 desc "Run RSpec Examples wrapped in a test instance of jetty"
-task :hudson do
-    if (ENV['RAILS_ENV'] == "test")
-      jetty_params = { 
-        :jetty_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty'), 
-        :quiet => false, 
-        :jetty_port => 8983, 
-        :solr_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty/solr'),
-        :fedora_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty/fedora/default'),
-        :startup_wait => 30
-        }
-      error = Jettywrapper.wrap(jetty_params) do  
-        Rake::Task["spec"].invoke
-      end
-      raise "test failures: #{error}" if error
-    else
-      system("rake hudson RAILS_ENV=test")
+task :test_with_jetty do
+  if (ENV['RAILS_ENV'] == "test")
+    jetty_params = { 
+      :jetty_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty'), 
+      :quiet => false, 
+      :jetty_port => 8983, 
+      :solr_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty/solr'),
+      :fedora_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty/fedora/default'),
+      :startup_wait => 30
+      }
+    error = Jettywrapper.wrap(jetty_params) do  
+      Rake::Task["spec"].invoke
     end
+    raise "test failures: #{error}" if error
+  else
+    system("rake hudson RAILS_ENV=test")
   end
+end
 
-desc "Generate HTML report for failing examples"
-Spec::Rake::SpecTask.new('failing_examples_with_html') do |t|
-  t.spec_files = FileList['failing_examples/**/*.rb']
-  t.spec_opts = ["--format", "html:doc/reports/tools/failing_examples.html", "--diff"]
-  t.fail_on_error = false
+# Use yard to build docs
+begin
+  require 'yard'
+  require 'yard/rake/yardoc_task'
+
+  project_root = File.expand_path(File.dirname(__FILE__))
+  puts "project_root = #{project_root}"
+  doc_destination = File.join(project_root, 'doc')
+
+
+  YARD::Rake::YardocTask.new do |yt|
+    yt.files = Dir.glob(File.join(project_root, 'robots', '**', '*.rb')) +
+                 [ File.join(project_root, 'README.rdoc') ]
+    yt.options = ['--readme', 'README.rdoc']
+  end
+rescue LoadError
+  desc "Generate YARD Documentation"
+  task :doc do
+    abort "Please install the YARD gem to generate rdoc."
+  end
 end
