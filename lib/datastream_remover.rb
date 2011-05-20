@@ -19,9 +19,9 @@ class DatastreamRemover
   # @param [String] restrict the removal to this PID namespace
   # @return [Array] the list of druids from which the datastream was removed
   # @example 
-  # => dr = DatastreamRemover.new(repository_url)
-  # => dr.removeDatastream("contentMetadata",10,"druid") 
-  # => will remove the contentMetadata datastream from all objects in the druid: PID namespace, 10 objects at a time
+  #  dr = DatastreamRemover.new(repository_url)
+  #  dr.removeDatastream("contentMetadata",10,"druid") 
+  #  will remove the contentMetadata datastream from all objects in the druid: PID namespace, 10 objects at a time
   def removeDatastream(datastream_name, batch_size, pid_namespace)
     removed_array = []
     open('/tmp/output', 'w') { |f| 
