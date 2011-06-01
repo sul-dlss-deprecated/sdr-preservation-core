@@ -45,7 +45,7 @@ module SdrIngest
       @dest_path = File.join(bag_parent_dir,druid)
       LyberCore::Log.debug("dest_path is : #{@dest_path}")
       if File.exists?(@dest_path)
-        LyberCore::Log.info("Bag already exists at destination: #{@dest_path}")
+        raise LyberCore::Exceptions::ItemError.new(druid, "Bag already exists at destination: #{@dest_path}")
       else
         # filename is druid.tar
         filename = druid + ".tar"

@@ -125,7 +125,10 @@ module SdrIngest
       # Put the results in "sdr_prov" so it can be tested
       @sdr_prov = doc_frag.to_s
       LyberCore::Log.debug("sdr_prov stanza is : #{@sdr_prov}")
-      
+
+    rescue Exception => e
+      raise LyberCore::Exceptions::FatalError.new("Cannot create sdr_prov stanza xml for #{@obj.pid}",e)
+
     end
    
     # make_new_prov
@@ -154,6 +157,8 @@ module SdrIngest
       
       @obj_prov = ex_prov_node.to_xml
       LyberCore::Log.debug("Created sdr_prov as a child node in provenanceMetadata")
+    rescue Exception => e
+      raise LyberCore::Exceptions::FatalError.new("Cannot create new provenanceMetadata xml for #{@obj.pid}",e)
     end
     
     def update_prov_datastream
@@ -163,6 +168,8 @@ module SdrIngest
       @obj.add_datastream(ds)
       @obj.save
       LyberCore::Log.debug("Updated provenanceMetadata datastream")
+    rescue Exception => e
+      raise LyberCore::Exceptions::FatalError.new("Cannot update provenanceMetadata datastream for #{@obj.pid}",e)
     end
     
     # fetch the fedora object from the repository so we can attach datastreams to it

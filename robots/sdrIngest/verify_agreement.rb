@@ -60,11 +60,11 @@ module SdrIngest
           LyberCore::Log.debug("Agreement is available in Sedora at : " + agreement_uri_string)
           @valid_agreement_ids << agreement_id
           return true
-        rescue Net::HTTPServerException
+        rescue Net::HTTPServerException => e
           # If agreement object is not in Sedora then throw an exception
-          raise LyberCore::Exceptions::ItemError.new(druid,"Couldn't find agreement object #{@agreement_id} in Sedora")
-        rescue
-          raise LyberCore::Exceptions::ItemError.new(druid, "Connecting to #{SEDORA_URI} in verify-agreement fails")
+          raise LyberCore::Exceptions::FatalError.new("Couldn't find agreement object #{@agreement_id} in Sedora",e)
+        rescue Exception => e
+          raise LyberCore::Exceptions::FatalError.new("Connecting to #{SEDORA_URI} in verify-agreement fails", e)
         end
       end
     end
@@ -92,7 +92,7 @@ module SdrIngest
         LyberCore::Log.debug(doc.xpath("//agreementId/text()") )
         doc.xpath("//agreementId/text()")
       rescue Exception => e
-        raise LyberCore::Exceptions::ItemError.new(druid, "Error getting an agreement from  #{SEDORA_URI}", e)
+        raise LyberCore::Exceptions::FatalError.new("Could not get an agreement for #{druid} from #{SEDORA_URI}", e)
       end
     end
   end

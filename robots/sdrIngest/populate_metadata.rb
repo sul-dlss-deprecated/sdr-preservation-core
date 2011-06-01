@@ -69,14 +69,12 @@ module SdrIngest
     # throw an error if we can't find the object
     def get_fedora_object
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter get_fedora_object")
-      begin
-        LyberCore::Log.debug("Registering #{SEDORA_URI}")
-        Fedora::Repository.register(SEDORA_URI)
-        @obj = ActiveFedora::Base.load_instance(@druid)
-        LyberCore::Log.debug("Loaded druid #{@druid} into object #{@obj}")
-      rescue  Exception => e
-        raise LyberCore::Exceptions::FatalError.new("Cannot connect to Fedora at url #{SEDORA_URI}",e)
-      end
+      LyberCore::Log.debug("Registering #{SEDORA_URI}")
+      Fedora::Repository.register(SEDORA_URI)
+      @obj = ActiveFedora::Base.load_instance(@druid)
+      LyberCore::Log.debug("Loaded druid #{@druid} into object #{@obj}")
+    rescue  Exception => e
+      raise LyberCore::Exceptions::FatalError.new("Cannot connect to Fedora at url #{SEDORA_URI}",e)
     end
     
     # Go grab the given filename from the bagit object, 
@@ -90,6 +88,8 @@ module SdrIngest
       md = ActiveFedora::Datastream.new(:pid=>@obj.pid, :dsid=>label, :dsLabel=>label, :blob=>IO.read(mdfile))
       @obj.add_datastream(md)
       return md
+    rescue Exception => e
+      raise LyberCore::Exceptions::FatalError.new("Cannot add #{label} datastream for #{@obj.pid}",e)
     end
     
     def populate_identity_metadata
