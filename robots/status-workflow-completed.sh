@@ -5,8 +5,7 @@
 # (2) total size of all objects in the storage area
 
 # Number of objects
-WORKFLOW_COUNT=~/sdr2/robots/workflow-count.sh
-OBJECT_COUNT=`${WORKFLOW_COUNT} 'completed=complete-deposit' | sed -s 's/^ *//'| cut -f1 -d' '`
+OBJECT_COUNT=`~/sdr2/robots/workflow-archive-count.sh`
 
 # Size of storage area
 WORKSPACE="/services-disk"
