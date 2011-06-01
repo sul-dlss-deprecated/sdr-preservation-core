@@ -51,21 +51,8 @@ module SdrIngest
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       # Identifiers
       @druid = work_item.druid
-    
-      raise IOError, "Can't find a bag at #{@bag}" unless self.bag_exists?
-      raise IOError, "Can't load sedora object for #{@druid}" unless self.get_fedora_object
-      self.populate_identity_metadata
-      self.populate_provenance_metadata
-      @obj.save
-    end
-    
-    def process_druid(druid)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_druid")
-      @druid = druid
-      
-      raise IOError, "Can't find a bag at #{@bag} : #{e.inspect} " unless self.bag_exists?
-      raise IOError, "Can't load sedora object for #{@druid} : #{e.inspect} \n  #{e.backtrace.join("\n")}" unless self.get_fedora_object
-      
+      raise LyberCore::Exceptions::ItemError.new(druid, "Can't find a bag at #{@bag}") unless self.bag_exists?
+      raise LyberCore::Exceptions::ItemError.new(druid, "Can't load sedora object for #{@druid}") unless self.get_fedora_object
       self.populate_identity_metadata
       self.populate_provenance_metadata
       @obj.save
@@ -82,19 +69,13 @@ module SdrIngest
     # throw an error if we can't find the object
     def get_fedora_object
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter get_fedora_object")
-      LyberCore::Log.debug("Connecting to #{SEDORA_URI}...")
       begin
+        LyberCore::Log.debug("Registering #{SEDORA_URI}")
         Fedora::Repository.register(SEDORA_URI)
         @obj = ActiveFedora::Base.load_instance(@druid)
-      rescue Errno::ECONNREFUSED => e
-        LyberCore::Log.error("Can't connect to Fedora at url #{SEDORA_URI} : #{e.inspect}")
-        LyberCore::Log.error( "#{e.backtrace}")
-        
-        raise RuntimeError, "Can't connect to Fedora at url #{SEDORA_URI} : #{e}"   
-        #return nil     
-      rescue Exception => e
-        raise e
-        #return nil
+        LyberCore::Log.debug("Loaded druid #{@druid} into object #{@obj}")
+      rescue  Exception => e
+        raise LyberCore::Exceptions::FatalError.new("Cannot connect to Fedora at url #{SEDORA_URI}",e)
       end
     end
     
@@ -125,20 +106,6 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  begin
     dm_robot = SdrIngest::PopulateMetadata.new()
-    # If this robot is invoked with a specific druid, it will populate the metadata for that druid only
-    if(ARGV[0])
-      LyberCore::Log.debug("Updating metadata for #{ARGV[0]}")
-      dm_robot.process_druid(ARGV[0])
-    else
-      LyberCore::Log.debug("workflow = #{dm_robot.workflow}")
-      dm_robot.start
-    end
-  rescue Exception => e
-    puts "ERROR : " + e.message
-    LyberCore::Log.error("Error in Populate Metadata :  #{e.message} + #{e.inspect}")
-    LyberCore::Log.error("#{e.backtrace.join("\n")}")
-  end
-  puts "Populate Metadata done\n"
+    dm_robot.start
 end

@@ -108,7 +108,7 @@ describe SdrIngest::CompleteDeposit do
       mock_workitem = mock("complete_deposit_workitem")
       mock_workitem.stub!(:druid).and_return("druid:ab123cd4567")
       
-      lambda {@complete_robot.process_item(mock_workitem)}.should raise_error(/Sedora/)
+      lambda {@complete_robot.process_item(mock_workitem)}.should raise_exception(LyberCore::Exceptions::FatalError)
     end  
   end
 
@@ -121,11 +121,6 @@ describe SdrIngest::CompleteDeposit do
       cleanup
     end
 
-    it "should raise error if update provenance fails" do
-      @complete_robot.stub!(:update_provenance).and_return(false)
-      lambda {@complete_robot.process_item(@mock_workitem)}.should raise_exception("Failed to update provenance to include Deposit completion.")
-    end
-    
     # This test looks at the "sdr_prov" instance var
     # and make sure it contains the XML string for the SDR provenance stanza.
     # It should contain all events stored in "sdr_wf",

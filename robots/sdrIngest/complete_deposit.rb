@@ -42,16 +42,13 @@ module SdrIngest
     
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      
       @druid = work_item.druid
-      raise "Cannot load Sedora object." unless get_fedora_object
-      
-      # Update provenance
-      raise "Failed to update provenance to include Deposit completion." unless update_provenance
+      get_fedora_object
+      update_provenance
 
-      # Update DOR workflow 
+      # Update DOR workflow
       result = Dor::WorkflowService.update_workflow_status("dor", @druid, "googleScannedBookWF", "sdr-ingest-deposit", "completed")
-      raise "Update workflow \"complete-deposit\" failed." unless result
+      raise LyberCore::Exceptions::FatalError.new("Update workflow \"complete-deposit\" failed.") unless result
     end
     
     private
@@ -173,20 +170,12 @@ module SdrIngest
     def get_fedora_object
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter get_fedora_object")
       begin
-        Fedora::Repository.register(SEDORA_URI)
         LyberCore::Log.debug("Registering #{SEDORA_URI}")
-        
+        Fedora::Repository.register(SEDORA_URI)
         @obj = ActiveFedora::Base.load_instance(@druid)
         LyberCore::Log.debug("Loaded druid #{@druid} into object #{@obj}")
-        
-      rescue Errno::ECONNREFUSED => e
-        LyberCore::Log.fatal("Cannot connect to Fedora at url #{SEDORA_URI} : #{e.inspect}")
-        LyberCore::Log.fatal( "#{e.backtrace.join("\n")}")
-        
-        raise RuntimeError, "Cannot connect to Fedora at url #{SEDORA_URI} : #{e}"  
-        return nil     
-      rescue
-        return nil
+      rescue  Exception => e
+        raise LyberCore::Exceptions::FatalError.new("Cannot connect to Fedora at url #{SEDORA_URI}",e)
       end
     end
   end
@@ -196,13 +185,6 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  begin
-    dm_robot = SdrIngest::CompleteDeposit.new()
-    dm_robot.start
-  rescue Exception => e
-    puts "ERROR : " + e.message
-    LyberCore::Log.error("Error in Complete Deposit :  #{e.message} + #{e.inspect}")
-    LyberCore::Log.error("#{e.backtrace.join("\n")}")
-  end
-  puts "Complete Deposit done\n"
+  dm_robot = SdrIngest::CompleteDeposit.new()
+  dm_robot.start
 end

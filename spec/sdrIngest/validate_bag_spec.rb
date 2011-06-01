@@ -9,6 +9,7 @@ describe SdrIngest::ValidateBag do
   context "bag_exists?" do
 
     before(:each) do
+      @druid = "lkdjflksdjda"
       @path = File.join(Dir.tmpdir, "lkdjflksdjda")
       @data = File.join(@path, DATA_DIR)
       @bagit = File.join(@path, BAGIT_TXT)
@@ -25,7 +26,7 @@ describe SdrIngest::ValidateBag do
     it "should return true to test the initial bag setup"  do
       	puts @path
         robot = SdrIngest::ValidateBag.new()
-      	robot.bag_exists?(@path).should == true
+      	robot.bag_exists?(@druid,@path).should == true
     end 
 
     it "should return false when base_path does not exist" do
@@ -33,7 +34,7 @@ describe SdrIngest::ValidateBag do
       FileUtils.rm_rf @path   
 
       robot = SdrIngest::ValidateBag.new()
-      robot.bag_exists?(@path).should == false
+      lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
     it "should return false when @path is not a directory" do 
@@ -41,14 +42,14 @@ describe SdrIngest::ValidateBag do
       FileUtils.touch(@path) # create a file
 
       robot = SdrIngest::ValidateBag.new()      	
-      robot.bag_exists?(@path).should == false
+      lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
       
     it "should return false when data_dir does not exist" do
       FileUtils.rm_rf(@data)
 
       robot = SdrIngest::ValidateBag.new()
-      robot.bag_exists?(@path).should == false
+      lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
     it "should return false when data_dir is not a directory" do
@@ -56,14 +57,14 @@ describe SdrIngest::ValidateBag do
       FileUtils.touch(@data)
 
       robot = SdrIngest::ValidateBag.new()
-      robot.bag_exists?(@path).should == false
+      lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
     it "should return false when bagit_txt_file does not exist" do
       FileUtils.rm_rf(@bagit)
 
       robot = SdrIngest::ValidateBag.new()
-      robot.bag_exists?(@path).should == false
+      lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
     it "should return false when bagit_txt_file is not a file" do
@@ -71,14 +72,14 @@ describe SdrIngest::ValidateBag do
       FileUtils.mkdir(@bagit)
 
       robot = SdrIngest::ValidateBag.new()
-      robot.bag_exists?(@path).should == false
+      lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
     it "should return false when bag_info_txt_file does not exist" do
       FileUtils.rm_rf(@bag)
 
       robot = SdrIngest::ValidateBag.new()
-      robot.bag_exists?(@path).should == false
+      lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
     it "should return false when bag_info_txt_file is not a file" do
@@ -86,7 +87,7 @@ describe SdrIngest::ValidateBag do
       FileUtils.mkdir(@bag)
 
       robot = SdrIngest::ValidateBag.new()
-      robot.bag_exists?(@path).should == false
+      lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
     it "should return true when it is a real bag" do
@@ -95,7 +96,7 @@ describe SdrIngest::ValidateBag do
       BagIt::Bag.new(path)
 
       robot = SdrIngest::ValidateBag.new()
-      robot.bag_exists?(path).should == true
+      robot.bag_exists?(@druid,path).should == true
 
       FileUtils.rm_rf(path)
     end

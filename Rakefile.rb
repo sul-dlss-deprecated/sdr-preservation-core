@@ -1,7 +1,14 @@
 # 
 # Rakefile.rb
 # 
-# 
+#
+# Note: rake v 0.9.0 seems to have a bug that causes error messages like:
+#     undefined method `desc' for #<Cucumber::Rake::Task ...
+# see:
+#    http://stackoverflow.com/questions/5287121/undefined-method-task-using-rake-0-9-0
+# The fix is to uninstall v 0.9.0 and use v 0.8.7
+# v 0.9.0 was installed in the global gemset on my system -- Richard
+
 require 'rake'
 require 'rake/testtask'
 require 'spec/rake/spectask'

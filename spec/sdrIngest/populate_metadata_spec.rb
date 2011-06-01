@@ -85,7 +85,7 @@ context "Populating Metadata" do
     it "raises an IOError if it can't find a bagit object for the given druid" do
       mock_workitem = mock("populate_metadata_workitem")
       mock_workitem.stub!(:druid).and_return("druid:zz999zz9999")
-      lambda { @robot.process_item(mock_workitem) }.should raise_exception(IOError, /Can\'t find a bag/)
+      lambda { @robot.process_item(mock_workitem) }.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
     it "raises an RuntimeError if the specified druid has an invalid syntax" do
@@ -137,7 +137,7 @@ context "Populating Metadata" do
       mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
       obj = ActiveFedora::Base.load_instance(mock_workitem.druid)
       obj.delete
-      lambda { @robot.process_item(mock_workitem) }.should raise_exception(ActiveFedora::ObjectNotFoundError)   
+      lambda { @robot.process_item(mock_workitem) }.should raise_exception(LyberCore::Exceptions::FatalError)
     end
   end
 

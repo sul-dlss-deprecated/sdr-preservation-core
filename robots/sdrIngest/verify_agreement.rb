@@ -20,7 +20,7 @@ module SdrIngest
   class VerifyAgreement < LyberCore::Robots::Robot
 
     # the agreement_id of the current workitem
-    attr_reader :agreement_id 
+    attr_reader :valid_agreement_ids
     attr_reader :env
     
     # Override the LyberCore::Robot initialize method so we can set object attributes during initialization
@@ -31,9 +31,9 @@ module SdrIngest
         :options => ARGV[0])
 
       @env = ENV['ROBOT_ENVIRONMENT']
+      @valid_agreement_ids = Array.new()
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
       LyberCore::Log.debug("Process ID is : #{$PID}")
-      puts DOR_URI
     end
   
 
@@ -41,59 +41,31 @@ module SdrIngest
     # This allows the robot to accept either a work_item or a druid
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      begin
-        druid = work_item.druid
-      rescue Exception => e
-        # more information needed
-        LyberCore::Log.error("Cannot get a druid from the workflow")
-        LyberCore::Log.error("#{e.backtrace.join("\n")}")
-        raise e
-      end
-      
-      begin
-        process_druid(druid)
-      rescue Exception => e
-        LyberCore::Log.error("Error processing druid  #{druid}")
-        LyberCore::Log.error("#{e.backtrace.join("\n")}")
-        raise e
-      end
-        
-    end
-
-    # Finds the object's agreement object in DOR
-    def process_druid(druid)
-
+      druid = work_item.druid
       LyberCore::Log.debug("Druid being processed is #{druid}")
-      puts "Druid being processed is " + druid 
 
       # get the agreement id for this object
-      begin
-        @agreement_id ||= get_agreement_id(druid)
-        #puts "Agreement id is #{@agreement_id}"
-        LyberCore::Log.debug("Agreement id is #{@agreement_id}")
-      rescue Exception => e
-          LyberCore::Log.error("Error getting an agreement id for  #{druid}")
-          LyberCore::Log.error("#{e.backtrace.join("\n")}")
-          raise e
-      end
+      agreement_id = get_agreement_id(druid)
+      LyberCore::Log.debug("Agreement id is #{agreement_id}")
 
       # check if it is in sedora
-      LyberCore::Log.debug( "SEDORA_URI is " + SEDORA_URI)
-      begin
-        #LyberCore::Connection.get("http://fedoraAdmin:fedoraAdmin@sedora-test.stanford.edu/fedora/objects/" + "#{@agreement_id}", {})
-        #LyberCore::Connection.get("http://sedora-test.stanford.edu/fedora/objects/" + "#{@agreement_id}", {})
-        
-        agreement_uri_string = "#{SEDORA_URI}/objects/#{@agreement_id}"
-        LyberCore::Log.debug("agreement_uri is : " + agreement_uri_string)
-        #LyberCore::Connection.get(SEDORA_URI + "/objects/" + "#{@agreement_id}", {})
-        LyberCore::Connection.get(agreement_uri_string, {})
-        #LyberCore::Log.debug("Agreement is available in Sedora at #{SEDORA_URI} + "/objects/" + #{@agreement_id} ")
-        LyberCore::Log.debug("Agreement is available in Sedora at : " + agreement_uri_string)
-      rescue Net::HTTPServerException
-        # If agreement object is not in Sedora then throw an exception
-        raise "Couldn't find agreement object #{@agreement_id} in Sedora"
-      rescue
-        raise "Connecting to #{SEDORA_URI} in verify-agreement fails"
+      if @valid_agreement_ids.include?(agreement_id)
+        return true
+      else
+        LyberCore::Log.debug( "SEDORA_URI is " + SEDORA_URI)
+        begin
+          agreement_uri_string = "#{SEDORA_URI}/objects/#{@agreement_id}"
+          LyberCore::Log.debug("agreement_uri is : " + agreement_uri_string)
+          LyberCore::Connection.get(agreement_uri_string, {})
+          LyberCore::Log.debug("Agreement is available in Sedora at : " + agreement_uri_string)
+          @valid_agreement_ids << agreement_id
+          return true
+        rescue Net::HTTPServerException
+          # If agreement object is not in Sedora then throw an exception
+          raise LyberCore::Exceptions::ItemError.new(druid,"Couldn't find agreement object #{@agreement_id} in Sedora")
+        rescue
+          raise LyberCore::Exceptions::ItemError.new(druid, "Connecting to #{SEDORA_URI} in verify-agreement fails")
+        end
       end
     end
 
@@ -119,9 +91,7 @@ module SdrIngest
         LyberCore::Log.debug(doc.xpath("//agreementId/text()") )
         doc.xpath("//agreementId/text()")
       rescue Exception => e
-        LyberCore::Log.error("Error getting an agreement from  #{SEDORA_URI}")
-        LyberCore::Log.error("#{e.backtrace.join("\n")}")
-        raise e
+        raise LyberCore::Exceptions::ItemError.new(druid, "Error getting an agreement from  #{SEDORA_URI}", e)
       end
     end
   end
@@ -129,19 +99,6 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  begin
-    dm_robot = SdrIngest::VerifyAgreement.new()
-    # If this robot is invoked with a specific druid, it will run for that druid only
-    if(ARGV[0])
-      puts "Verifying agreement for #{ARGV[0]}"
-      dm_robot.process_druid(ARGV[0])
-    else
-      LyberCore::Log.debug("About to start robot")
-      dm_robot.start
-    end
-  rescue Exception => e
-    LyberCore::Log.error("#{e.inspect}")
-    puts "ERROR : " + e.message
-  end
-  puts "Verify Agreement done\n"
+  dm_robot = SdrIngest::VerifyAgreement.new()
+  dm_robot.start
 end

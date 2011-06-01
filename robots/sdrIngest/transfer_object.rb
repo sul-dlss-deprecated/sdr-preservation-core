@@ -40,19 +40,12 @@ module SdrIngest
     # * Makes use of the Robot Framework FileUtilities.
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      # Identifiers
-      begin
-        druid = work_item.druid
-      rescue Exception => e
-        # more information needed
-        LyberCore::Log.error("Cannot get a druid from the workflow")
-        raise e
-      end
+      druid = work_item.druid
       bag_parent_dir = SdrDeposit.local_bag_parent_dir(druid)
       @dest_path = File.join(bag_parent_dir,druid)
       LyberCore::Log.debug("dest_path is : #{@dest_path}")
       if File.exists?(@dest_path)
-        LyberCore::Log.info("Object already exists: #{@dest_path}")
+        LyberCore::Log.info("Bag already exists at destination: #{@dest_path}")
       else
         # filename is druid.tar
         filename = druid + ".tar"
@@ -61,11 +54,7 @@ module SdrIngest
           FileUtils.mkdir_p bag_parent_dir
           LyberCore::Utils::FileUtilities.transfer_object(filename, DOR_WORKSPACE_DIR, bag_parent_dir)
         rescue Exception => e
-          LyberCore::Log.error("Error in transferring object : #{e.inspect}")
-          LyberCore::Log.error("#{e.backtrace.join("\n")}")
-          
-          # TODO: what do we want to do here ? raise or continue ?
-          raise e
+          raise LyberCore::Exceptions::ItemError.new(druid, "Error transferring object", e)
         end
         
         LyberCore::Log.debug("#{filename} transferred to #{bag_parent_dir}")
@@ -91,11 +80,10 @@ module SdrIngest
           if (numfiles >= 1)
             LyberCore::Log.debug("File : #{filename} now deleted")
           else
-            LyberCore::Log.error("There was an error deleting #{filename}")
-          end 
+            raise LyberCore::Exceptions::ItemError.new(druid, "There was an error deleting #{filename}")
+          end
         else
-          LyberCore::Log.error("#{unpackcommand} fails")
-          raise "Cannot execute #{unpackcommand}"
+          raise LyberCore::Exceptions::ItemError.new(druid, "#{unpackcommand} failed")
         end
 
       end
@@ -106,14 +94,9 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  begin
-    dm_robot = SdrIngest::TransferObject.new()
-    dm_robot.start
-  rescue Exception => e
-    LyberCore::Log.error("#{e.message}" + "#{e.backtrace.join("\n")}")
-    puts "ERROR : " + e.message + e.backtrace.join("\n")
-  end
-  puts "Transfer Object done\n"
+  dm_robot = SdrIngest::TransferObject.new()
+  dm_robot.start
 end
+
 
 
