@@ -153,6 +153,7 @@ module SdrIngest
          while i < @druids.length() do
            begin
              process_druid(@druids[i])
+             LyberCore::Log.info("#{@druid} completed")
              @success_count += 1
            rescue LyberCore::Exceptions::FatalError => fatal_error
              raise fatal_error
