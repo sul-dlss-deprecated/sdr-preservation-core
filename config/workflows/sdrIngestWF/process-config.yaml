@@ -1,4 +1,9 @@
+bootstrap:
+  batch_limit: 1000
+  error_limit: 5
+
 register-sdr:
+   prerequisite: bootstrap
    batch_limit: 1000
    error_limit: 5
 

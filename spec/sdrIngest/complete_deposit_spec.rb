@@ -204,29 +204,4 @@ describe SdrIngest::CompleteDeposit do
     end      
   end
   
-  context "Update DOR workflow" do
-    before(:each) do
-      setup
-    end
-    
-    after(:each) do
-      cleanup
-    end
-        
-    # How do we test this?  We need to call the method and then read the googleScannedBook workflow to verify the status...    
-    it "should update DOR workflow to sdr-deposit-complete" do
-      pending
-      # actually call the function we are testing
-      @complete_robot.process_item(@mock_workitem)
-    end
-    
-    it "should report an error if workflow update failed" do
-      Dor::WorkflowService.should_receive(:update_workflow_status).with("dor", "druid:jc837rq9922", "googleScannedBookWF", "sdr-ingest-deposit", "completed")
-      
-      lambda {@complete_robot.process_item(@mock_workitem)}.should raise_error(/Update workflow "complete-deposit" failed/)
-    end
-  end
-
-
-
 end

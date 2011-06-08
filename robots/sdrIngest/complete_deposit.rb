@@ -45,10 +45,6 @@ module SdrIngest
       @druid = work_item.druid
       get_fedora_object
       update_provenance
-
-      # Update DOR workflow
-      result = Dor::WorkflowService.update_workflow_status("dor", @druid, "googleScannedBookWF", "sdr-ingest-deposit", "completed")
-      raise LyberCore::Exceptions::FatalError.new("Update workflow \"complete-deposit\" failed.") unless result
     end
     
     private
