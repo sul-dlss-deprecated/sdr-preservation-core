@@ -71,7 +71,7 @@ describe "connect to sedora" do
     end
     
     it "should process all the druids that are returned from the workflow service " do
-      DorService.stub!(:get_objects_for_workstep).with("sdr", "sdrIngestWF", "bootstrap", "register-sdr").and_return("<objects count='2' ><object id='sdrtwo:processItemTest1' url='https://dor-prod.stanford.edu/fedora/objects/druid:kd425tz2802' /><object id='sdrtwo:processItemTest2' url='https://dor-prod.stanford.edu/fedora/objects/druid:kd425tz2802' /></objects>")
+      DorService.stub!(:get_objects_for_workstep).with("sdr", "sdrIngestWF", "start-ingest", "register-sdr").and_return("<objects count='2' ><object id='sdrtwo:processItemTest1' url='https://dor-prod.stanford.edu/fedora/objects/druid:kd425tz2802' /><object id='sdrtwo:processItemTest2' url='https://dor-prod.stanford.edu/fedora/objects/druid:kd425tz2802' /></objects>")
     
       @robot.should_receive(:process_druid).once.with("sdrtwo:processItemTest1")
       @robot.should_receive(:process_druid).once.with("sdrtwo:processItemTest2")
@@ -81,7 +81,7 @@ describe "connect to sedora" do
     end
     
     it "should raise an error if it cannot extract druids from xml" do 
-      DorService.stub!(:get_objects_for_workstep).with("sdr", "sdrIngestWF", "bootstrap", "register-sdr").and_return("A bunch of junk")
+      DorService.stub!(:get_objects_for_workstep).with("sdr", "sdrIngestWF", "start-ingest", "register-sdr").and_return("A bunch of junk")
       lambda {  @robot.process_items }.should raise_error(LyberCore::Exceptions::FatalError)
     end
     

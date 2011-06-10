@@ -1,5 +1,5 @@
 <workflow id="sdrIngestWF">
-	   <process name="bootstrap" status="completed" />
+     <process name="start-ingest" status="completed" />
      <process name="register-sdr" status="waiting" />
      <process name="transfer-object" status="waiting" />
      <process name="validate-bag" status="waiting"/>

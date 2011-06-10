@@ -97,7 +97,7 @@ module SdrIngest
          LyberCore::Log.info("Getting list of druids to process ... ")
 
          begin
-           dor_objects_to_register = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "bootstrap", "register-sdr" )
+           dor_objects_to_register = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "start-ingest", "register-sdr" )
          rescue Exception => e
            raise LyberCore::Exceptions::FatalError.new("Unable to get list of objects to register",e)
          end
