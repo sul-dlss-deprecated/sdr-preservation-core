@@ -16,29 +16,27 @@ require 'English'
 
 module SdrIngest
 
-  # Verifies preservation agreement for objects
+  # Verifies that an agreement object exists for each object
   class VerifyAgreement < LyberCore::Robots::Robot
 
     # the agreement_id of the current workitem
     attr_reader :valid_agreement_ids
+
+    # @return [String] The environment in which the robot is running, e.g. test
     attr_reader :env
     
-    # Override the LyberCore::Robot initialize method so we can set object attributes during initialization
     def initialize()
       super('sdrIngestWF', 'verify-agreement',
         :logfile => "#{LOGDIR}/verify-agreement.log", 
         :loglevel => Logger::INFO,
         :options => ARGV[0])
-
       @env = ENV['ROBOT_ENVIRONMENT']
       @valid_agreement_ids = Array.new()
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
       LyberCore::Log.debug("Process ID is : #{$PID}")
     end
   
-
-    # Extract the druid and pass it along to process_druid
-    # This allows the robot to accept either a work_item or a druid
+    # Lookup the identifier of the agreement object and verify that it has previously been ingested
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       druid = work_item.druid

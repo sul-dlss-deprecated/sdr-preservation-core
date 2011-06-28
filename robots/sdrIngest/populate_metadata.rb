@@ -8,45 +8,38 @@ require 'lyber_core'
 require 'logger'
 require 'English'
 
-#:title:The SdrIngest Workflow
-#= The SdrIngest Workflow
-#The +SdrIngest+ workflow takes objects from Dor's queue and deposits them into SDR.
-#The most up to date description of the deposit workflow is always in 
-#config/workflows/sdrIngest/sdrIngestWorkflow.xml. (Content included below.)
-#:include:config/workflows/sdrIngest/sdrIngestWorkflow.xml
 module SdrIngest
   
-  # PopulateMetadata finds a stub object in Sedora and 
-  # populates its datastreams with the contents from a bagit object.
+  # Adds datastreams to the Fedora object using metadata files from the bagit object.
   class PopulateMetadata < LyberCore::Robots::Robot
     
-    # the fedora object to operate on
+    # @return [Fedora object] The object to which datastreams will be added
     attr_reader :obj
     
-    # the bag to fetch metadata from
+    # @return [String] The full path of the bag to fetch metadata from
     attr_reader :bag
     
-    # the druid of the current workitem
+    # @return [String] The druid of the current workitem
     attr_reader :druid 
 
-    # Accessor method for datastream
-    attr_reader :identity_metadata, :provenance_metadata
+    # @return [Fedora datastream] identityMetadata
+    attr_reader :identity_metadata
     
-    # Override the LyberCore::Robot initialize method so we can set object attributes during initialization
+    # @return [Fedora datastream] provenanceMetadata
+    attr_reader :identity_metadata, :provenance_metadata
+
     def initialize()
       super('sdrIngestWF', 'populate-metadata',
         :logfile => "#{LOGDIR}/populate-metadata.log", 
         :loglevel => Logger::INFO,
         :options => ARGV[0])
-
       @env = ENV['ROBOT_ENVIRONMENT']
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
       LyberCore::Log.debug("Process ID is : #{$PID}")
-      
     end
 
-    # Override the robot LyberCore::Robot.process_item method.
-    # * Makes use of the Robot Framework FileUtilities.
+    # Add the metadata datastreams to the Fedora object
+    # Overrides the robot LyberCore::Robot.process_item method.
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       # Identifiers
@@ -59,14 +52,13 @@ module SdrIngest
     end
     
     # Check to see if the bagit directory exists.
-    # It does not check the validity of the bag, it assumes this has already happened.
     def bag_exists?
       @bag = SdrDeposit.local_bag_path(self.druid)
       File.directory? @bag
     end
     
-    # fetch the fedora object from the repository so we can attach datastreams to it
-    # throw an error if we can't find the object
+    # Fetch the fedora object from the repository so we can attach datastreams to it
+    # @raise [LyberCore::Exceptions::FatalError] if we can't find the object
     def get_fedora_object
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter get_fedora_object")
       LyberCore::Log.debug("Registering #{SEDORA_URI}")
@@ -77,10 +69,10 @@ module SdrIngest
       raise LyberCore::Exceptions::FatalError.new("Cannot connect to Fedora at url #{SEDORA_URI}",e)
     end
     
-    # Go grab the given filename from the bagit object, 
+    # Determine the metadata files full path in the bagit object,
     # make a datastream out of it using the given label, 
-    # attach it to the fedora object, and save. 
-    # Throw an error if you can't find a bag or if you can't find the file
+    # add it to the fedora object, and save.
+    # @raise [LyberCore::Exceptions::FatalError] if we can't find the file
     def populate_metadata(filename,label)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter populate_metadata")
       mdfile = File.expand_path(@bag + '/data/metadata/' + filename)
@@ -91,11 +83,13 @@ module SdrIngest
     rescue Exception => e
       raise LyberCore::Exceptions::FatalError.new("Cannot add #{label} datastream for #{@obj.pid}",e)
     end
-    
+
+    # Add the identityMetadata datastream
     def populate_identity_metadata
       @identity_metadata = populate_metadata('identityMetadata.xml','identityMetadata')
     end
     
+    # Add the provenanceMetadata datastream
     def populate_provenance_metadata
       @provenance_metadata = populate_metadata('provenanceMetadata.xml','provenanceMetadata')
     end

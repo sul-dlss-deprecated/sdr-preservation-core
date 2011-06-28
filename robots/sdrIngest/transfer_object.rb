@@ -10,34 +10,29 @@ require 'fileutils'
 
 module SdrIngest
 
-# +TransferObject+ Transfers objects from DOR workspace to SDR's staging area.
-# - notifies DOR of success by: <b><i>need to be filled in</i></b>
-# - notifies DOR of missing object by: <i><b>need to be filled in</b></i>
-
+# Transfers objects from DOR workspace to SDR's staging area.
   class TransferObject < LyberCore::Robots::Robot
 
-    # the destination object that gets created by running this script
+    # @return [String] The full path of the bag containing the object being processed
     attr_reader :dest_path
+
+    # @return [String] The environment in which the robot is running, e.g. test
     attr_reader :env
 
+    def initialize()
     # Initialize the robot by calling LyberCore::Robots::Robot.new
     # with the workflow name and the workflow step
-    def initialize()
       super('sdrIngestWF', 'transfer-object',
         :logfile => "#{LOGDIR}/transfer-object.log", 
         :loglevel => Logger::INFO,
         :options => ARGV[0])
-        
-        # have to be able to change logfile and loglevel from config option or command line
-
       @env = ENV['ROBOT_ENVIRONMENT']
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
       LyberCore::Log.debug("Process ID is : #{$PID}")
     end
 
-
-    # Override the robot LyberCore::Robot.process_item method.
-    # * Makes use of the Robot Framework FileUtilities.
+    # Transfer the object's bag from the DOR workspace to the SDR storage area
+    # Overrides the robot LyberCore::Robot.process_item method.
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       druid = work_item.druid
@@ -59,8 +54,7 @@ module SdrIngest
         
         LyberCore::Log.debug("#{filename} transferred to #{bag_parent_dir}")
 
-        # if env = sdr-services-test then untar the file directly in SDR_UNPACK_SERVER(sdr-thumper5)
-        # e.g ssh sdr-thumper5 "cd ~/target/sdr2objects; tar xf 4177.tar"
+        # Untar the file and delete the tarfile if successful
         if (@env == "sdr-services-test" || @env == "sdr-services")
             unpack_dir = SdrDeposit.remote_bag_parent_dir(druid)
             unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{unpack_dir}; tar xf #{filename}\""
@@ -68,9 +62,7 @@ module SdrIngest
             unpackcommand = "cd #{unpack_dir}; tar xf #{filename} --force-local"
         end
         LyberCore::Log.debug("Unpack command is :  #{unpackcommand}")
-        
         status = system(unpackcommand)
-          
         LyberCore::Log.debug("Return from untar is : #{status}")
         if (status == true)
           # remove the tar file

@@ -1,5 +1,0 @@
-
-sdr-ingest-deposit:
-   batch_limit: 1000
-   error_limit: 6
-   prerequisite: sdr-ingest-transfer

@@ -11,18 +11,22 @@ require 'logger'
 
 module SdrIngest
   
-  # CompleteDeposit sends a callback message to DOR notifying the DOR
-  # workflow that the sdrIngest workflow is complete
+  # Complete the processing of the ingested object
   class CompleteDeposit < LyberCore::Robots::Robot
-    attr_reader :obj, :druid
 
-    # Workflow XML as read from the object 
+    # @return [Fedora object] the ingested object
+    attr_reader :obj
+
+    # @return [String] the identifier for the object
+    attr_reader :druid
+
+    # @return [String] Workflow XML as read from the object
     attr_reader :obj_wf 
 
-    # Instance variable containing sdr provenance generated from the workflow datastream
+    # @return [String] sdr provenance generated from the workflow datastream
     attr_reader :sdr_prov 
 
-    # Existing provenance datastream, as read from the object
+    # @return [String] Existing provenance datastream, as read from the object
     attr_reader :obj_prov
        
     def initialize()
@@ -30,16 +34,12 @@ module SdrIngest
         :logfile => "#{LOGDIR}/complete-deposit.log", 
         :loglevel => Logger::INFO,
         :options => ARGV[0])
-
       @env = ENV['ROBOT_ENVIRONMENT']
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
       LyberCore::Log.debug("Process ID is : #{$PID}")
-      
-      @start_time = Time.new
-      LyberCore::Log.debug("Start time is :   #{@start_time}")
-            
     end
     
+    # Append a sdr stanza to the provenance metadata datastream
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       @druid = work_item.druid
@@ -156,7 +156,8 @@ module SdrIngest
     rescue Exception => e
       raise LyberCore::Exceptions::FatalError.new("Cannot create new provenanceMetadata xml for #{@obj.pid}",e)
     end
-    
+
+    # Save the revised provenanceMetadata datastream
     def update_prov_datastream
       ds_id = 'provenanceMetadata'
       ActiveFedora::Datastream.delete(@obj.pid, ds_id)
@@ -168,8 +169,8 @@ module SdrIngest
       raise LyberCore::Exceptions::FatalError.new("Cannot update provenanceMetadata datastream for #{@obj.pid}",e)
     end
     
-    # fetch the fedora object from the repository so we can attach datastreams to it
-    # throw an error if we can't find the object
+    # fetch the fedora object from the repository
+    # @raise [LyberCore::Exceptions::FatalError] if we can't find the object
     def get_fedora_object
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter get_fedora_object")
       begin

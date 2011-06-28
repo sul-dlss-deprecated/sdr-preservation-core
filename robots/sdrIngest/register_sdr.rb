@@ -10,21 +10,27 @@ require 'logger'
 
 module SdrIngest
 
-# Creates +Sedora+ objects and bootstrapping the workflow.
+# Creates +Sedora+ objects and workflow datastreams.
 
   class RegisterSdr
 
-    # Array of workitem objects to be processed
+    # @return [Array of String] Identifiers of objects to be processed
     attr_reader :druids
 
-    # The timings for the batch run
+    # @return [Time] timestamp marking when the batch run began
     attr_reader :start_time
-    attr_reader :end_time
-    attr :elapsed_time
 
-    # The tally of how many items have been processed
-    attr_accessor :success_count
-    attr_accessor :error_count
+    # @return [Time] timestamp marking when the batch run ended
+    attr_reader :end_time
+
+    # @return [int] The seconds required to process the batch
+    attr_reader :elapsed_time
+
+    # @return ([int] The tally of how many items were successfully processed
+    attr_reader :success_count
+
+    # @return [int] The tally of how many items had item-level errors during processing
+    attr_reader :error_count
 
 
     def initialize()
@@ -53,7 +59,7 @@ module SdrIngest
       @error_count = 0
     end
 
-    # Output the batch's timings and other statistics to STDOUT for capture in a log
+    # Logs the batch's timings and other statistics 
     def print_stats
       @end_time = Time.new
       @elapsed_time = @end_time - @start_time
@@ -93,7 +99,6 @@ module SdrIngest
                                           :dsLocation => "#{WORKFLOW_URI}/sdr/objects/#{druid}/workflows/sdrIngestWF"
         )
         obj.add_datastream(ds)
-
 
       rescue Exception => e
         raise LyberCore::Exceptions::FatalError.new("Object cannot be saved in Sedora", e)

@@ -21,17 +21,13 @@ module SdrIngest
           :logfile => "#{LOGDIR}/validate-bag.log", 
           :loglevel => Logger::INFO,
           :options => ARGV[0])
-
         @env = ENV['ROBOT_ENVIRONMENT']
         LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
         LyberCore::Log.debug("Process ID is : #{$PID}")
-        
-        # TODO : check if DR_URI or WORKFLOW_URI is set
-    
-    end
+     end
       
       
-    # Ensure the bag exists by checking for the presence of bagit.txt and 
+    # Ensure that the bag exists by checking for the presence of bagit.txt and
     # bag-info.txt
     def bag_exists?(druid, base_path)
     	data_dir = File.join(base_path, DATA_DIR)
@@ -64,9 +60,8 @@ module SdrIngest
       return true
     end
     
-    # Override the robot LyberCore::Robot.process_item method.
-    # Extract the druid and pass it along to process_druid
-    # This allows the robot to accept either a work_item or a druid
+    # Validate the bag containing the object's content and metadata
+    # Overrides the robot LyberCore::Robot.process_item method.
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       druid = work_item.druid

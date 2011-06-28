@@ -1,48 +1,50 @@
-= SDR Deposit Workflow Robots
-==This is a test addition
+= SDR Ingest Workflow Robots
 
 ==An overview of the workflow
-You can see the steps of the workflow in <tt>config/workflows/deposit/depositWorkflow.xml</tt>
+You can see the steps of the workflow in
+    config/workflows/sdrIngestWF/sdrIngestWF.xml
 
-You can see the dependencies and settings for each step in <tt>config/workflows/deposit/process-config.yaml</tt>
+You can see the dependencies and settings for each step in
+    config/workflows/sdrIngestWF/process-config.yaml
 
 ==Execution
 
-Run robots from the root directory of the project.  Set the environment as a shell variable:
-ROBOT_ENVIRONMENT=development ./robots/google_scanned_book/descriptive_metadata.rb
+Run robots using the script:
+    ~/sdr2/robots/run-sdr-robots.sh {robot filename}
+    
+This script figures out the path to the robot filename and the ROBOT_ENVIRONMENT
+to be used, unless already specified as an environmental variable.
 
-Default is local
 
 ==Running tests
-You'll need to check out a local copy of fedora and solr, and a local copy of the sdr2 example objects. 
-<tt>git submodule init</tt>
-<tt>git submodule update</tt>
+Tests require intalling local copy of hydra-jetty (fedora + solr), and a local copy of the sdr2 example objects.
+    git submodule init
+    git submodule update
 
-==robot_framework
-|
----config
-  |
-  ---environments : configuration for dev,test,prod environments
-  ---workflows : workflow specific configuration - steps, dependencies. One directory per workflow.
-     |
-     ---collection : Any subdirectories in workflow specify collections
-|
----lib : ruby classes needed for your local robots
-|
----robots
-  |
-  ---google_scanned_book : all of the robots for a particular workflow. One directory per workflow
-|
----spec
-  |
-  ---google_scanned_book : specs for the workflow
+    cd ~/sdr2/hydra-jetty
+    java -jar start.jar
+
+Then in a separate window:
+    cd ~/sdr2
+    rake spec
+
+==Project Directory Structure
+    |
+    ---config
+    |  |
+    |  ---environments : configuration for dev,test,prod environments
+    |  ---workflows : workflow specific configuration - steps, dependencies. One directory per workflow.
+    |
+    ---lib : ruby classes needed for your local robots
+    |
+    ---robots
+    |  |
+    |  ---sdrIngest : all of the robots for a particular workflow. One directory per workflow
+    |
+    ---spec
+      |
+      ---lib : spec for library classes
+      ---sdrIngest : specs for the workflow
 
 
 
-==TODO
--maybe define a ROBOT_ROOT constant in boot.rb?
-	-lyber_core/workflow might need to read in workflow config directory relative from ROBOT_ROOT
--maybe make all robots executable shell scripts?
-	-First line: #!/usr/bin/env ruby
-	-Remove .rb
-	-chmod 755

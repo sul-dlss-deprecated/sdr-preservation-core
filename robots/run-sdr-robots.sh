@@ -85,7 +85,7 @@ function run_robot_if_space() {
 }
 
 
-# Run all the google robots every 100 seconds in test or 1800 seconds in prod
+# Run all the robots specified below
 function run_all_robots() {
     run_robot complete_deposit.rb
     run_robot verify_agreement.rb

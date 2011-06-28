@@ -8,7 +8,6 @@ describe "connect to sedora" do
   context "Registering SDR Object" do
   it "should be able to connect to sedora" do
 
-    #@robot = GoogleScannedBook::RegisterSdr.new('googleScannedBook', 'register-sdr')
     @robot = SdrIngest::RegisterSdr.new()
     mock_workitem = mock("register_sdr_workitem")
     druid = "sdrtwo:AlpanaTests" + "#{Process.pid}"
