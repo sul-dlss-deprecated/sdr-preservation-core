@@ -67,7 +67,7 @@ GEM
     systemu (2.2.0)
     validatable (1.6.7)
     xml-simple (1.0.12)
-    yard (0.5.8)
+    yard (0.7.2)
 
 PLATFORMS
   ruby
@@ -83,4 +83,4 @@ DEPENDENCIES
   rcov
   rest-client
   rspec (< 2.0)
-  yard
+  yard (>= 0.7.2)

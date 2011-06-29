@@ -12,4 +12,4 @@ gem "rake", ">=0.8.7"  # Same as lyber-core 0.9-legacy branch
 gem "rest-client"
 gem "rcov"  # Same as lyber-core 0.9-legacy branch
 gem "rspec", "< 2.0" # Same as lyber-core 0.9-legacy branch
-gem "yard" # Same as lyber-core 0.9-legacy branch
+gem "yard", ">= 0.7.2"  # Yard Issue 272 fixes compatability bug with RubyGems 1.7.x
