@@ -52,16 +52,7 @@ describe SdrIngest::VerifyAgreement do
           DOR_URI.should eql('http://dor-dev.stanford.edu/dor')
           WORKFLOW_URI.should eql('http://lyberservices-dev.stanford.edu/workflow')
       end
-        
-        # @robot = SdrIngest::VerifyAgreement.new()
-        # @env = ENV['ROBOT_ENVIRONMENT']
-        # if (@env == "dev")
-        #   DOR_URI = 'http://dor-test.stanford.edu/dor'
-        #   WORKFLOW_URI = 'http://lyberservices-test.stanford.edu/workflow'
-        # end
-        #                  
-      
-    
+            
     it "should raise an error if it cannot get a druid value" do
       pending
         druid = "foo:bar"

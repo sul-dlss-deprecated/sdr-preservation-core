@@ -59,7 +59,7 @@ module SdrIngest
             unpack_dir = SdrDeposit.remote_bag_parent_dir(druid)
             unpackcommand = "ssh #{SDR_UNPACK_SERVER}  \"cd #{unpack_dir}; tar xf #{filename}\""
         else
-            unpackcommand = "cd #{unpack_dir}; tar xf #{filename} --force-local"
+            unpackcommand = "cd #{bag_parent_dir}; tar xf #{filename} --force-local"
         end
         LyberCore::Log.debug("Unpack command is :  #{unpackcommand}")
         status = system(unpackcommand)
