@@ -6,7 +6,7 @@ gem "active-fedora"
 gem "bagit" , ">=0.1.0" # Same as lyber-core 0.9-legacy branch
 gem "fakeweb"
 gem "jettywrapper"
-gem "lyber-core", "0.9.8"
+gem "lyber-core", "0.9.9"
 gem "nokogiri"
 gem "rake", ">=0.8.7"  # Same as lyber-core 0.9-legacy branch
 gem "rest-client"

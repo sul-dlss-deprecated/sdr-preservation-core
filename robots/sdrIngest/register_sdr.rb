@@ -94,7 +94,7 @@ module SdrIngest
         # Reference: https://wiki.duraspace.org/display/FCR30/REST+API#RESTAPI-addDatastream
         label = 'sdrIngestWF'
         ds = ActiveFedora::Datastream.new(:pid => druid,
-                                          :dsid => 'sdrIngestWF', :dsLabel => 'sdrIngestWF',
+                                          :dsIS => 'sdrIngestWF', :dsLabel => 'sdrIngestWF',
                                           :controlGroup => "E", :versionable => "false", :checksum => "DISABLED",
                                           :dsLocation => "#{WORKFLOW_URI}/sdr/objects/#{druid}/workflows/sdrIngestWF"
         )
@@ -137,7 +137,7 @@ module SdrIngest
       while i < @druids.length() do
         begin
           process_druid(@druids[i])
-          LyberCore::Log.info("#{@druid} completed")
+          LyberCore::Log.info("#{@druid[i]} completed")
           @success_count += 1
         rescue LyberCore::Exceptions::FatalError => fatal_error
           raise fatal_error
