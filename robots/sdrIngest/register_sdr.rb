@@ -14,9 +14,9 @@ module SdrIngest
 
     def initialize()
       super('sdrIngestWF', 'register-sdr',
-        :logfile => "#{LOGDIR}/register-sdr.log",
-        :loglevel => Logger::INFO,
-        :options => ARGV[0])
+            :logfile => "#{LOGDIR}/register-sdr.log",
+            :loglevel => Logger::INFO,
+            :options => ARGV[0])
       env = ENV['ROBOT_ENVIRONMENT']
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{env}")
       LyberCore::Log.debug("Process ID is : #{$PID}")
@@ -42,7 +42,7 @@ module SdrIngest
       return true
     end
 
-    # Add new or retrieve existing object having pid = druid
+    # Add new object having pid = druid
     def add_fedora_object(druid)
       # Creatig a new Fedora object will be the usual case
       object = ActiveFedora::Base.new(:pid => druid)
@@ -51,7 +51,7 @@ module SdrIngest
       return object
     rescue Fedora::ServerError => e
       if (e.message.include?('ObjectExistsException'))
-        # puts 'object exists'
+        # If the object already exists, then don't re-raise the exception but just return nil
         return nil
       else
         raise LyberCore::Exceptions::FatalError.new("Object cannot be created in Sedora", e)
@@ -60,38 +60,37 @@ module SdrIngest
       raise LyberCore::Exceptions::FatalError.new("Object cannot be created in Sedora", e)
     end
 
-    # retrieve existing object having pid = druid
+    # retrieve existing object having pid = druid.
+    # This allows re-run of the robot to create workflow datastream
     def get_fedora_object(druid)
       object = ActiveFedora::Base.load_instance(druid)
       LyberCore::Log.debug("Loading druid #{druid} into object #{object}")
+      return object
     rescue Exception => e
       raise LyberCore::Exceptions::FatalError.new("Object cannot be retrieved from Sedora", e)
-      return object
     end
 
     # Adding the sdrIngestWF datastream for the workflow
-    # The workflow database entries were previously created by sdr-ingest-transfer robot
+    # The workflow database rows were previously inserted by the sdr-ingest-transfer robot
     # of the separate workflow that is submitting objects to be ingested
     # Reference: https://wiki.duraspace.org/display/FCR30/REST+API#RESTAPI-addDatastream
     def add_workflow_datastream(fedora_object)
-      begin
-        druid = fedora_object.pid
-         label = 'sdrIngestWF'
-         ds = ActiveFedora::Datastream.new(:pid => druid ,
-           :dsIS => label, :dsLabel => label,
-           :controlGroup => "E", :versionable => "false", :checksum => "DISABLED",
-           :dsLocation => "#{WORKFLOW_URI}/sdr/objects/#{druid}/workflows/sdrIngestWF"
-         )
-         fedora_object.add_datastream(ds)
-       rescue Exception => e
-         raise LyberCore::Exceptions::FatalError.new("#{label} datastream cannot be saved in Sedora", e)
-       end
-
+      druid = fedora_object.pid
+      label = 'sdrIngestWF'
+      ds = ActiveFedora::Datastream.new(:pid => druid,
+              :dsID => label, :dsLabel => label,
+              :controlGroup => "E", :versionable => "false", :checksum => "DISABLED",
+              :dsLocation => "#{WORKFLOW_URI}/sdr/objects/#{druid}/workflows/sdrIngestWF"
+      )
+      ds.save()
+      return ds
+    rescue Exception => e
+      raise LyberCore::Exceptions::FatalError.new("#{label} datastream cannot be saved in Sedora", e)
     end
 
   end
 
-end 
+end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
