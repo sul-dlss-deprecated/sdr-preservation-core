@@ -79,7 +79,8 @@ module SdrIngest
       label = 'sdrIngestWF'
       ds = ActiveFedora::Datastream.new(:pid => druid,
               :dsID => label, :dsLabel => label,
-              :controlGroup => "E", :versionable => "false", :checksum => "DISABLED",
+              :controlGroup => "E", :versionable => "false",
+              :checksumType => "DISABLED", :checksum => "none",
               :dsLocation => "#{WORKFLOW_URI}/sdr/objects/#{druid}/workflows/sdrIngestWF"
       )
       ds.save()
