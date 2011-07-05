@@ -2,7 +2,6 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../boot')
 
-#require 'dor_service'
 require 'dlss_service'
 require 'lyber_core'
 require 'active-fedora'
@@ -10,169 +9,92 @@ require 'logger'
 
 module SdrIngest
 
-# Creates +Sedora+ objects and workflow datastreams.
-
-  class RegisterSdr
-
-    # @return [Array of String] Identifiers of objects to be processed
-    attr_reader :druids
-
-    # @return [Time] timestamp marking when the batch run began
-    attr_reader :start_time
-
-    # @return [Time] timestamp marking when the batch run ended
-    attr_reader :end_time
-
-    # @return [int] The seconds required to process the batch
-    attr_reader :elapsed_time
-
-    # @return ([int] The tally of how many items were successfully processed
-    attr_reader :success_count
-
-    # @return [int] The tally of how many items had item-level errors during processing
-    attr_reader :error_count
-
+  # Creates +Sedora+ objects and workflow datastreams.
+  class RegisterSdr < LyberCore::Robots::Robot
 
     def initialize()
-
-      # Take the logfile and level from a config option or command line later
-      LyberCore::Log.set_logfile("#{LOGDIR}/register-sdr.log")
-      LyberCore::Log.set_level(Logger::INFO)
-
-      #@logg = Logger.new("/tmp/register-sdr.log")
-      #@logg.level = Logger::DEBUG
-      #@logg.formatter = proc{|s,t,p,m|"%5s [%s] (%s) %s :: %s\n" % [s,
-      #                  t.strftime("%Y-%m-%d %H:%M:%S"), $$, p, m]}
-
-
-      # Start the timer
-      @start_time = Time.new
-      @env = ENV['ROBOT_ENVIRONMENT']
-
-      LyberCore::Log.debug("Start time is :   #{@start_time}")
-
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{@env}")
+      super('sdrIngestWF', 'register-sdr',
+        :logfile => "#{LOGDIR}/register-sdr.log",
+        :loglevel => Logger::INFO,
+        :options => ARGV[0])
+      env = ENV['ROBOT_ENVIRONMENT']
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{env}")
       LyberCore::Log.debug("Process ID is : #{$PID}")
-
-      # Initialize the success and error counts
-      @success_count = 0
-      @error_count = 0
+      initialize_fedora_repository(SEDORA_URI)
     end
 
-    # Logs the batch's timings and other statistics 
-    def print_stats
-      @end_time = Time.new
-      @elapsed_time = @end_time - @start_time
-      LyberCore::Log.info("**********************************************")
-      LyberCore::Log.info("Total time: " + @elapsed_time.to_s)
-      LyberCore::Log.info("Completed objects: " + @success_count.to_s)
-      LyberCore::Log.info("Errors: " + @error_count.to_s)
-      LyberCore::Log.info("**********************************************")
+    # Initialize the fedora repository
+    def initialize_fedora_repository(fedora_uri)
+      Fedora::Repository.register(fedora_uri)
+      LyberCore::Log.debug("DONE : Sedora registration for #{fedora_uri}")
+    rescue Exception => e
+      raise LyberCore::Exceptions::FatalError.new("Cannot connect to Fedora at url #{fedora_uri}", e)
     end
-
 
     # - Creates a *Sedora* object
-    # - Initializes the +sdrIngestWF+ workflow
-    def process_druid(druid)
+    # - Adds the +sdrIngestWF+ datastream
+    def process_item(work_item)
+      druid = work_item.druid
       LyberCore::Log.debug("Processessing druid #{druid}")
-
-      begin
-        Fedora::Repository.register(SEDORA_URI)
-        LyberCore::Log.debug("DONE : Sedora registration for #{SEDORA_URI}")
-      rescue Exception => e
-        raise LyberCore::Exceptions::FatalError.new("Cannot connect to Fedora at url #{SEDORA_URI}", e)
-      end
-
-      begin
-        obj = ActiveFedora::Base.new(:pid => druid)
-        obj.save
-        LyberCore::Log.debug("DONE : Created new object #{druid} in Sedora")
-
-        # Adding the sdrIngestWF datastream for the workflow
-        # The workflow database entries were previously created by sdr-ingest-transfer robot
-        # of the separate workflow that is submitting objects to be ingested
-        # Reference: https://wiki.duraspace.org/display/FCR30/REST+API#RESTAPI-addDatastream
-        label = 'sdrIngestWF'
-        ds = ActiveFedora::Datastream.new(:pid => druid,
-                                          :dsIS => 'sdrIngestWF', :dsLabel => 'sdrIngestWF',
-                                          :controlGroup => "E", :versionable => "false", :checksum => "DISABLED",
-                                          :dsLocation => "#{WORKFLOW_URI}/sdr/objects/#{druid}/workflows/sdrIngestWF"
-        )
-        obj.add_datastream(ds)
-
-      rescue Exception => e
-        raise LyberCore::Exceptions::FatalError.new("Object cannot be saved in Sedora", e)
-      end
-
+      fedora_object = add_fedora_object(druid)
+      fedora_object = get_fedora_object(druid) if fedora_object.nil?
+      add_workflow_datastream(fedora_object)
       return true
+    end
+
+    # Add new or retrieve existing object having pid = druid
+    def add_fedora_object(druid)
+      # Creatig a new Fedora object will be the usual case
+      object = ActiveFedora::Base.new(:pid => druid)
+      object.save
+      LyberCore::Log.debug("DONE : Created new object #{druid} in Sedora")
+      return object
+    rescue Fedora::ServerError => e
+      if (e.message.include?('ObjectExistsException'))
+        # puts 'object exists'
+        return nil
+      else
+        raise LyberCore::Exceptions::FatalError.new("Object cannot be created in Sedora", e)
+      end
+    rescue Exception => e
+      raise LyberCore::Exceptions::FatalError.new("Object cannot be created in Sedora", e)
+    end
+
+    # retrieve existing object having pid = druid
+    def get_fedora_object(druid)
+      object = ActiveFedora::Base.load_instance(druid)
+      LyberCore::Log.debug("Loading druid #{druid} into object #{object}")
+    rescue Exception => e
+      raise LyberCore::Exceptions::FatalError.new("Object cannot be retrieved from Sedora", e)
+      return object
+    end
+
+    # Adding the sdrIngestWF datastream for the workflow
+    # The workflow database entries were previously created by sdr-ingest-transfer robot
+    # of the separate workflow that is submitting objects to be ingested
+    # Reference: https://wiki.duraspace.org/display/FCR30/REST+API#RESTAPI-addDatastream
+    def add_workflow_datastream(fedora_object)
+      begin
+        druid = fedora_object.pid
+         label = 'sdrIngestWF'
+         ds = ActiveFedora::Datastream.new(:pid => druid ,
+           :dsIS => label, :dsLabel => label,
+           :controlGroup => "E", :versionable => "false", :checksum => "DISABLED",
+           :dsLocation => "#{WORKFLOW_URI}/sdr/objects/#{druid}/workflows/sdrIngestWF"
+         )
+         fedora_object.add_datastream(ds)
+       rescue Exception => e
+         raise LyberCore::Exceptions::FatalError.new("#{label} datastream cannot be saved in Sedora", e)
+       end
 
     end
 
-    # end process_item
+  end
 
-    # Obtain the list of druids to be registered and process each one
-    def process_items()
-
-      # Get the druid list
-      # First, get_objects_for_workstep(repository, workflow, completed, waiting)
-
-      LyberCore::Log.info("Getting list of druids to process ... ")
-
-      begin
-        dor_objects_to_register = DorService.get_objects_for_workstep("sdr", "sdrIngestWF", "start-ingest", "register-sdr")
-      rescue Exception => e
-        raise LyberCore::Exceptions::FatalError.new("Unable to get list of objects to register", e)
-      end
-
-      begin
-        @druids = DorService.get_druids_from_object_list(dor_objects_to_register)
-      rescue Exception => e
-        raise LyberCore::Exceptions::FatalError.new("Unable to extract druids from XML", e)
-      end
-
-      LyberCore::Log.debug("Number of objects to register :  #{@druids.length()}")
-
-      # Now process druids one by one
-      i = 0
-      while i < @druids.length() do
-        begin
-          process_druid(@druids[i])
-          LyberCore::Log.info("#{@druid[i]} completed")
-          @success_count += 1
-        rescue LyberCore::Exceptions::FatalError => fatal_error
-          raise fatal_error
-        rescue Exception => e
-          item_error = LyberCore::Exceptions::ItemError.new(@druids[i], "Item error", e)
-          LyberCore::Log.exception(item_error)
-          @error_count += 1
-        end
-        i += 1
-      end # end while
-      # Print success, error count
-      print_stats
-
-    end
-
-  end # end of class
-end # end of module
-
+end 
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  # If this script is invoked with a specific druid, it will register sdr with that druid only
-  begin
-    if (ARGV[0])
-      LyberCore::Log.info "Registering SDR with #{ARGV[0]}"
-      sdr_bootstrap = SdrIngest::RegisterSdr.new()
-      sdr_bootstrap.process_druid(ARGV[0])
-    else
-      sdr_bootstrap = SdrIngest::RegisterSdr.new()
-      sdr_bootstrap.process_items()
-    end
-  rescue LyberCore::Exceptions::FatalError => fatal_error
-    LyberCore::Log.exception(fatal_error)
-  rescue Exception => e
-    fatal_error = LyberCore::Exceptions::FatalError.new("Fatal error", e)
-    LyberCore::Log.exception(fatal_error)
-  end
+  dm_robot = SdrIngest::RegisterSdr.new()
+  dm_robot.start
 end

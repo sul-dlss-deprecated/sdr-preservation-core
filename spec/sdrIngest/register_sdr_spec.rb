@@ -3,98 +3,66 @@ require 'rubygems'
 require 'lyber_core'
 require 'sdrIngest/register_sdr'
 
-describe "connect to sedora" do
-
-  context "Registering SDR Object" do
-  it "should be able to connect to sedora" do
-
-    @robot = SdrIngest::RegisterSdr.new()
-    mock_workitem = mock("register_sdr_workitem")
-    druid = "sdrtwo:AlpanaTests" + "#{Process.pid}"
-    print druid
-    mock_workitem.stub!(:druid).and_return(druid)
-
-    puts "About to register"
-    Fedora::Repository.register(SEDORA_URI)
-    puts "Done register"
-
-
-    begin
-      puts "About to save "
-      obj = ActiveFedora::Base.new(:pid => mock_workitem.druid)
-      obj.save
-      puts "Done save "
-    rescue
-      $stderr.print $!
-    end
-
-  end
+describe SdrIngest::RegisterSdr do
 
   context "basic behaviour" do
-   it "can be created" do
+
+    it "can be created" do
       x = SdrIngest::RegisterSdr.new()
       x.should be_instance_of(SdrIngest::RegisterSdr)
+      x.is_a?(LyberCore::Robots::Robot).should eql(true)
     end
-  end
-
-  it "should be able to connect to workflow service" do
-
-    
 
   end
-  
-  
-  describe "#process_druid" do 
+
+  context "process_item" do
+
+
+    before(:all) do
+      @robot = SdrIngest::RegisterSdr.new()
+      ActiveFedora::SolrService.register(SOLR_URL)
+      @pid1 = 'sdrtwo:registerSdrTestObject1'
+      @work_item_1 = mock('work_item_1')
+    end
+
     before(:each) do
-      @robot = SdrIngest::RegisterSdr.new()
+      begin
+        ActiveFedora::Base.load_instance(@pid1).delete
+      rescue Exception => e
+        puts e.inspect
+        puts "could not delete #{@pid1}"
+      end
     end
-    
-    after(:all) do 
-        ActiveFedora::Base.load_instance("sdrtwo:registerSdrTestObject1").delete
-    end
-        
-    it "it should register the object in sedora" do 
-        @robot.process_druid("sdrtwo:registerSdrTestObject1")
-        ActiveFedora::Base.load_instance("sdrtwo:registerSdrTestObject1").should be_true
-    end
-  
-    it "it should raise excpetion if the object is already in fedora" do 
-        lambda { @robot.process_druid("sdrtwo:registerSdrTestObject1") }.should raise_error(LyberCore::Exceptions::FatalError)    
-    end
-  
-  end 
 
-  describe "#process_items" do 
-    before(:each) do 
-      @robot = SdrIngest::RegisterSdr.new()
+    it "should add an object to fedora" do
+      object = @robot.add_fedora_object(@pid1)
+      object.nil?.should eql(false)
+      object.should be_instance_of(ActiveFedora::Base)
+      ActiveFedora::Base.load_instance(@pid1).should be_true
+      # if you try to add an existing object again you'll get nil result, not an exception
+      @robot.add_fedora_object(@pid1).should be_nil
     end
-    
+
+    it "it should register the object in sedora" do
+      @work_item_1.should_receive(:druid).and_return(@pid1)
+      @robot.process_item(@work_item_1)
+      ActiveFedora::Base.load_instance(@pid1).should be_true
+    end
+
+
     it "should process all the druids that are returned from the workflow service " do
+      pending
       DorService.stub!(:get_objects_for_workstep).with("sdr", "sdrIngestWF", "start-ingest", "register-sdr").and_return("<objects count='2' ><object id='sdrtwo:processItemTest1' url='https://dor-prod.stanford.edu/fedora/objects/druid:kd425tz2802' /><object id='sdrtwo:processItemTest2' url='https://dor-prod.stanford.edu/fedora/objects/druid:kd425tz2802' /></objects>")
-    
+
       @robot.should_receive(:process_druid).once.with("sdrtwo:processItemTest1")
       @robot.should_receive(:process_druid).once.with("sdrtwo:processItemTest2")
-      
+
       @robot.process_items
-      
+
     end
-    
-    it "should raise an error if it cannot extract druids from xml" do 
-      DorService.stub!(:get_objects_for_workstep).with("sdr", "sdrIngestWF", "start-ingest", "register-sdr").and_return("A bunch of junk")
-      lambda {  @robot.process_items }.should raise_error(LyberCore::Exceptions::FatalError)
-    end
-    
-    it "should raise an error if it cannot connect to the workflow service " do
-      lambda { @robot.process_items }.should raise_error(LyberCore::Exceptions::FatalError)
-    end
-    
+
+ 
   end
 
 
-
-  it "should be able to create a workflow" do
-
-  end
-
-end
 end
