@@ -6,8 +6,8 @@ html/*
 docs/*
 coverage/*
 coverage.data
-hydra-jetty
-hydra-jetty/*
 config/environments/passwords.rb
 .yardoc
 doc/*
+.idea
+.bundle
