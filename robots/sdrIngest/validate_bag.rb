@@ -6,6 +6,7 @@ require 'lyber_core'
 require 'bagit'
 require 'logger'
 require 'English'
+require 'pathname'
 
 DATA_DIR = "data"
 BAGIT_TXT = "bagit.txt"
@@ -55,11 +56,18 @@ module SdrIngest
       unless File.file?(bag_info_txt_file)
         raise LyberCore::Exceptions::ItemError.new(druid,"#{bag_info_txt_file} does not exist or is not a file")
       end
-      
+
+      # relationshipMetadata file must contain a valid APO
+      relationship_md_pathname = Pathname.new(data_dir).join('metadata/relationshipMetadata.xml')
+      if relationship_md_pathname.exist?
+        apo_druid = SdrIngest::VerifyApo.get_apo_druid(relationship_md_pathname)
+        SdrIngest::VerifyApo.verify_apo_in_fedora(apo_druid, SEDORA_URI)
+      end
+
       # If all files and directories exist where they should, we assume the bag exists
       return true
     end
-    
+
     # Validate the bag containing the object's content and metadata
     # Overrides the robot LyberCore::Robot.process_item method.
     def process_item(work_item)

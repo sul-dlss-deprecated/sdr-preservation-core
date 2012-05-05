@@ -42,8 +42,16 @@ module SdrIngest
       druid = work_item.druid
       LyberCore::Log.debug("Druid being processed is #{druid}")
 
+      object_home=SdrDeposit.local_bag_path(druid)
+      relationship_md_pathname = Pathname.new(object_home).join('data/metadata/relationshipMetadata.xml')
+      if relationship_md_pathname.exist?
+        # relationshipMetadata file must contain a valid APO
+        agreement_id = SdrIngest::VerifyApo.get_apo_druid(relationship_md_pathname)
+      else
+        agreement_id = get_agreement_id(druid)
+      end
+
       # get the agreement id for this object
-      agreement_id = get_agreement_id(druid)
       LyberCore::Log.debug("Agreement id is #{agreement_id}")
 
       # check if it is in sedora
