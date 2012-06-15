@@ -88,8 +88,8 @@ namespace :objects do
       puts "Building agreement obj in #{ENV['ROBOT_ENVIRONMENT']}"
       environment = ENV['ROBOT_ENVIRONMENT']
       require File.expand_path(File.dirname(__FILE__) + "/../../config/environments/#{environment}")
-      puts "Connecting to #{SEDORA_URI}..."
-      Fedora::Repository.register(SEDORA_URI)
+      puts "Connecting to #{Sdr::Config.sedora.url}..."
+      Fedora::Repository.register(Sdr::Config.sedora.url)
       ActiveFedora::SolrService.register(SOLR_URL)
       filename = File.expand_path(File.dirname(__FILE__) + '/google_books_agreement.xml')
       puts "Importing '#{filename}' to #{Fedora::Repository.instance.fedora_url}"
@@ -113,8 +113,8 @@ namespace :objects do
       puts "Building agreement obj in #{ENV['ROBOT_ENVIRONMENT']}"
       environment = ENV['ROBOT_ENVIRONMENT']
       require File.expand_path(File.dirname(__FILE__) + "/../../config/environments/#{environment}")
-      puts "Connecting to #{SEDORA_URI}..."
-      Fedora::Repository.register(SEDORA_URI)
+      puts "Connecting to #{Sdr::Config.sedora.url}..."
+      Fedora::Repository.register(Sdr::Config.sedora.url)
       ActiveFedora::SolrService.register(SOLR_URL)
       
       # Make sure we're starting with a blank object
@@ -151,7 +151,7 @@ namespace :objects do
       
       obj.save
       
-      puts "The object should be available at #{SEDORA_URI}/get/#{PID}"
+      puts "The object should be available at #{Sdr::Config.sedora.url}/get/#{PID}"
       
       rels_ext_ds = ActiveFedora::Datastream.new(:pid=>PID, :dsid=>"RELS-EXT", :dsLabel=>"RELS-EXT", :blob=>rels_ext)
       obj.add_datastream(rels_ext_ds)

@@ -1,5 +1,10 @@
 = SDR Ingest Workflow Robots
 
+== Authors
+* Alpana Pande
+* Bess Sadler
+* Richard Anderson
+
 ==An overview of the workflow
 You can see the steps of the workflow in
     config/workflows/sdrIngestWF/sdrIngestWF.xml
@@ -46,5 +51,20 @@ Then in a separate window:
       ---lib : spec for library classes
       ---sdrIngest : specs for the workflow
 
+==ActiveFedora syntax
 
+# Create a new object
+@obj = ActiveFedora::Base.new(:pid => @druid)
+@obj.label = "my label"
+@obj.save
+
+# Get an existing object
+@obj = ActiveFedora::Base.find(pid=@druid)
+or
+@obj = ActiveFedora::DigitalObject.find(ActiveFedora::Base, pid=@druid)
+
+
+# Add a datastream
+@ds = ActiveFedora::Datastream.new(@obj, dsid='sdrIngestWF', :dsLabel=>'sdrIngestWF', :content=>wf_str)
+@ds.save
 

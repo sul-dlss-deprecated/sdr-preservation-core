@@ -8,7 +8,7 @@ describe Sdr2Model do
     
     before(:all) do
       pid = "fixture:fixture1"
-      Fedora::Repository.register(SEDORA_URI)
+      Fedora::Repository.register(Sdr::Config.sedora.url)
       ActiveFedora::SolrService.register(SOLR_URL)
       filename = File.expand_path(File.dirname(__FILE__) + '/../fixtures/fixture_fixture1.foxml.xml')
       file = File.new(filename, "r")
@@ -22,7 +22,7 @@ describe Sdr2Model do
     end
     
     after(:all) do
-      Fedora::Repository.register(SEDORA_URI)
+      Fedora::Repository.register(Sdr::Config.sedora.url)
       ActiveFedora::SolrService.register(SOLR_URL)
       pid = "fixture:fixture1"
       ActiveFedora::Base.load_instance(pid).delete

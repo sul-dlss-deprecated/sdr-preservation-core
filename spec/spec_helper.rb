@@ -1,20 +1,19 @@
-$: << File.join(File.dirname(__FILE__), "./fixtures")
+ENV['RSPEC'] = "true"
 
-$:.unshift File.join(File.dirname(__FILE__), "..", "lib")
-$:.unshift File.join(File.dirname(__FILE__), "..", "robots")
-require 'spec'
-require 'pathname'
- 
-# Make sure specs run with the definitions from test.rb
-environment = ENV['ROBOT_ENVIRONMENT'] = 'test'
-require File.expand_path(File.dirname(__FILE__) + "/../config/environments/#{environment}")  
-ROBOT_ROOT = File.expand_path(File.dirname(__FILE__) + "/..") unless defined?(ROBOT_ROOT)
+require 'rspec'
+require 'equivalent-xml'
+
+
+include Sdr
 
 def fixture_setup
-  @fixtures = Pathname.new(ROBOT_ROOT).join('spec/fixtures')
+  @fixtures = Pathname.new(File.dirname(__FILE__)).join('fixtures')
+  @temp = Pathname.new(File.dirname(__FILE__)).join('temp')
+  @temp.mkpath
+  @temp = @temp.realpath
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.before(:all) {fixture_setup}
   config.before(:each) {}
   config.after(:all) {}

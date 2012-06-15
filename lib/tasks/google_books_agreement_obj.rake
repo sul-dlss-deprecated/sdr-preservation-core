@@ -103,8 +103,8 @@ namespace :objects do
       puts "Building base agreement obj in #{ENV['ROBOT_ENVIRONMENT']}"
       environment = ENV['ROBOT_ENVIRONMENT']
       require File.expand_path(File.dirname(__FILE__) + "/../../config/environments/#{environment}")
-      puts "Connecting to #{SEDORA_URI}..."
-      Fedora::Repository.register(SEDORA_URI)
+      puts "Connecting to #{Sdr::Config.sedora.url}..."
+      Fedora::Repository.register(Config.sedora.url)
       ActiveFedora::SolrService.register(SOLR_URL)
       
       # Make sure we're starting with a blank object
@@ -141,7 +141,7 @@ namespace :objects do
       
       obj.save
       
-      puts "The object should be available at #{SEDORA_URI}/get/#{pid}"
+      puts "The object should be available at #{Sdr::Config.sedora.url}/get/#{pid}"
       
       rels_ext_ds = ActiveFedora::Datastream.new(:pid=>pid, :dsid=>"RELS-EXT", :dsLabel=>"RELS-EXT", :blob=>rels_ext)
       obj.add_datastream(rels_ext_ds)

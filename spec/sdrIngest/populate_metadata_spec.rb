@@ -13,7 +13,7 @@ context "Populating Metadata" do
     mock_workitem = mock("populate_metadata_workitem")
     mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
     
-    Fedora::Repository.register(SEDORA_URI)
+    Fedora::Repository.register(Sdr::Config.sedora.url)
     ActiveFedora::SolrService.register(SOLR_URL)
     
     # Make sure we're starting with a blank object
@@ -36,7 +36,7 @@ context "Populating Metadata" do
     mock_workitem = mock("populate_metadata_workitem")
     mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
 
-    Fedora::Repository.register(SEDORA_URI)
+    Fedora::Repository.register(Sdr::Config.sedora.url)
     ActiveFedora::SolrService.register(SOLR_URL)
     
     # Make sure we're starting with a blank object

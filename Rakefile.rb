@@ -11,8 +11,8 @@
 
 require 'rake'
 require 'rake/testtask'
-require 'spec/rake/spectask'
-require 'jettywrapper'
+require 'rspec/core/rake_task'
+#require 'jettywrapper'
 
 # Import external rake tasks
 Dir.glob('lib/tasks/*.rake').each { |r| import r }
@@ -30,8 +30,8 @@ task :environment do
 end
 
 desc "Run RSpec with RCov"
-Spec::Rake::SpecTask.new('spec') do |t|
-  t.spec_files = FileList['spec/**/*.rb']
+RSpec::Core::RakeTask.new('spec') do |t|
+  t.pattern = FileList['spec/unit_tests/*.rb']
   t.rcov = true
   t.rcov_opts = ['--exclude', 'spec,/usr/,/home/hudson']
 end

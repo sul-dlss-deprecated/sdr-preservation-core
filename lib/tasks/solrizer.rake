@@ -27,7 +27,7 @@ namespace :solrizer do
   desc 'Index test'
   task :indexall => :environment  do
     
-    Fedora::Repository.register(SEDORA_URI)
+    Fedora::Repository.register(Sdr::Config.sedora.url)
     solrizer = Solrizer::Solrizer.new()
     
     completed_pids_url = "http://lyberservices-dev.stanford.edu/workflow/workflow_queue?repository=sdr&workflow=sdrIngestWF&completed=complete-deposit"
@@ -60,8 +60,8 @@ namespace :solrizer do
     #   end
     #   environment = ENV['ROBOT_ENVIRONMENT']
     #   require File.expand_path(File.dirname(__FILE__) + "/../../config/environments/#{environment}")
-    #   puts "Connecting to #{SEDORA_URI}..."
-    #   Fedora::Repository.register(SEDORA_URI)
+    #   puts "Connecting to #{Sdr::Config.sedora.url}..."
+    #   Fedora::Repository.register(Sdr::Config.sedora.url)
     #   ActiveFedora::SolrService.register(SOLR_URL)
     #   
     #   puts "Re-indexing Fedora Repository."
