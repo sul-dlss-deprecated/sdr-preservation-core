@@ -3,9 +3,10 @@ require 'boot'
 
 module Sdr
 
-  # Creates +Sedora+ objects and workflow datastreams.
+  # A robot for creating +Sedora+ objects and workflow datastreams unless they exist
   class RegisterSdr < LyberCore::Robots::Robot
 
+    # set workflow name, step name, log location, log severity level
     def initialize()
       super('sdrIngestWF', 'register-sdr',
             :logfile => "#{Sdr::Config.logdir}/register-sdr.log",
@@ -16,13 +17,19 @@ module Sdr
       LyberCore::Log.debug("Process ID is : #{$PID}")
     end
 
-    # - Creates a *Sedora* object
-    # - Adds the +sdrIngestWF+ datastream
+    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @return [void] process an object from the queue through this robot
+    #   Overrides LyberCore::Robots::Robot.process_item method.
+    #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       register_item(work_item.druid)
     end
 
+    # @param druid [String] The object identifier
+    # @return [SedoraObject]
+    # - Creates a *Sedora* object unless it already exists
+    # - Adds the +sdrIngestWF+ datastream to the Sedora object unless it already exists
     def register_item(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter register_item")
       if SedoraObject.exists?(druid)

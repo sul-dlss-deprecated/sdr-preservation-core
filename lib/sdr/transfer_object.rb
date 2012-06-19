@@ -3,12 +3,11 @@ require 'boot'
 
 module Sdr
 
-# Transfers objects from DOR workspace to SDR's staging area.
+  # Robot for transferring objects from the DOR export area to the SDR deposit area.
   class TransferObject < LyberCore::Robots::Robot
 
+    # set workflow name, step name, log location, log severity level
     def initialize()
-    # Initialize the robot by calling LyberCore::Robots::Robot.new
-    # with the workflow name and the workflow step
       super('sdrIngestWF', 'transfer-object',
         :logfile => "#{Sdr::Config.logdir}/transfer-object.log",
         :loglevel => Logger::INFO,
@@ -18,13 +17,17 @@ module Sdr
       LyberCore::Log.debug("Process ID is : #{$$}")
     end
 
+    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @return [void] process an object from the queue through this robot
+    #   Overrides LyberCore::Robots::Robot.process_item method.
+    #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       transfer_object(work_item.druid)
     end
 
-    # Transfer the object's bag from the DOR workspace to the SDR storage area
-    # Overrides the robot LyberCore::Robot.process_item method.
+    # @param druid [String] The object identifier
+    # @return [void] Transfer the object from the DOR export area to the SDR deposit area.
     def transfer_object(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
       transfer_bag(druid)
@@ -32,6 +35,8 @@ module Sdr
       cleanup_tarfile(druid)
     end
 
+    # @param druid [String] The object identifier
+    # @return [void] Copy the TAR file containing the object using Rsync
     def transfer_bag(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
       bag_dir = SdrDeposit.bag_pathname(druid)
@@ -53,8 +58,8 @@ module Sdr
       end
     end
 
-
-    # Untar the file and delete the tarfile if successful
+    # @param druid [String] The object identifier
+    # @return [void] Unpack the TAR file.
     def untar_bag(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter untar_bag")
       bag_parent_dir = SdrDeposit.bag_pathname(druid).parent
@@ -68,7 +73,8 @@ module Sdr
       end
     end
 
-    # remove the tar file
+    # @param druid [String] The object identifier
+    # @return [void] Delete the tar file.
     def cleanup_tarfile(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter cleanup_tarfile")
       tarfile =SdrDeposit.tarfile_pathname(druid)

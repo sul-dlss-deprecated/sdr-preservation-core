@@ -3,12 +3,13 @@ require 'boot'
 
 module Sdr
 
-  # Verifies that an agreement object exists for each object
+  # Robot for verifying that an APO or agreement object exists for each object
   class VerifyAgreement < LyberCore::Robots::Robot
 
-    # the agreement_id of the current workitem
+    # A cache of APO/agreement object identifiers that have already been verified to exist in Sedora
     attr_reader :valid_identifiers
 
+    # set workflow name, step name, log location, log severity level
     def initialize()
       super('sdrIngestWF', 'verify-agreement',
         :logfile => "#{Sdr::Config.logdir}/verify-agreement.log",
@@ -20,12 +21,18 @@ module Sdr
       LyberCore::Log.debug("Process ID is : #{$$}")
     end
   
-    # Lookup the identifier of the agreement object and verify that it has previously been ingested
+    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @return [void] process an object from the queue through this robot
+    #   Overrides LyberCore::Robots::Robot.process_item method.
+    #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       verify_agreement(work_item.druid)
     end
 
+    # @param druid [String] The object identifier
+    # @return [Boolean] Find the APO or Agreement identifier in the object metadata,
+    #   and verify that the identifer belongs to a previously ingested object
     def verify_agreement(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter validate_agreement")
       LyberCore::Log.debug("Druid being processed is #{druid}")
@@ -41,7 +48,8 @@ module Sdr
       end
     end
 
-    # Lookup the identifier of the APO object and verify that it has previously been ingested
+    # @param druid [String] The object identifier
+    # @return [String] The 'isGovernedBy' APO identifier found in the relationshipMetadata
     def find_apo_id(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter find_apo_id")
       if (relationship_metadata = get_metadata(druid,'relationshipMetadata'))
@@ -57,8 +65,8 @@ module Sdr
       raise LyberCore::Exceptions::FatalError.new("Unable to find APO id for #{druid}", e)
     end
 
-    # @return [Nokogiri::XML::NodeSet] Given a druid, get its identityMetadata datastream from Sedora
-    #   and extract the agreement_id in a NodeSet.  If not found, return empty NodeSet.
+    # @param druid [String] The object identifier
+    # @return [String] The agreement identifier found in the identityMetadata datastream
     def find_agreement_id(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter find_agreement_id")
       if (identity_metadata = get_metadata(druid,'identityMetadata'))
@@ -73,6 +81,9 @@ module Sdr
       raise LyberCore::Exceptions::FatalError.new("Unable to find agreement id for #{druid}", e)
     end
 
+    # @param druid [String] The object identifier
+    # @param dsid [String] The datastream identifier, which is also the basename of the XML data file
+    # @return [String] The contents of the specified datastream, else nil if not found
     def get_metadata(druid, dsid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter get_metadata")
       pathname = SdrDeposit.bag_pathname(druid).join("data/metadata/#{dsid}.xml")
@@ -83,8 +94,8 @@ module Sdr
       end
     end
 
-
-    # check if the itentifier is a sedora pid
+    # @param identifier [String] The APO or agreement identifier
+    # @return [Boolean] Return true if the identifier is a sedora pid
     def verify_identifier(identifier)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter verify_identifier")
       if @valid_identifiers.include?(identifier)
