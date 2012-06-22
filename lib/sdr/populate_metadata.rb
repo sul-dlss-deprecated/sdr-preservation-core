@@ -35,6 +35,7 @@ module Sdr
       sedora_object = Sdr::SedoraObject.find(druid)
       set_datastream_content(sedora_object, bag_pathname, 'identityMetadata')
       set_datastream_content(sedora_object, bag_pathname, 'provenanceMetadata')
+      set_datastream_content(sedora_object, bag_pathname, 'relationshipMetadata')
       sedora_object.save
       sedora_object
     rescue ActiveFedora::ObjectNotFoundError => e
@@ -54,18 +55,20 @@ module Sdr
       bag_pathname
     end
 
-    # @param sedora_object [SedoraObject] The Fedora object to which datatream content is to be added
+    # @param sedora_object [SedoraObject] The Fedora object to which datatream content is to be saved
     # @param bag_pathname [Pathname] The location of the BagIt bag containing the object data files
     # @param dsid [String] The datastream identifier, which is also the basename of the XML data file
     # @return [void] Perform the following steps:
     #   - Determine the metadata files full path in the bagit object,
-    #   - make a datastream out of it using the given label,
-    #   - add it to the fedora object, and save.
+    #   - determine if the metadata file exists, and if so
+    #   - copy the content of the metadata file to the datastream.
     # @raise [LyberCore::Exceptions::FatalError] if we can't find the file
     def set_datastream_content(sedora_object, bag_pathname, dsid)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter set_datastream_content")
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter set_datastream_content for #{dsid}")
       md_pathname = bag_pathname.join('data/metadata',"#{dsid}.xml")
-      sedora_object.datastreams[dsid].content = md_pathname.read
+      if md_pathname.file?
+        sedora_object.datastreams[dsid].content = md_pathname.read
+      end
     rescue Exception => e
       raise LyberCore::Exceptions::FatalError.new("Cannot add #{dsid} datastream for #{sedora_object.pid}",e)
     end

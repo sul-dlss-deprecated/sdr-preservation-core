@@ -72,6 +72,9 @@ require 'lyber_core/exceptions/fatal_error'
 require 'lyber_core/exceptions/service_error'
 require 'lyber_core/exceptions/item_error'
 
+require 'moab_stanford'
+include Stanford
+
 # Load the environment file based on Environment.  Default to local
 if(ENV.include?('ROBOT_ENVIRONMENT'))
   environment = ENV['ROBOT_ENVIRONMENT']

@@ -5,7 +5,7 @@
 # (2) total size of all objects in the storage area
 
 # Number of objects
-OBJECT_COUNT=`~/sdr2/robots/workflow-archive-count.sh`
+OBJECT_COUNT=`~/sdr2/bin/workflow-archive-count.sh`
 
 # Size of storage area
 WORKSPACE="/services-disk"

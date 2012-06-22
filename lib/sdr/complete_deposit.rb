@@ -6,12 +6,15 @@ module Sdr
   # Robot for completing the processing of each ingested object
   class CompleteDeposit < LyberCore::Robots::Robot
 
+    attr_accessor :repository
+
     # set workflow name, step name, log location, log severity level
     def initialize()
       super('sdrIngestWF', 'complete-deposit',
         :logfile => "#{Sdr::Config.logdir}/complete-deposit.log",
         :loglevel => Logger::INFO,
         :options => ARGV[0])
+      @repository = Stanford::StorageRepository.new
       env = ENV['ROBOT_ENVIRONMENT']
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{env}")
       LyberCore::Log.debug("Process ID is : #{$PID}")
@@ -23,7 +26,24 @@ module Sdr
     #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      update_provenance(work_item.druid)
+      complete_deposit(work_item.druid)
+    end
+
+    # @param druid [String] The object identifier
+    # @return [void] complete ingest of the item, update provenance, cleanup deposit data.
+    def complete_deposit(druid)
+      bag_pathname = SdrDeposit.bag_pathname(druid)
+      @repository.store_new_object_version(druid, bag_pathname)
+      @repository.verify_version_storage(druid)
+      update_provenance(druid)
+      cleanup_bag(druid)
+    end
+``
+    # @param druid [String] The object identifier
+    # @return [void] delete the BagIt bag from the deposit area
+    def cleanup_bag(druid)
+      bag_pathname = SdrDeposit.bag_pathname(druid)
+      bag_pathname.rmtree
     end
 
     # @param druid [String] The object identifier

@@ -121,17 +121,28 @@ describe Sdr::VerifyAgreement do
   end
 
   specify "VerifyAgreement#get_metadata" do
-    bag_pathname = mock("bag_pathname")
-    relationship_metadata_pathaname = mock("relationship_metadata_pathaname")
-    SdrDeposit.stub(:bag_pathname).with(@druid).and_return(bag_pathname)
-    bag_pathname.stub(:join).with('data/metadata/relationshipMetadata.xml').
-        and_return(relationship_metadata_pathaname)
-    relationship_metadata_pathaname.stub(:read).and_return("<relationshipMetadata>...")
-    relationship_metadata_pathaname.stub(:exist?).and_return(true)
+    sedora_object = mock(SedoraObject)
+    SedoraObject.stub(:find).with(@druid).and_return(sedora_object)
+    datastream = mock('relationshipMetadata')
+    sedora_object.stub(:datastreams).and_return({'relationshipMetadata'=>datastream})
+    datastream.stub(:new?).and_return(false)
+    datastream.stub(:content).and_return("<relationshipMetadata>...")
     @va.get_metadata(@druid,'relationshipMetadata').should == "<relationshipMetadata>..."
 
-    relationship_metadata_pathaname.stub(:exist?).and_return(false)
+    datastream.stub(:new?).and_return(true)
     @va.get_metadata(@druid,'relationshipMetadata').should == nil
+
+
+    #bag_pathname = mock("bag_pathname")
+    #relationship_metadata_pathaname = mock("relationship_metadata_pathaname")
+    #SdrDeposit.stub(:bag_pathname).with(@druid).and_return(bag_pathname)
+    #bag_pathname.stub(:join).with('data/metadata/relationshipMetadata.xml').
+    #    and_return(relationship_metadata_pathaname)
+    #relationship_metadata_pathaname.stub(:read).and_return("<relationshipMetadata>...")
+    #relationship_metadata_pathaname.stub(:exist?).and_return(true)
+    #@va.get_metadata(@druid,'relationshipMetadata').should == "<relationshipMetadata>..."
+    #relationship_metadata_pathaname.stub(:exist?).and_return(false)
+    #@va.get_metadata(@druid,'relationshipMetadata').should == nil
   end
 
   specify "VerifyAgreement#verify_identifier" do

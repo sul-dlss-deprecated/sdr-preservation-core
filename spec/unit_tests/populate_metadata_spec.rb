@@ -31,7 +31,7 @@ describe Sdr::PopulateMetadata do
     @pm.should_receive(:find_bag).with(@druid).and_return(bag_pathname)
     sedora_object = mock(SedoraObject)
     Sdr::SedoraObject.stub(:find).with(@druid).and_return(sedora_object)
-    @pm.should_receive(:set_datastream_content).twice
+    @pm.should_receive(:set_datastream_content).exactly(3).times
     sedora_object.should_receive(:save)
     @pm.fill_datastreams(@druid)
 
@@ -64,6 +64,7 @@ describe Sdr::PopulateMetadata do
   specify "PopulateMetadata#set_datastream_content" do
     sedora_object = mock(SedoraObject)
     bag_pathname = SdrDeposit.bag_pathname(@druid)
+    Pathname.any_instance.stub(:file?).and_return(true)
     Pathname.any_instance.stub(:read).and_return('<identityMetadata objectId="druid:jc837rq9922">')
     dsid = 'identityMetadata'
     identity_metatdata = mock(dsid)

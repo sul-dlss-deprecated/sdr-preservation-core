@@ -16,7 +16,7 @@ rvm list gemsets
 ENVIRONMENT_HOME=${SHELL_SCRIPT_HOME}/../config/environments
 
 # Location of robot scripts
-ROBOT_SCRIPT_HOME=${SHELL_SCRIPT_HOME}/sdrIngest
+ROBOT_SCRIPT_HOME=${SHELL_SCRIPT_HOME}/../lib
 
 # The name of the current computer without the domain
 HOST=`hostname -s`

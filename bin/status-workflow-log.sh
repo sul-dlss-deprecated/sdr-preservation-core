@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function queue_size() {
-	WORKFLOW_COUNT=~/sdr2/robots/workflow-count.sh
+	WORKFLOW_COUNT=~/sdr2/bin/workflow-count.sh
 	${WORKFLOW_COUNT} "$1" | sed -s 's/^ *//'| cut -f1 -d' '
 }
 

@@ -44,8 +44,23 @@ describe Sdr::CompleteDeposit do
   specify "CompleteDeposit#process_item" do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @cd.should_receive(:update_provenance).with(@druid)
+    @cd.should_receive(:complete_deposit).with(@druid)
     @cd.process_item(work_item)
+  end
+
+  specify "CompleteDeposit#complete_deposit" do
+    @cd.repository.should_receive(:store_new_object_version).with(@druid, SdrDeposit.bag_pathname(@druid))
+    @cd.repository.should_receive(:verify_version_storage).with(@druid)
+    @cd.should_receive(:update_provenance).with(@druid)
+    @cd.should_receive(:cleanup_bag).with(@druid)
+    @cd.complete_deposit(@druid)
+  end
+
+  specify "CompleteDeposit#cleanup_bag" do
+    bag_pathname = mock(Pathname)
+    SdrDeposit.stub(:bag_pathname).with(@druid).and_return(bag_pathname)
+    bag_pathname.should_receive(:rmtree)
+    @cd.cleanup_bag(@druid)
   end
 
   specify "CompleteDeposit#update_provenance" do

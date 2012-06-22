@@ -86,12 +86,19 @@ module Sdr
     # @return [String] The contents of the specified datastream, else nil if not found
     def get_metadata(druid, dsid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter get_metadata")
-      pathname = SdrDeposit.bag_pathname(druid).join("data/metadata/#{dsid}.xml")
-      if pathname.exist?
-        pathname.read
-      else
+      sedora_object = Sdr::SedoraObject.find(druid)
+      datastream = sedora_object.datastreams[dsid]
+      if datastream.new?
         nil
+      else
+        datastream.content
       end
+      #pathname = SdrDeposit.bag_pathname(druid).join("data/metadata/#{dsid}.xml")
+      #if pathname.exist?
+      #  pathname.read
+      #else
+      #  nil
+      #end
     end
 
     # @param identifier [String] The APO or agreement identifier
