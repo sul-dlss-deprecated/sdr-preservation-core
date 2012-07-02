@@ -11,19 +11,19 @@ module Sdr
 #    has_metadata :name => "rightsMetadata", :type => ActiveFedora::NokogiriDatastream, :label => 'Rights Metadata', :control_group => 'M'
     has_metadata :name => "relationshipMetadata", :type => ActiveFedora::NokogiriDatastream, :label => 'Relationship Metadata', :control_group => 'M'
     has_metadata :name => "sdrIngestWF", :type => ActiveFedora::NokogiriDatastream, :label => 'Workflow Metadata', :control_group => 'E'
-#    has_metadata :name => "workflows", :type => ActiveFedora::NokogiriDatastream, :label => 'Workflows', :control_group => 'E'
+    has_metadata :name => "workflows", :type => ActiveFedora::NokogiriDatastream, :label => 'Workflows', :control_group => 'E'
 
     def set_workflow_datastream_location
       if self.sdrIngestWF.new?
         sdrIngestWF.mimeType = 'application/xml'
-        sdrIngestWF.dsLocation = File.join(Dor::Config.workflow.url,"dor/objects/#{self.pid}/sdrIngestWF")
+        sdrIngestWF.dsLocation = File.join(Dor::Config.workflow.url,"sdr/objects/#{self.pid}/workflows/sdrIngestWF")
         sdrIngestWF.save
       end
-      #if self.workflows.new?
-      #  workflows.mimeType = 'application/xml'
-      #  workflows.dsLocation = File.join(Dor::Config.workflow.url,"dor/objects/#{self.pid}/workflows")
-      #  workflows.save
-      #end
+      if self.workflows.new?
+        workflows.mimeType = 'application/xml'
+        workflows.dsLocation = File.join(Dor::Config.workflow.url,"dor/objects/#{self.pid}/workflows")
+        workflows.save
+      end
     end
 
   end
