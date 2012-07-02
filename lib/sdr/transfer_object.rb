@@ -30,28 +30,29 @@ module Sdr
     # @return [void] Transfer the object from the DOR export area to the SDR deposit area.
     def transfer_object(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
-      transfer_bag(druid)
-      untar_bag(druid)
-      cleanup_tarfile(druid)
+      deposit_object = DepositObject.new(druid)
+      bag_pathname = deposit_object.bag_pathname(verify=false)
+      tarfile_pathname =deposit_object.tarfile_pathname()
+      transfer_bag(druid, bag_pathname, tarfile_pathname)
+      untar_bag(druid, bag_pathname, tarfile_pathname)
+      cleanup_tarfile(druid, tarfile_pathname)
     end
 
     # @param druid [String] The object identifier
     # @return [void] Copy the TAR file containing the object using Rsync
-    def transfer_bag(druid)
+    def transfer_bag(druid, bag_pathname, tarfile_pathname)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
-      bag_dir = SdrDeposit.bag_pathname(druid)
-      LyberCore::Log.debug("object_pathname is : #{bag_dir}")
-      if bag_dir.exists?
-        raise LyberCore::Exceptions::ItemError.new(druid, "Object already exists at destination: #{bag_dir.to_s}")
+      LyberCore::Log.debug("bag_pathname is : #{bag_pathname}")
+      if bag_pathname.exist?
+        raise LyberCore::Exceptions::ItemError.new(druid, "Deposit bag already exists at destination: #{bag_pathname.to_s}")
       else
-        # filename is druid.tar
-        filename = druid + ".tar"
-        LyberCore::Log.debug("Tar file name being transferred is : #{filename}")
+        tarfile = tarfile_pathname.basename.to_s
+        LyberCore::Log.debug("Tar file name being transferred is : #{tarfile}")
         begin
-          bag_parent_dir = bag_dir.parent
-          bag_parent_dir.mkpath
-          LyberCore::Utils::FileUtilities.transfer_object(filename, Sdr::Config.dor_export, bag_parent_dir.to_s)
-          LyberCore::Log.debug("#{filename} transferred to #{bag_parent_dir.to_s}")
+          bag_pathname.parent.mkpath
+          bag_parent_dir = bag_pathname.parent.to_s
+          LyberCore::Utils::FileUtilities.transfer_object(tarfile, Sdr::Config.dor_export, bag_parent_dir)
+          LyberCore::Log.debug("#{tarfile} transferred to #{bag_parent_dir}")
         rescue Exception => e
           raise LyberCore::Exceptions::ItemError.new(druid, "Error transferring object", e)
         end
@@ -60,11 +61,11 @@ module Sdr
 
     # @param druid [String] The object identifier
     # @return [void] Unpack the TAR file.
-    def untar_bag(druid)
+    def untar_bag(druid, bag_pathname, tarfile_pathname)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter untar_bag")
-      bag_parent_dir = SdrDeposit.bag_pathname(druid).parent
-      filename = druid + ".tar"
-      unpackcommand = "cd #{bag_parent_dir.to_s}; tar xf #{filename} --force-local"
+      bag_parent_dir = bag_pathname.parent.to_s
+      tarfile = tarfile_pathname.basename.to_s
+      unpackcommand = "cd #{bag_parent_dir}; tar xf #{tarfile} --force-local"
       LyberCore::Log.debug("Unpack command is :  #{unpackcommand}")
       status = system(unpackcommand)
       LyberCore::Log.debug("Return from untar is : #{status}")
@@ -75,13 +76,13 @@ module Sdr
 
     # @param druid [String] The object identifier
     # @return [void] Delete the tar file.
-    def cleanup_tarfile(druid)
+    def cleanup_tarfile(druid, tarfile_pathname)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter cleanup_tarfile")
-      tarfile =SdrDeposit.tarfile_pathname(druid)
-      tarfile.delete
-      LyberCore::Log.debug("File : #{tarfile.to_s} now deleted")
+      tarfile_pathname.delete
+      tarfile = tarfile_pathname.basename.to_s
+      LyberCore::Log.debug("File : #{tarfile} now deleted")
     rescue Exception => e
-      raise LyberCore::Exceptions::ItemError.new(druid, "Unable to delete #{tarfile.to_s}", e)
+      raise LyberCore::Exceptions::ItemError.new(druid, "Unable to delete #{tarfile}", e)
     end
 
   end
@@ -91,7 +92,7 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::TransferObject.new()
+  dm_robot = Sdr::TransferObject.new()
   dm_robot.start
 end
 

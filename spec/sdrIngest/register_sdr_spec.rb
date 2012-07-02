@@ -4,13 +4,13 @@ require 'lyber_core'
 require 'sdrIngest/register_sdr'
 require 'fakeweb'
 
-describe SdrIngest::RegisterSdr do
+describe Sdr::RegisterSdr do
 
   context "basic behaviour" do
 
     it "can be created" do
-      x = SdrIngest::RegisterSdr.new()
-      x.should be_instance_of(SdrIngest::RegisterSdr)
+      x = Sdr::RegisterSdr.new()
+      x.should be_instance_of(Sdr::RegisterSdr)
       x.is_a?(LyberCore::Robots::Robot).should eql(true)
     end
 
@@ -20,7 +20,7 @@ describe SdrIngest::RegisterSdr do
 
 
     before(:all) do
-      @robot = SdrIngest::RegisterSdr.new()
+      @robot = Sdr::RegisterSdr.new()
       # if you do not register SOLR you will get  ActiveFedora::SolrNotInitialized if doing object.delete
       ActiveFedora::SolrService.register(SOLR_URL)
       @pid1 = 'sdrtwo:registerSdrTestObject1'

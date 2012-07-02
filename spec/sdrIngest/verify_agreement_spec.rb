@@ -5,11 +5,11 @@ require 'lyber_core'
 require 'sdrIngest/verify_agreement'
 require 'fakeweb'
 
-describe SdrIngest::VerifyAgreement do 
+describe Sdr::VerifyAgreement do 
     context "initial state" do
       before :all do
         ENV['ROBOT_ENVIRONMENT'] = 'test'
-        @robot = SdrIngest::VerifyAgreement.new()
+        @robot = Sdr::VerifyAgreement.new()
       end
   
       it "inherits behavior from LyberCore::Robots::Robot" do

@@ -5,7 +5,8 @@ describe Sdr::PopulateMetadata do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
-
+    deposit_object = DepositObject.new(@druid)
+    @bag_pathname = deposit_object.bag_pathname(validate=false)
   end
 
   before(:each) do
@@ -22,18 +23,17 @@ describe Sdr::PopulateMetadata do
   specify "PopulateMetadata#process_item" do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @pm.should_receive(:fill_datastreams).with(@druid)
+    @pm.should_receive(:populate_metadata).with(@druid)
     @pm.process_item(work_item)
   end
 
-  specify "PopulateMetadata#fill_datastreams" do
-    bag_pathname = SdrDeposit.bag_pathname(@druid)
-    @pm.should_receive(:find_bag).with(@druid).and_return(bag_pathname)
+  specify "PopulateMetadata#populate_metadata" do
+    Pathname.any_instance.should_receive(:directory?).and_return(:true)
     sedora_object = mock(SedoraObject)
     Sdr::SedoraObject.stub(:find).with(@druid).and_return(sedora_object)
     @pm.should_receive(:set_datastream_content).exactly(3).times
     sedora_object.should_receive(:save)
-    @pm.fill_datastreams(@druid)
+    @pm.populate_metadata(@druid)
 
     #def fill_datastreams(druid)
     #  LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter populate_metadata")
@@ -49,21 +49,8 @@ describe Sdr::PopulateMetadata do
     #end
   end
 
-  specify "PopulateMetadata#find_bag" do
-    bag_pathname = mock("Bag Pathname")
-    SdrDeposit.stub(:bag_pathname).with(@druid).and_return(bag_pathname)
-
-    bag_pathname.stub(:directory?).and_return(true)
-    @pm.find_bag(@druid)
-
-    bag_pathname.stub(:directory?).and_return(false)
-    lambda{@pm.find_bag(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
-
-   end
-
   specify "PopulateMetadata#set_datastream_content" do
     sedora_object = mock(SedoraObject)
-    bag_pathname = SdrDeposit.bag_pathname(@druid)
     Pathname.any_instance.stub(:file?).and_return(true)
     Pathname.any_instance.stub(:read).and_return('<identityMetadata objectId="druid:jc837rq9922">')
     dsid = 'identityMetadata'
@@ -71,7 +58,7 @@ describe Sdr::PopulateMetadata do
     sedora_object.should_receive(:datastreams).and_return({'identityMetadata'=>identity_metatdata})
     identity_metatdata.should_receive(:content=).with(/<identityMetadata objectId="druid:jc837rq9922">/)
     sedora_object.should_not_receive(:pid).and_return(@druid)
-    @pm.set_datastream_content(sedora_object, bag_pathname, dsid)
+    @pm.set_datastream_content(sedora_object, @bag_pathname, dsid)
 
     #def set_datastream_content(sedora_object, bag_pathname, dsid)
     #  LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter set_datastream_content for #{dsid}")

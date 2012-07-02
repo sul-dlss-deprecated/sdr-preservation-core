@@ -5,7 +5,8 @@ describe Sdr::ValidateBag do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
-
+    deposit_object = DepositObject.new(@druid)
+    @bag_pathname = deposit_object.bag_pathname(validate=false)
   end
 
   before(:each) do
@@ -27,51 +28,50 @@ describe Sdr::ValidateBag do
   end
 
   specify "ValidateBag#validate_bag" do
-    @vb.should_receive(:validate_bag_structure).with(@druid)
-    @vb.should_receive(:validate_bag_data).with(@druid)
+    @vb.should_receive(:validate_bag_structure).with(@druid, @bag_pathname)
+    @vb.should_receive(:validate_bag_data).with(@druid, @bag_pathname)
+    Pathname.any_instance.should_receive(:directory?).and_return(true)
     @vb.validate_bag(@druid)
   end
 
   specify "ValidateBag#validate_bag_structure" do
-    bag_dir = mock('bagdir')
-    SdrDeposit.stub(:bag_pathname).with(@druid).and_return(bag_dir)
-    bag_dir.stub(:to_s).and_return('bagdir')
-    bag_dir.stub(:directory?).and_return(false)
-    lambda{@vb.validate_bag_structure(@druid)}.should raise_exception(/bagdir does not exist/)
-    bag_dir.stub(:directory?).and_return(true)
+    @bag_pathname.stub(:to_s).and_return('bagdir')
+    @bag_pathname.stub(:directory?).and_return(false)
+    lambda{@vb.validate_bag_structure(@druid, @bag_pathname)}.should raise_exception(/bagdir does not exist/)
+    @bag_pathname.stub(:directory?).and_return(true)
 
     data_dir = mock('datadir')
-    bag_dir.stub(:join).with('data').and_return(data_dir)
+    @bag_pathname.stub(:join).with('data').and_return(data_dir)
     data_dir.stub(:to_s).and_return('datadir')
     data_dir.stub(:directory?).and_return(false)
-    lambda{@vb.validate_bag_structure(@druid)}.should raise_exception(/datadir does not exist/)
+    lambda{@vb.validate_bag_structure(@druid, @bag_pathname)}.should raise_exception(/datadir does not exist/)
     data_dir.stub(:directory?).and_return(true)
 
     bagit_txt_file = mock('bagit_txt_file')
-    bag_dir.stub(:join).with('bagit.txt').and_return(bagit_txt_file)
+    @bag_pathname.stub(:join).with('bagit.txt').and_return(bagit_txt_file)
     bagit_txt_file.stub(:to_s).and_return('bagit_txt_file')
     bagit_txt_file.stub(:file?).and_return(false)
-    lambda{@vb.validate_bag_structure(@druid)}.should raise_exception(/bagit_txt_file does not exist/)
+    lambda{@vb.validate_bag_structure(@druid, @bag_pathname)}.should raise_exception(/bagit_txt_file does not exist/)
     bagit_txt_file.stub(:file?).and_return(true)
 
     bag_info_txt_file = mock('bag_info_txt_file')
-    bag_dir.stub(:join).with('bag-info.txt').and_return(bag_info_txt_file)
+    @bag_pathname.stub(:join).with('bag-info.txt').and_return(bag_info_txt_file)
     bag_info_txt_file.stub(:to_s).and_return('bag_info_txt_file')
     bag_info_txt_file.stub(:file?).and_return(false)
-    lambda{@vb.validate_bag_structure(@druid)}.should raise_exception(/bag_info_txt_file does not exist/)
+    lambda{@vb.validate_bag_structure(@druid, @bag_pathname)}.should raise_exception(/bag_info_txt_file does not exist/)
     bag_info_txt_file.stub(:file?).and_return(true)
 
-    @vb.validate_bag_structure(@druid).should == true
+    @vb.validate_bag_structure(@druid, @bag_pathname).should == true
   end
 
   specify "ValidateBag#validate_bag_data" do
     bag = mock('Bag')
-    BagIt::Bag.stub(:new).with(SdrDeposit.bag_pathname(@druid).to_s).and_return(bag)
+    BagIt::Bag.stub(:new).with(@bag_pathname.to_s).and_return(bag)
     bag.should_receive(:valid?).and_return(false)
-    lambda{@vb.validate_bag_data(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
+    lambda{@vb.validate_bag_data(@druid, @bag_pathname)}.should raise_exception(LyberCore::Exceptions::ItemError)
 
     bag.should_receive(:valid?).and_return(true)
-    @vb.validate_bag_data(@druid).should == true
+    @vb.validate_bag_data(@druid, @bag_pathname).should == true
   end
 
   

@@ -5,6 +5,9 @@ describe Sdr::TransferObject do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
+    deposit_object = DepositObject.new(@druid)
+    @bag_pathname = deposit_object.bag_pathname(validate=false)
+    @tarfile_pathname =deposit_object.tarfile_pathname()
   end
 
   before(:each) do
@@ -26,53 +29,50 @@ describe Sdr::TransferObject do
   end
 
   specify "TransferObject#transfer_object" do
-    @to.should_receive(:transfer_bag).with(@druid)
-    @to.should_receive(:untar_bag).with(@druid)
-    @to.should_receive(:cleanup_tarfile).with(@druid)
+    @to.should_receive(:transfer_bag).with(@druid, @bag_pathname, @tarfile_pathname)
+    @to.should_receive(:untar_bag).with(@druid, @bag_pathname, @tarfile_pathname)
+    @to.should_receive(:cleanup_tarfile).with(@druid, @tarfile_pathname)
     @to.transfer_object(@druid)
   end
 
   specify "TransferObject#transfer_bag" do
 
     Pathname.any_instance.stub(:exists?).and_return(true)
-    lambda{@to.transfer_bag(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
+    lambda{@to.transfer_bag(@druid, @bag_pathname, @tarfile_pathname)}.should raise_exception(LyberCore::Exceptions::ItemError)
 
     Pathname.any_instance.stub(:exists?).and_return(false)
     Pathname.any_instance.should_receive(:mkpath)
     LyberCore::Utils::FileUtilities.should_receive(:transfer_object).with(
-        "#{@druid}.tar",
+        @tarfile_pathname.basename.to_s,
         Sdr::Config.dor_export,
-        SdrDeposit.bag_pathname(@druid).parent.to_s
+        @bag_pathname.parent.to_s
     )
-    @to.transfer_bag(@druid)
+    @to.transfer_bag(@druid, @bag_pathname, @tarfile_pathname)
 
    end
 
   specify "TransferObject#untar_bag" do
 
-    parent = SdrDeposit.bag_pathname(@druid).parent.to_s
+    parent = @bag_pathname.parent.to_s
     filename = "#{@druid}.tar"
 
     @to.should_receive(:system).with("cd #{parent}; tar xf #{filename} --force-local").
         and_return(true)
-    @to.untar_bag(@druid)
+    @to.untar_bag(@druid,@bag_pathname, @tarfile_pathname)
 
     @to.should_receive(:system).with("cd #{parent}; tar xf #{filename} --force-local").
         and_return(false)
-    lambda{@to.untar_bag(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
+    lambda{@to.untar_bag(@druid, @bag_pathname, @tarfile_pathname)}.should raise_exception(LyberCore::Exceptions::ItemError)
 
    end
 
   specify "TransferObject#cleanup_tarfile" do
 
-    tarfile = mock("tar file pathname")
-    SdrDeposit.stub(:tarfile_pathname).with(@druid).and_return(tarfile)
+    @tarfile_pathname.should_receive(:delete)
+    @to.cleanup_tarfile(@druid, @tarfile_pathname)
 
-    tarfile.should_receive(:delete)
-    @to.cleanup_tarfile(@druid)
-
-    tarfile.should_receive(:delete).and_raise(Exception)
-    lambda{@to.cleanup_tarfile(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
+    @tarfile_pathname.should_receive(:delete).and_raise(Exception)
+    lambda{@to.cleanup_tarfile(@druid, @tarfile_pathname)}.should raise_exception(LyberCore::Exceptions::ItemError)
 
    end
 

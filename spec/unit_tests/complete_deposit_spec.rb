@@ -5,6 +5,8 @@ describe Sdr::CompleteDeposit do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
+    deposit_object=DepositObject.new(@druid)
+    @bag_pathname = deposit_object.bag_pathname(validate=false)
 
     @sdr_workflow = %{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <workflow objectId="druid:jc837rq9922" id="sdrIngestWF">
@@ -49,18 +51,14 @@ describe Sdr::CompleteDeposit do
   end
 
   specify "CompleteDeposit#complete_deposit" do
-    @cd.repository.should_receive(:store_new_object_version).with(@druid, SdrDeposit.bag_pathname(@druid))
-    @cd.repository.should_receive(:verify_version_storage).with(@druid)
+    repository = mock(Stanford::StorageRepository)
+    Stanford::StorageRepository.should_receive(:new).and_return(repository)
+    repository.should_receive(:store_new_object_version).with(@druid, @bag_pathname)
+    repository.should_receive(:verify_version_storage).with(@druid)
     @cd.should_receive(:update_provenance).with(@druid)
-    @cd.should_receive(:cleanup_bag).with(@druid)
+    Pathname.any_instance.should_receive(:rmtree)
+    Pathname.any_instance.should_receive(:directory?).and_return(true)
     @cd.complete_deposit(@druid)
-  end
-
-  specify "CompleteDeposit#cleanup_bag" do
-    bag_pathname = mock(Pathname)
-    SdrDeposit.stub(:bag_pathname).with(@druid).and_return(bag_pathname)
-    bag_pathname.should_receive(:rmtree)
-    @cd.cleanup_bag(@druid)
   end
 
   specify "CompleteDeposit#update_provenance" do

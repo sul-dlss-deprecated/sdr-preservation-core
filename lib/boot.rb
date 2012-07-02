@@ -5,6 +5,8 @@ $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
 $LOAD_PATH.unshift(specdir) unless $LOAD_PATH.include?(specdir)
 #puts $LOAD_PATH
 
+require 'rubygems'
+require 'bundler/setup'
 require 'confstruct'
 # @see https://github.com/mbklein/confstruct
 
@@ -58,6 +60,7 @@ require 'pathname'
 require 'nokogiri'
 #require 'logger'
 
+require 'druid-tools'
 require 'dor/services/workflow_service'
 require 'lyber_core/log'
 require 'lyber_core/robots/robot'
@@ -83,6 +86,22 @@ else
 end
 require File.join(ROBOT_ROOT,"config/environments/#{environment}")
 
+module Dor
+  module WorkflowService
+    class << self
+      def workflow_resource
+        url = Dor::Config.workflow.url
+        cert = Dor::Config.ssl.cert_file
+        key = Dor::Config.ssl.key_file
+        pass = Dor::Config.ssl.key_pass
+        params = {}
+        params[:ssl_client_cert] = OpenSSL::X509::Certificate.new(File.read(cert)) if cert
+        params[:ssl_client_key]  = OpenSSL::PKey::RSA.new(File.read(key), pass) if key
+        RestClient::Resource.new(url, params)
+      end
+    end
+  end
+end
 
 ENABLE_SOLR_UPDATES = false
 require 'rake'
@@ -91,5 +110,5 @@ require 'sdr/sedora_configurator'
 ActiveFedora.configurator = Sdr::SedoraConfigurator.new
 ActiveFedora.init
 
-require 'sdr/sdr_deposit'
+require 'sdr/deposit_object'
 require 'sdr/sedora_object'

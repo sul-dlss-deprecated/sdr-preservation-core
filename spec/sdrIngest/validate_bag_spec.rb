@@ -4,7 +4,7 @@ require 'lyber_core'
 require 'sdrIngest/validate_bag'
 require 'tmpdir'
 
-describe SdrIngest::ValidateBag do 
+describe Sdr::ValidateBag do 
 
   context "bag_exists?" do
 
@@ -25,7 +25,7 @@ describe SdrIngest::ValidateBag do
     
     it "should return true to test the initial bag setup"  do
       	puts @path
-        robot = SdrIngest::ValidateBag.new()
+        robot = Sdr::ValidateBag.new()
       	robot.bag_exists?(@druid,@path).should == true
     end 
 
@@ -33,7 +33,7 @@ describe SdrIngest::ValidateBag do
       # delete the bag dir
       FileUtils.rm_rf @path   
 
-      robot = SdrIngest::ValidateBag.new()
+      robot = Sdr::ValidateBag.new()
       lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
@@ -41,14 +41,14 @@ describe SdrIngest::ValidateBag do
       FileUtils.rm_rf(@path)
       FileUtils.touch(@path) # create a file
 
-      robot = SdrIngest::ValidateBag.new()      	
+      robot = Sdr::ValidateBag.new()      	
       lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
       
     it "should return false when data_dir does not exist" do
       FileUtils.rm_rf(@data)
 
-      robot = SdrIngest::ValidateBag.new()
+      robot = Sdr::ValidateBag.new()
       lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
@@ -56,14 +56,14 @@ describe SdrIngest::ValidateBag do
       FileUtils.rm_rf(@data)
       FileUtils.touch(@data)
 
-      robot = SdrIngest::ValidateBag.new()
+      robot = Sdr::ValidateBag.new()
       lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
     it "should return false when bagit_txt_file does not exist" do
       FileUtils.rm_rf(@bagit)
 
-      robot = SdrIngest::ValidateBag.new()
+      robot = Sdr::ValidateBag.new()
       lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
@@ -71,14 +71,14 @@ describe SdrIngest::ValidateBag do
       FileUtils.rm_rf(@bagit)
       FileUtils.mkdir(@bagit)
 
-      robot = SdrIngest::ValidateBag.new()
+      robot = Sdr::ValidateBag.new()
       lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
     it "should return false when bag_info_txt_file does not exist" do
       FileUtils.rm_rf(@bag)
 
-      robot = SdrIngest::ValidateBag.new()
+      robot = Sdr::ValidateBag.new()
       lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
@@ -86,7 +86,7 @@ describe SdrIngest::ValidateBag do
       FileUtils.rm_rf(@bag)
       FileUtils.mkdir(@bag)
 
-      robot = SdrIngest::ValidateBag.new()
+      robot = Sdr::ValidateBag.new()
       lambda{robot.bag_exists?(@druid,@path)}.should raise_exception(LyberCore::Exceptions::ItemError)
     end
 
@@ -95,7 +95,7 @@ describe SdrIngest::ValidateBag do
       path = File.join(Dir.tmpdir, "lkdjflksdjfalddfsdfa")
       BagIt::Bag.new(path)
 
-      robot = SdrIngest::ValidateBag.new()
+      robot = Sdr::ValidateBag.new()
       robot.bag_exists?(@druid,path).should == true
 
       FileUtils.rm_rf(path)
@@ -105,7 +105,7 @@ describe SdrIngest::ValidateBag do
   context "validate" do
     
       it "should raise error when bag does not exist" do
-        robot = SdrIngest::ValidateBag.new()
+        robot = Sdr::ValidateBag.new()
         mock_workitem = mock("workitem")
         mock_workitem.stub!(:druid).and_return("druid:ab123cd4567")
 
@@ -113,7 +113,7 @@ describe SdrIngest::ValidateBag do
       end
 
       it "should return nil when bag is valid" do
-        robot = SdrIngest::ValidateBag.new()
+        robot = Sdr::ValidateBag.new()
         mock_workitem = mock("workitem")
         mock_workitem.stub!(:druid).and_return("druid:ab123cd4567")
         mock_bag = mock("bag")
@@ -125,7 +125,7 @@ describe SdrIngest::ValidateBag do
       end
 
       it "should raise error when bag is not valid" do
-        robot = SdrIngest::ValidateBag.new()
+        robot = Sdr::ValidateBag.new()
         mock_workitem = mock("workitem")
         mock_workitem.stub!(:druid).and_return("druid:ab123cd4567")
         mock_bag = mock("bag")

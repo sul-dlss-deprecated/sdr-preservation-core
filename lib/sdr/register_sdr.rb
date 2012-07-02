@@ -50,6 +50,6 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::RegisterSdr.new()
+  dm_robot = Sdr::RegisterSdr.new()
   dm_robot.start
 end

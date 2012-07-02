@@ -3,13 +3,13 @@ require 'rubygems'
 require 'lyber_core'
 require 'sdrIngest/populate_metadata'
 
-describe SdrIngest::PopulateMetadata do
+describe Sdr::PopulateMetadata do
   
 context "Populating Metadata" do
   
   def setup
     
-    @robot = SdrIngest::PopulateMetadata.new()    
+    @robot = Sdr::PopulateMetadata.new()
     mock_workitem = mock("populate_metadata_workitem")
     mock_workitem.stub!(:druid).and_return("druid:jc837rq9922")
     
@@ -51,15 +51,15 @@ context "Populating Metadata" do
   
   context "basic behavior" do
    it "can be created" do
-      r = SdrIngest::PopulateMetadata.new()
-      r.should be_instance_of(SdrIngest::PopulateMetadata)
+      r = Sdr::PopulateMetadata.new()
+      r.should be_instance_of(Sdr::PopulateMetadata)
     end
   end
   
   context "knows how to deal with bagit objects" do
     
     before(:each) do
-#      @robot = SdrIngest::PopulateMetadata.new("sdrIngestWF","populate-metadata")    
+#      @robot = Sdr::PopulateMetadata.new("sdrIngestWF","populate-metadata")
       setup
     end
         

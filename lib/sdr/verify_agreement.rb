@@ -123,6 +123,6 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = SdrIngest::VerifyAgreement.new()
+  dm_robot = Sdr::VerifyAgreement.new()
   dm_robot.start
 end

@@ -24,14 +24,14 @@ module Sdr
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       druid = work_item.druid
-      fill_datastreams(druid)
+      populate_metadata(druid)
     end
 
     # @param druid [String] The object identifier
     # @return [SedoraObject] Add the core metadata datastreams to the Fedora object
-    def fill_datastreams(druid)
+    def populate_metadata(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter fill_datastreams")
-      bag_pathname = find_bag(druid)
+      bag_pathname = DepositObject.new(druid).bag_pathname()
       sedora_object = Sdr::SedoraObject.find(druid)
       set_datastream_content(sedora_object, bag_pathname, 'identityMetadata')
       set_datastream_content(sedora_object, bag_pathname, 'provenanceMetadata')
@@ -44,16 +44,6 @@ module Sdr
       raise LyberCore::Exceptions::FatalError.new("Cannot process item #{druid}",e)
     end
 
-    # @param druid [String] The object identifier
-    # @return [Pathname] Find and verify the BagIt bag directory.
-    def find_bag(druid)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter find_bag")
-      bag_pathname = SdrDeposit.bag_pathname(druid)
-      unless bag_pathname.directory?
-        raise LyberCore::Exceptions::ItemError.new(druid, "Can't find a bag at #{bag_pathname.to_s}")
-      end
-      bag_pathname
-    end
 
     # @param sedora_object [SedoraObject] The Fedora object to which datatream content is to be saved
     # @param bag_pathname [Pathname] The location of the BagIt bag containing the object data files
@@ -78,6 +68,6 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-    dm_robot = SdrIngest::PopulateMetadata.new()
+    dm_robot = Sdr::PopulateMetadata.new()
     dm_robot.start
 end
