@@ -29,12 +29,20 @@ task :environment do
    ActiveFedora::SolrService.register( SOLR_URL )
 end
 
-desc "Run RSpec with RCov"
-RSpec::Core::RakeTask.new('spec') do |t|
-  t.pattern = FileList['spec/unit_tests/*.rb']
-  t.rcov = true
-  t.rcov_opts = ['--exclude', 'spec,/usr/,/home/hudson']
+desc "Run RSpec"
+RSpec::Core::RakeTask.new(:spec) do |t|
+  t.pattern = 'spec/unit_tests/*.rb'
+  t.rspec_opts = ['--backtrace']
 end
+
+desc "Run RSpec with RCov"
+RSpec::Core::RakeTask.new(:rcov) do |t|
+  t.rcov = true
+  t.pattern = 'spec/unit_tests/*.rb'
+  t.rspec_opts = ["-c, -f progress"]
+  t.rcov_opts = ['-x', '-Ilib:spec', '--exclude gems,spec,/usr/,/home/hudson']
+end
+
 
 desc "Run RSpec Examples wrapped in a test instance of jetty"
 task :test_with_jetty do
