@@ -2,6 +2,7 @@ ENV['RSPEC'] = "true"
 
 require 'rspec'
 require 'equivalent-xml'
+require 'fakeweb'
 
 
 include Sdr

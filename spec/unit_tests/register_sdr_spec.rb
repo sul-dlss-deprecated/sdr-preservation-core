@@ -4,7 +4,14 @@ require 'spec_helper'
 describe Sdr::RegisterSdr do
 
   before(:all) do
-    @druid = "druid:jc837rq9922"
+    @object_id = "jc837rq9922"
+    @druid = "druid:#{@object_id}"
+    url = ActiveFedora.configurator.fedora_config[:url]
+    user = ActiveFedora.configurator.fedora_config[:user]
+    password = ActiveFedora.configurator.fedora_config[:password]
+    @sedora = url.sub(/[:]\/\//, "://#{user}:#{password}@")
+    @druid_url = "#{@sedora}/objects/druid%3A#{@object_id}"
+    #    http://fedoraAdmin:fedoraAdmin@localhost:8983/fedora/objects/druid%3Ajc837rq9922?format=xml
   end
 
   before(:each) do
@@ -25,8 +32,38 @@ describe Sdr::RegisterSdr do
     @rs.process_item(work_item)
   end
 
-  specify "RegisterSdr#register_item" do
+  specify "RegisterSdr#register_item existing item with fakeweb" do
+    FakeWeb.allow_net_connect = "#{@druid_url}?format=xml"
+    FakeWeb.allow_net_connect = "#{@druid_url}/datastreams?format=xml"
+    FakeWeb.allow_net_connect = "#{@druid_url}/datastreams/sdrIngestWF?format=xml"
+    FakeWeb.allow_net_connect = "#{@druid_url}/datastreams/workflows?format=xml"
+    FakeWeb.register_uri(:get, "#{@druid_url}?format=xml", :status => ["200", "OK"])
+    FakeWeb.register_uri(:get, "#{@druid_url}/datastreams?format=xml", :status => ["200", "OK"])
+    FakeWeb.register_uri(:get, "#{@druid_url}/datastreams/sdrIngestWF?format=xml", :status => ["200", "OK"])
+    FakeWeb.register_uri(:get, "#{@druid_url}/datastreams/workflows?format=xml", :status => ["200", "OK"])
+    @rs.register_item(@druid)
+  end
 
+  specify "RegisterSdr#register_item new item with fakeweb" do
+#    http://fedoraAdmin:fedoraAdmin@localhost:8983/fedora/objects/druid%3Ajc837rq9922?format=xml
+    FakeWeb.clean_registry
+    FakeWeb.allow_net_connect = true
+    #FakeWeb.allow_net_connect = "#{@druid_url}?format=xml"
+    #FakeWeb.allow_net_connect = "#{@druid_url}/datastreams?format=xml"
+    #FakeWeb.allow_net_connect = "#{@druid_url}/datastreams/sdrIngestWF?format=xml"
+    #FakeWeb.allow_net_connect = "#{@druid_url}/datastreams/workflows?format=xml"
+    FakeWeb.register_uri(:get, "#{@druid_url}?format=xml", :status => ["404", "no path in db registry for [#{@druid}]"])
+    FakeWeb.register_uri(:post, "#{@druid_url}", :status => ["201", "OK"])
+    FakeWeb.register_uri(:post, %r|RELS-EXT|, :status => ["200", "OK"])
+    FakeWeb.register_uri(:get, "#{@druid_url}/datastreams?format=xml", :status => ["200", "OK"])
+    FakeWeb.register_uri(:post, %r|sdrIngestWF[?]dsLocation=|, :status => ["201", "OK"])
+    FakeWeb.register_uri(:post, %r|sdrIngestWF[?]controlGroup|, :status => ["201", "OK"])
+    FakeWeb.register_uri(:post, %r|workflows[?]dsLocation=|, :status => ["201", "OK"])
+    FakeWeb.register_uri(:post, %r|workflows[?]controlGroup|, :status => ["201", "OK"])
+    @rs.register_item(@druid)
+  end
+
+  specify "RegisterSdr#register_item with mocks" do
     sedora_object = mock(SedoraObject)
     SedoraObject.stub(:exists?).with(@druid).and_return(true)
     SedoraObject.should_receive(:find).with(@druid).and_return(sedora_object)
@@ -56,6 +93,36 @@ describe Sdr::RegisterSdr do
 
   end
 
+  it "can add an object to fedora or return nil if object exists" do
+    pending "reimplement using mock ActiveFedora objects"
+    object = @robot.add_fedora_object(@pid1)
+    object.nil?.should eql(false)
+    object.should be_instance_of(ActiveFedora::Base)
+    ActiveFedora::Base.load_instance(@pid1).should be_true
+    # if you try to add an existing object again you'll get nil result, not an exception
+    @robot.add_fedora_object(@pid1).should be_nil
+  end
+
+  it "can retrieve an already existing object" do
+    pending "reimplement using mock ActiveFedora objects"
+    object_in = ActiveFedora::Base.new(:pid => @pid1)
+    object_in.save
+    object_out = @robot.get_fedora_object(@pid1)
+    object_out.should be_instance_of(ActiveFedora::Base)
+    object_out.pid.should eql(object_in.pid)
+  end
+
+  it "can create a workflow datastream" do
+    pending "reimplement using mock ActiveFedora objects"
+    fedora_object = ActiveFedora::Base.new(:pid => @pid1)
+    fedora_object.save
+    @robot.add_workflow_datastream(fedora_object)
+    object_out = @robot.get_fedora_object(@pid1)
+    object_out.datastreams.keys.should include('sdrIngestWF')
+    ds = object_out.datastreams['sdrIngestWF']
+    ds.attributes[:dsLabel].should eql('sdrIngestWF')
+    ds.attributes[:controlGroup].should eql('E')
+  end
 
 
 end

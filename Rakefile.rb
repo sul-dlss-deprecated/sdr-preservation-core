@@ -12,6 +12,7 @@
 require 'rake'
 require 'rake/testtask'
 require 'rspec/core/rake_task'
+
 #require 'jettywrapper'
 
 # Import external rake tasks
@@ -35,12 +36,18 @@ RSpec::Core::RakeTask.new(:spec) do |t|
   t.rspec_opts = ['--backtrace']
 end
 
+# see: http://stackoverflow.com/questions/8886258/rcov-for-rspec-2-not-detecting-coverage-correctly-not-rails
+# There seems to be an issue with RCov and RSpec (>2.6.0) where the coverage percentage just doesn't make sense anymore
+# see also: http://stackoverflow.com/questions/2218362/rcov-why-is-this-code-not-being-considered-covered
+# and http://stackoverflow.com/questions/8859748/rcov-code-coverage-issue
+# I am using rcov (0.9.11), ruby 1.8.7, Rails 3.1, spec 2.7. The coverage report shows some of the code as having 0% coverage but I have test coverage for it. When I modify the code with 0% coverage, I get failing tests.
 desc "Run RSpec with RCov"
-RSpec::Core::RakeTask.new(:rcov) do |t|
+RSpec::Core::RakeTask.new(:spec_rcov) do |t|
   t.rcov = true
+  t.verbose = true
   t.pattern = 'spec/unit_tests/*.rb'
-  t.rspec_opts = ["-c, -f progress"]
-  t.rcov_opts = ['-x', '-Ilib:spec', '--exclude gems,spec,/usr/,/home/hudson']
+  t.rspec_opts = [ "-f documentation"]
+  t.rcov_opts = ['--exclude /gems/,/Library/,/usr/,spec,lib/tasks']
 end
 
 

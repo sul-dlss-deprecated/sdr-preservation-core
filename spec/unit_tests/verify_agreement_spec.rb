@@ -15,8 +15,11 @@ describe Sdr::VerifyAgreement do
   specify "VerifyAgreement#initialize" do
     @va.should be_instance_of VerifyAgreement
     @va.should be_kind_of LyberCore::Robots::Robot
+    @va.workflow.should be_kind_of(LyberCore::Robots::Workflow)
     @va.workflow_name.should == 'sdrIngestWF'
     @va.workflow_step.should == 'verify-agreement'
+    LyberCore::Log.logfile.should eql("#{Sdr::Config.logdir}/verify-agreement.log")
+    LyberCore::Log.level.should eql(Logger::INFO)
   end
 
   specify "VerifyAgreement#process_item" do

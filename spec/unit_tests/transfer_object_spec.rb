@@ -49,6 +49,8 @@ describe Sdr::TransferObject do
     )
     @to.transfer_bag(@druid, @bag_pathname, @tarfile_pathname)
 
+    LyberCore::Utils::FileUtilities.stub!(:transfer_object).and_raise("rsync failed")
+    lambda {transfer_robot.process_item(mock_workitem)}.should raise_error
    end
 
   specify "TransferObject#untar_bag" do
