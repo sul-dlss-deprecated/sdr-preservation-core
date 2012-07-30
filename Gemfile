@@ -17,3 +17,5 @@ gem "rspec", "> 2"
 gem "rcov"
 gem "yard"
 gem "equivalent-xml"
+gem 'lyberteam-devel'
+
