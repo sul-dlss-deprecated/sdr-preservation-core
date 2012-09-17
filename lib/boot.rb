@@ -46,7 +46,7 @@ module Sdr
       user  'fedoraAdmin'
       password nil
     end
-    logdir '/var/sdr2service/log'
+    logdir File.join(ROBOT_ROOT, 'log')
     dor_export "lyberadmin@lyberservices-prod.stanford.edu:/dor/export/"
     sdr_deposit_home nil
     storage_node "/services-disk/sdr2objects"
@@ -79,10 +79,13 @@ require 'moab_stanford'
 include Stanford
 
 # Load the environment file based on Environment.  Default to local
-if(ENV.include?('ROBOT_ENVIRONMENT'))
-  environment = ENV['ROBOT_ENVIRONMENT']
-else
-  environment = 'test'
+environment = case ENV["ROBOT_ENVIRONMENT"]
+  when :test
+    "sdr-services-test.rb"
+  when :prod
+    "sdr-services.rb"
+  else
+    "development"
 end
 require File.join(ROBOT_ROOT,"config/environments/#{environment}")
 

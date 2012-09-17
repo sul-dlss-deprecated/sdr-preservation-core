@@ -10,15 +10,9 @@ module Sdr
     attr_reader :valid_identifiers
 
     # set workflow name, step name, log location, log severity level
-    def initialize()
-      super('sdrIngestWF', 'verify-agreement',
-        :logfile => "#{Sdr::Config.logdir}/verify-agreement.log",
-        :loglevel => Logger::INFO,
-        :options => ARGV[0])
+    def initialize(opts = {})
+      super('sdrIngestWF', 'verify-agreement', opts)
       @valid_identifiers = Array.new()
-      env = ENV['ROBOT_ENVIRONMENT']
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{env}")
-      LyberCore::Log.debug("Process ID is : #{$$}")
     end
   
     # @param work_item [LyberCore::Robots::WorkItem] The item to be processed

@@ -7,14 +7,8 @@ module Sdr
   class CompleteDeposit < LyberCore::Robots::Robot
 
     # set workflow name, step name, log location, log severity level
-    def initialize()
-      super('sdrIngestWF', 'complete-deposit',
-        :logfile => "#{Sdr::Config.logdir}/complete-deposit.log",
-        :loglevel => Logger::INFO,
-        :options => ARGV[0])
-      env = ENV['ROBOT_ENVIRONMENT']
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{env}")
-      LyberCore::Log.debug("Process ID is : #{$PID}")
+    def initialize(opts = {})
+      super('sdrIngestWF', 'complete-deposit', opts)
     end
 
     # @param work_item [LyberCore::Robots::WorkItem] The item to be processed

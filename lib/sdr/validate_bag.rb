@@ -8,14 +8,8 @@ module Sdr
   class ValidateBag < LyberCore::Robots::Robot
 
     # @return [ValidateBag] set workflow name, step name, log location, log severity level
-    def initialize()
-      super('sdrIngestWF', 'validate-bag',
-            :logfile => "#{Sdr::Config.logdir}/validate-bag.log",
-            :loglevel => Logger::INFO,
-            :options => ARGV[0])
-      env = ENV['ROBOT_ENVIRONMENT']
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Environment is : #{env}")
-      LyberCore::Log.debug("Process ID is : #{$$}")
+    def initialize(opts = {})
+      super('sdrIngestWF', 'validate-bag', opts)
     end
 
     # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
