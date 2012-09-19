@@ -80,9 +80,9 @@ include Stanford
 
 # Load the environment file based on Environment.  Default to local
 environment = case ENV["ROBOT_ENVIRONMENT"]
-  when :test
+  when 'test'
     "sdr-services-test.rb"
-  when :prod
+  when 'prod'
     "sdr-services.rb"
   else
     "development"

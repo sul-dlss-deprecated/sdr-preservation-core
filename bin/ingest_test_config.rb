@@ -1,41 +1,55 @@
-robots = []
+require 'boot'
+
+workflow_url = Dor::Config.workflow.url
+user_password = "#{Sdr::Config.sedora.user}:#{Sdr::Config.sedora.password}"
+fedora_url = Sdr::Config.sedora.url.sub('//',"//#{user_password}@")
+deposit_home = Sdr::Config.sdr_deposit_home
+druid_id = Druid.split(/:/)[1]
+druid_id =~ /^([a-z]{2})(\d{3})([a-z]{2})(\d{4})$/
+repository_path = File.join( Sdr::Config.storage_node, $1, $2, $3, $4, druid_id)
+
+Robots = []
 
 Robot = Struct.new(:name, :queries, :files)
 Query = Struct.new(:url, :code, :expectation)
 DataFile = Struct.new(:path)
 
-robots << robot = Robot.new("RegisterSdr", [], [])
+Robots << robot = Robot.new("Sdr::RegisterSdr", [], [])
 robot.queries << Query.new(
-    "{fedora}/objects/{druid}?format=xml", 200,
-    "<objectProfile"
+    "#{fedora_url}/objects/#{Druid}?format=xml", 200,
+    /<objectProfile/
 )
 robot.queries << Query.new(
-    "{fedora}/objects/{druid}/datastreams?format=xml", 200,
-    "<objectDatastreams"
+    "#{fedora_url}/objects/#{Druid}/datastreams?format=xml", 200,
+    /<objectDatastreams/
 )
 robot.queries << Query.new(
-    "{fedora}/objects/{druid}/datastreams/workflows/content?format=xml", 200,
-    "<workflows"
+    "#{fedora_url}/objects/#{Druid}/datastreams/workflows?format=xml", 200,
+    /<dsLabel>Workflows<\/dsLabel>/
 )
 
-robots << robot = Robot.new("TransferObject", [], [])
-robot.files << DataFile.new("{deposit}/{druid}")
+Robots << robot = Robot.new("Sdr::TransferObject", [], [])
+robot.files << DataFile.new("#{deposit_home}/#{Druid}")
 
-robots << robot = Robot.new("ValidateBag", [], [])
-robot.files << DataFile.new("{deposit}/{druid}/bag-info.txt")
+Robots << robot = Robot.new("Sdr::ValidateBag", [], [])
+robot.files << DataFile.new("#{deposit_home}/#{Druid}/bag-info.txt")
 
-robots << robot = Robot.new("PopulateMetadata", [], [])
+Robots << robot = Robot.new("Sdr::PopulateMetadata", [], [])
 robot.queries << Query.new(
-    "{fedora}/objects/{druid}/datastreams?format=xml", 200,
-    "relationshipMetadata|provenanceMetadata|identityMetadata"
+    "#{fedora_url}/objects/#{Druid}/datastreams?format=xml", 200,
+    /relationshipMetadata/
 )
 
-robots << robot = Robot.new("VerifyAgreement", [], [])
+Robots << robot = Robot.new("Sdr::VerifyAgreement", [], [])
 
-robots << robot = Robot.new("CompleteDeposit", [], [])
+Robots << robot = Robot.new("Sdr::CompleteDeposit", [], [])
 robot.queries << Query.new(
-    "{fedora}/objects/{druid}/datastreams/provenanceMetadata/content?format=xml", 200,
-    '<agent name="SDR">'
+    "#{fedora_url}/objects/#{Druid}/datastreams/provenanceMetadata/content?format=xml", 200,
+    /<agent name="SDR">/
 )
-robot.files << DataFile.new("{repository_path}")
+robot.queries << Query.new(
+    "https://localhost/sdr/objects/#{Druid}", 200,
+    /<html>/
+)
+robot.files << DataFile.new("#{repository_path}")
 
