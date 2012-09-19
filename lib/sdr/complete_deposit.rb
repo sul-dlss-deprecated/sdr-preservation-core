@@ -39,9 +39,10 @@ module Sdr
     #   * Update the object's Sedora provenance datastream
     def update_provenance(druid)
       sedora_object = Sdr::SedoraObject.find(druid)
-      workflow_datastream = sedora_object.sdrIngestWF
+      #workflow_datastream = sedora_object.sdrIngestWF
+      workflow_datastream_content = Dor::WorkflowService.get_workflow_xml('sdr',druid, 'sdrIngestWF')
       provenance_datastream = sedora_object.provenanceMetadata
-      sdr_agent = create_sdr_agent(druid, workflow_datastream.content)
+      sdr_agent = create_sdr_agent(druid, workflow_datastream_content)
       full_provenance = append_sdr_agent(druid, sdr_agent.to_xml, provenance_datastream.content)
       provenance_datastream.content = full_provenance.to_xml(:indent=>2)
       provenance_datastream.save

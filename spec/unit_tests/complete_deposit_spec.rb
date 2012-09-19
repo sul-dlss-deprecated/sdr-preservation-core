@@ -63,7 +63,8 @@ describe Sdr::CompleteDeposit do
 
   specify "CompleteDeposit#update_provenance" do
     workflow_datastream = mock("sdrIngestWF")
-    workflow_datastream.stub(:content).and_return(@sdr_workflow)
+    # workflow_datastream.stub(:content).and_return(@sdr_workflow)
+    Dor::WorkflowService.stub(:get_workflow_xml).with('sdr',@druid, 'sdrIngestWF').and_return(@sdr_workflow)
     provenance_datastream = mock("provenanceMetadata")
     provenance_datastream.stub(:content).and_return(@dor_provenance)
     sedora_object = mock(SedoraObject)
