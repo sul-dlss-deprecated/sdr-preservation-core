@@ -19,7 +19,7 @@ module Dor
        workspace nil
      end
      workflow do
-       url 'http://lyberservices-xxx.stanford.edu/workflow'
+       url 'https://lyberservices-xxx.stanford.edu/workflow'
      end
      ssl do
        cert_file '/var/sdr2service/sdr2/config/certs/ls-xxx.crt'
@@ -39,18 +39,22 @@ end
 # end
 
 # Sdr::Config contains the constants that are required within this project
+# to get the sedora password:
+#   ssh sdr2service@{sedora-???}
+#   cat /var/local/fedora/install/install.properties | grep admin.pass
 module Sdr
   Config = Confstruct::Configuration.new do
     sedora do
       url  'http://sedora-xxx.stanford.edu/fedora'
       user  'fedoraAdmin'
-      password nil
+      password "see above"
     end
     logdir File.join(ROBOT_ROOT, 'log')
     dor_export "lyberadmin@lyberservices-prod.stanford.edu:/dor/export/"
-    sdr_deposit_home nil
-    storage_node "/services-disk/sdr2objects"
-    example_objects "/services-disk/sdr2objects"
+    sdr_deposit_home "/services-disk02/deposit"
+    old_storage_node "/services-disk/sdr2objects"
+    storage_node "/services-disk02/sdr2objects"
+    example_objects "/services-disk02/examples"
   end
 end
 

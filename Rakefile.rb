@@ -32,7 +32,7 @@ end
 
 desc "Run RSpec"
 RSpec::Core::RakeTask.new(:spec) do |t|
-  t.pattern = 'spec/unit_tests/*.rb'
+  t.pattern = 'spec/sdr*/*.rb'
   t.rspec_opts = ['--backtrace']
 end
 
@@ -45,7 +45,7 @@ desc "Run RSpec with RCov"
 RSpec::Core::RakeTask.new(:spec_rcov) do |t|
   t.rcov = true
   t.verbose = true
-  t.pattern = 'spec/unit_tests/*.rb'
+  t.pattern = 'spec/sdr*/*.rb'
   t.rspec_opts = [ "-f documentation"]
   t.rcov_opts = ['--exclude /gems/,/Library/,/usr/,spec,lib/tasks']
 end
@@ -71,24 +71,3 @@ task :test_with_jetty do
   end
 end
 
-# Use yard to build docs
-begin
-  require 'yard'
-  require 'yard/rake/yardoc_task'
-
-  project_root = File.expand_path(File.dirname(__FILE__))
-  puts "project_root = #{project_root}"
-  doc_destination = File.join(project_root, 'doc')
-
-
-  YARD::Rake::YardocTask.new do |yt|
-    yt.files = Dir.glob(File.join(project_root, 'robots', '**', '*.rb')) +
-                 [ File.join(project_root, 'README.rdoc') ]
-    yt.options = ['--readme', 'README.rdoc']
-  end
-rescue LoadError
-  desc "Generate YARD Documentation"
-  task :doc do
-    abort "Please install the YARD gem to generate rdoc."
-  end
-end

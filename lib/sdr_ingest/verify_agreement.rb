@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'libdir')
+require File.join(File.dirname(__FILE__),'../libdir')
 require 'boot'
 
 module Sdr
@@ -9,9 +9,17 @@ module Sdr
     # A cache of APO/agreement object identifiers that have already been verified to exist in Sedora
     attr_reader :valid_identifiers
 
+    # define class instance variables and getter method so that we can inherit from this class
+    @workflow_name = 'sdrIngestWF'
+    @workflow_step = 'verify-agreement'
+    class << self
+      attr_accessor :workflow_name
+      attr_accessor :workflow_step
+    end
+
     # set workflow name, step name, log location, log severity level
     def initialize(opts = {})
-      super('sdrIngestWF', 'verify-agreement', opts)
+      super(self.class.workflow_name, self.class.workflow_step, opts)
       @valid_identifiers = Array.new()
     end
   

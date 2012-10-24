@@ -1,4 +1,4 @@
-require 'sdr/verify_agreement'
+require 'sdr_ingest/verify_agreement'
 require 'spec_helper'
 
 describe Sdr::VerifyAgreement do

@@ -31,31 +31,37 @@ LyberCore::Log.info "druid = #{Druid}"
 Robots.each do |robot|
   begin
     LyberCore::Log.info "=" * 60
-    robot_filename = robot.name.gsub(/(::)([A-Z])/, '/\2').gsub(/([^\/])([A-Z])/, '\1_\2').downcase
     robot_opts = {:logfile => logfile, :loglevel => loglevel, :argv => ['-d', Druid]}
-    require robot_filename
+    require robot.path
 #    robot_object = eval(robot.name).new(robot_opts)
 # http://www.ruby-forum.com/topic/182803
-    robot_object = robot.name.split('::').reduce(Object){|cls, c| cls.const_get(c) }.new(robot_opts)
-    robot_object.start
-    sleep 5
+    robot_class = robot.name.split('::').reduce(Object){|cls, c| cls.const_get(c) }
+    robot_object = robot_class.new(robot_opts)
     robot_status = Dor::WorkflowService.get_workflow_status('sdr', Druid, robot_object.workflow_name, robot_object.workflow_step)
-    LyberCore::Log.info "robot status = #{robot_status}"
-    robot.queries.each do |query|
-      LyberCore::Log.info "query_url = #{query.url}"
-      response = RestClient.get query.url
-      LyberCore::Log.info "response.code = #{response.code}"
-      match = response.body =~ query.expectation ? 'matches:' : 'differs:'
-      LyberCore::Log.info "response.body #{match} #{query.expectation.inspect}"
-      exit if match != 'matches:'
+    case robot_status
+      when 'completed'
+        LyberCore::Log.info "robot status = previously completed"
+      else
+        robot_object.start
+        sleep 5
+        robot_status = Dor::WorkflowService.get_workflow_status('sdr', Druid, robot_object.workflow_name, robot_object.workflow_step)
+        LyberCore::Log.info "robot status = #{robot_status}"
+        robot.queries.each do |query|
+          LyberCore::Log.info "query_url = #{query.url}"
+          response = RestClient.get query.url
+          LyberCore::Log.info "response.code = #{response.code}"
+          match = response.body =~ query.expectation ? 'matches:' : 'differs:'
+          LyberCore::Log.info "response.body #{match} #{query.expectation.inspect}"
+          exit if match != 'matches:'
+        end
+        robot.files.each do |file|
+          pathname = Pathname(file.path)
+          existence = pathname.exist? ? 'found:' : 'missing:'
+          LyberCore::Log.info "pathname #{existence} #{pathname.to_s}"
+          exit if existence != 'found:'
+        end
+        exit if robot_status != "completed"
     end
-    robot.files.each do |file|
-      pathname = Pathname(file.path)
-      existence = pathname.exist? ? 'found:' : 'missing:'
-      LyberCore::Log.info "pathname #{existence} #{pathname.to_s}"
-      exit if existence != 'found:'
-    end
-    exit if robot_status != "completed"
   rescue Exception
     LyberCore::Log.error "#{$!.inspect}\n#{$@}"
     exit

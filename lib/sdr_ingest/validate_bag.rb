@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'libdir')
+require File.join(File.dirname(__FILE__),'../libdir')
 require 'boot'
 require 'bagit'
 
@@ -7,9 +7,17 @@ module Sdr
   # Robot for Validating BagIt bags that are transferred to SDR's deposit area.
   class ValidateBag < LyberCore::Robots::Robot
 
+    # define class instance variables and getter method so that we can inherit from this class
+    @workflow_name = 'sdrIngestWF'
+    @workflow_step = 'validate-bag'
+    class << self
+      attr_accessor :workflow_name
+      attr_accessor :workflow_step
+    end
+
     # @return [ValidateBag] set workflow name, step name, log location, log severity level
     def initialize(opts = {})
-      super('sdrIngestWF', 'validate-bag', opts)
+      super(self.class.workflow_name, self.class.workflow_step, opts)
     end
 
     # @param work_item [LyberCore::Robots::WorkItem] The item to be processed

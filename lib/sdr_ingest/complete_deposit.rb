@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__),'libdir')
+require File.join(File.dirname(__FILE__),'../libdir')
 require 'boot'
 
 module Sdr
@@ -6,9 +6,17 @@ module Sdr
   # Robot for completing the processing of each ingested object
   class CompleteDeposit < LyberCore::Robots::Robot
 
+    # define class instance variables and getter method so that we can inherit from this class
+    @workflow_name = 'sdrIngestWF'
+    @workflow_step = 'complete-deposit'
+    class << self
+      attr_accessor :workflow_name
+      attr_accessor :workflow_step
+    end
+
     # set workflow name, step name, log location, log severity level
     def initialize(opts = {})
-      super('sdrIngestWF', 'complete-deposit', opts)
+      super(self.class.workflow_name, self.class.workflow_step, opts)
     end
 
     # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
@@ -25,8 +33,8 @@ module Sdr
     def complete_deposit(druid)
       bag_pathname = DepositObject.new(druid).bag_pathname()
       repository = Stanford::StorageRepository.new
-      repository.store_new_object_version(druid, bag_pathname)
-      repository.verify_version_storage(druid)
+      new_version = repository.store_new_object_version(druid, bag_pathname)
+      new_version.verify_storage
       update_provenance(druid)
       bag_pathname.rmtree
     end

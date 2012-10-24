@@ -1,4 +1,4 @@
-require 'sdr/complete_deposit'
+require 'sdr_ingest/complete_deposit'
 require 'spec_helper'
 
 describe Sdr::CompleteDeposit do
@@ -53,8 +53,9 @@ describe Sdr::CompleteDeposit do
   specify "CompleteDeposit#complete_deposit" do
     repository = mock(Stanford::StorageRepository)
     Stanford::StorageRepository.should_receive(:new).and_return(repository)
-    repository.should_receive(:store_new_object_version).with(@druid, @bag_pathname)
-    repository.should_receive(:verify_version_storage).with(@druid)
+    new_version = mock(StorageObjectVersion)
+    repository.should_receive(:store_new_object_version).with(@druid, @bag_pathname).and_return(new_version)
+    new_version.should_receive(:verify_storage)
     @cd.should_receive(:update_provenance).with(@druid)
     Pathname.any_instance.should_receive(:rmtree)
     Pathname.any_instance.should_receive(:directory?).and_return(true)

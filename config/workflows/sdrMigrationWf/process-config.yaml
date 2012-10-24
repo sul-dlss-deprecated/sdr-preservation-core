@@ -1,0 +1,23 @@
+migration-start:
+  batch_limit: 1000
+  error_limit: 5
+
+migration-register:
+   prerequisite: migration-start
+   batch_limit: 1000
+   error_limit: 5
+
+migration-transfer:
+  prerequisite: migration-register
+  batch_limit: 200
+  error_limit: 5
+  
+migration-metadata:
+  prerequisite: migration-validate
+  batch_limit: 200
+  error_limit: 5
+
+migration-complete:
+  prerequisite: migration-metadata
+  batch_limit: 200
+  error_limit: 5  

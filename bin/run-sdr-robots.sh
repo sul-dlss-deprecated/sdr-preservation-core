@@ -6,17 +6,14 @@ source $HOME/.bashrc
 
 # Location of shell scripts
 # http://hustoknow.blogspot.com/2011/01/what-bashsource-does.html
-SHELL_SCRIPT_HOME=`dirname $BASH_SOURCE`
-
-source ${SHELL_SCRIPT_HOME}/../.rvmrc
-rvm list gemsets
-# rvm info
+BIN_DIR=`dirname $BASH_SOURCE`
+APP_HOME=`dirname $BIN_DIR`
 
 # Location of global environment scripts
-ENVIRONMENT_HOME=${SHELL_SCRIPT_HOME}/../config/environments
+ENVIRONMENT_HOME=${APP_HOME}/config/environments
 
 # Location of robot scripts
-ROBOT_SCRIPT_HOME=${SHELL_SCRIPT_HOME}/../lib/sdr
+ROBOT_SCRIPT_HOME=${APP_HOME}/lib/sdr_ingest
 
 # The name of the current computer without the domain
 HOST=`hostname -s`

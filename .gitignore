@@ -11,3 +11,4 @@ config/environments/passwords.rb
 doc/*
 .idea
 .bundle
+.rvmrc

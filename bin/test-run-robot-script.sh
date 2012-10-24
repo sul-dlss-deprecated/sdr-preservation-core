@@ -3,7 +3,7 @@
 
 source `dirname $0`/run-sdr-robots.sh
 
-echo SHELL_SCRIPT_HOME = $SHELL_SCRIPT_HOME
+echo APP_HOME = $APP_HOME
 echo ENVIRONMENT_HOME  = $ENVIRONMENT_HOME
 echo ROBOT_SCRIPT_HOME = $ROBOT_SCRIPT_HOME
 echo WORKSPACE         = $WORKSPACE

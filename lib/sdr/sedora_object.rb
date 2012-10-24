@@ -5,6 +5,7 @@ module Sdr
 
 #    has_metadata :name => "DC", :type => ActiveFedora::NokogiriDatastream, :label => 'Dublin Core Record for this object'
     has_metadata :name => "identityMetadata", :type => ActiveFedora::NokogiriDatastream, :label => 'Identity Metadata', :control_group => 'M'
+    has_metadata :name => "versionMetadata", :type => ActiveFedora::NokogiriDatastream, :label => 'Identity Metadata', :control_group => 'M'
 #    has_metadata :name => "descMetadata", :type => ActiveFedora::NokogiriDatastream, :label => 'Descriptive Metadata', :control_group => 'M'
 #    has_metadata :name => "contentMetadata", :type => ActiveFedora::NokogiriDatastream, :label => 'Content Metadata', :control_group => 'M'
     has_metadata :name => "provenanceMetadata", :type => ActiveFedora::NokogiriDatastream, :label => 'Provenance Metadata', :control_group => 'M'
@@ -15,6 +16,7 @@ module Sdr
 
     def set_workflow_datastream_location
       if self.sdrIngestWF.new?
+        puts FakeWeb.last_request.url
         sdrIngestWF.mimeType = 'application/xml'
         sdrIngestWF.dsLocation = File.join(Dor::Config.workflow.url,"sdr/objects/#{self.pid}/workflows/sdrIngestWF")
         sdrIngestWF.save

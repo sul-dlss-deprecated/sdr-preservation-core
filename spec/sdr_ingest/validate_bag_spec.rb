@@ -1,4 +1,4 @@
-require 'sdr/validate_bag'
+require 'sdr_ingest/validate_bag'
 require 'spec_helper'
 
 describe Sdr::ValidateBag do

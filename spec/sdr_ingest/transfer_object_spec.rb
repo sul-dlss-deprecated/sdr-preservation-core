@@ -1,4 +1,4 @@
-require 'sdr/transfer_object'
+require 'sdr_ingest/transfer_object'
 require 'spec_helper'
 
 describe Sdr::TransferObject do

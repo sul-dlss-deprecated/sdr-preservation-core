@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__),'libdir')
+require File.join(File.dirname(__FILE__),'../libdir')
 require 'boot'
 
 module Sdr
@@ -6,9 +6,17 @@ module Sdr
   # Robot for transferring objects from the DOR export area to the SDR deposit area.
   class TransferObject < LyberCore::Robots::Robot
 
+    # define class instance variables and getter method so that we can inherit from this class
+    @workflow_name = 'sdrIngestWF'
+    @workflow_step = 'transfer-object'
+    class << self
+      attr_accessor :workflow_name
+      attr_accessor :workflow_step
+    end
+
     # set workflow name, step name, log location, log severity level
     def initialize(opts = {})
-      super('sdrIngestWF', 'transfer-object', opts)
+      super(self.class.workflow_name, self.class.workflow_step, opts)
     end
 
     # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
@@ -21,7 +29,15 @@ module Sdr
     end
 
     # @param druid [String] The object identifier
-    # @return [void] Transfer the object from the DOR export area to the SDR deposit area.
+    # @return [void] Transfer and untar the object from the DOR export area to the SDR deposit area.
+    #   Note: POSIX tar has a limit of 100 chars in a filename
+    #     some implementations of gnu TAR work around this by adding a ././@LongLink file containing the full name
+    #     See: http://www.delorie.com/gnu/docs/tar/tar_114.html
+    #      http://stackoverflow.com/questions/2078778/what-exactly-is-the-gnu-tar-longlink-trick
+    #      http://www.gnu.org/software/tar/manual/html_section/Portability.html
+    #   Also, beware of incompatabilities between BSD tar and other TAR formats
+    #     regarding the handling of vendor extended attributes.
+    #     See: http://xorl.wordpress.com/2012/05/15/admin-mistakes-gnu-bsd-tar-and-posix-compatibility/
     def transfer_object(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
       deposit_object = DepositObject.new(druid)
