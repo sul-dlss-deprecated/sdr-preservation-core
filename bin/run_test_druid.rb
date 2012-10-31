@@ -8,22 +8,28 @@ $LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
 environment = ENV["ROBOT_ENVIRONMENT"]
 time = Time.now
 
-Druid = ARGV[0]
+if ARGV.size < 2
+  puts "syntax: run_test_druid.rb {ingest|migration} {druid} [loglevel]"
+end
+
+Mode = ARGV[0]
+
+Druid = ARGV[1]
 unless Druid =~ /\A(?:druid:)?([a-z]{2})(\d{3})([a-z]{2})(\d{4})\z/
   puts 'You must supply a valid druid as the first argument to this program'
   exit
 end
 
-load File.join(File.dirname(__FILE__), 'ingest_test_config.rb')
+load File.join(File.dirname(__FILE__), "#{Mode}_test_config.rb")
 
 druid_id = Druid.split(/:/)[1]
 logfile = "#{ROBOT_ROOT}/log/#{time.strftime('%Y%m%dT%H%M%S')}-#{druid_id}"
 LyberCore::Log.set_logfile(logfile)
 
-loglevel = ARGV[1] || Logger::INFO
+loglevel = ARGV[2] || Logger::INFO
 LyberCore::Log.set_level(loglevel)
 
-LyberCore::Log.info "SDR Ingest Test Run"
+LyberCore::Log.info "SDR #{Mode} test run"
 LyberCore::Log.info "environment = #{environment}"
 LyberCore::Log.info "timestamp = #{time.iso8601}"
 LyberCore::Log.info "druid = #{Druid}"
@@ -37,10 +43,14 @@ Robots.each do |robot|
 # http://www.ruby-forum.com/topic/182803
     robot_class = robot.name.split('::').reduce(Object){|cls, c| cls.const_get(c) }
     robot_object = robot_class.new(robot_opts)
-    robot_status = Dor::WorkflowService.get_workflow_status('sdr', Druid, robot_object.workflow_name, robot_object.workflow_step)
+    begin
+      robot_status = Dor::WorkflowService.get_workflow_status('sdr', Druid, robot_object.workflow_name, robot_object.workflow_step)
+    rescue
+      robot_status='unknown'
+    end
     case robot_status
       when 'completed'
-        LyberCore::Log.info "robot status = previously completed"
+        LyberCore::Log.info "#{robot.name} status = previously completed"
       else
         robot_object.start
         sleep 5

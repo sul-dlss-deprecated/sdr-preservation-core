@@ -86,7 +86,7 @@ include Stanford
 environment = case ENV["ROBOT_ENVIRONMENT"]
   when 'test'
     "sdr-services-test.rb"
-  when 'prod'
+  when 'prod', 'production'
     "sdr-services.rb"
   else
     "development"

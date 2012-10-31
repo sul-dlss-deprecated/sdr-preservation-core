@@ -16,7 +16,13 @@ Robot = Struct.new(:name, :path, :queries, :files)
 Query = Struct.new(:url, :code, :expectation)
 DataFile = Struct.new(:path)
 
-Robots << robot = Robot.new("Sdr::RegisterSdr", "sdr_ingest/register_sdr", [], [])
+Robots << robot = Robot.new("Sdr::MigrationStart", "sdr_migration/migration_start.rb", [], [])
+robot.queries << Query.new(
+    "#{workflow_url}/sdr/objects/#{Druid}/workflows/sdrMigrationWF", 200,
+    /completed/
+)
+
+Robots << robot = Robot.new("Sdr::MigrationRegister", "sdr_migration/migration_register.rb", [], [])
 robot.queries << Query.new(
     "#{fedora_url}/objects/#{Druid}?format=xml", 200,
     /<objectProfile/
@@ -30,31 +36,24 @@ robot.queries << Query.new(
     /<dsLabel>Workflows<\/dsLabel>/
 )
 
-Robots << robot = Robot.new("Sdr::TransferObject", "sdr_ingest/transfer_object", [], [])
+Robots << robot = Robot.new("Sdr::MigrationTransfer", "sdr_migration/migration_transfer.rb", [], [])
 robot.files << DataFile.new("#{deposit_home}/#{Druid}")
-
-Robots << robot = Robot.new("Sdr::ValidateBag", "sdr_ingest/validate_bag", [], [])
 robot.files << DataFile.new("#{deposit_home}/#{Druid}/bag-info.txt")
 
-Robots << robot = Robot.new("Sdr::PopulateMetadata", "sdr_ingest/populate_metadata",[], [])
+Robots << robot = Robot.new("Sdr::MigrationMetadata", "sdr_migration/migration_metadata.rb",[], [])
 robot.queries << Query.new(
     "#{fedora_url}/objects/#{Druid}/datastreams?format=xml", 200,
-    /relationshipMetadata/
+    /versionMetadata/
 )
 
-Robots << robot = Robot.new("Sdr::VerifyAgreement", "sdr_ingest/verify_agreement",[], [])
+Robots << robot = Robot.new("Sdr::MigrationComplete", "sdr_migration/migration_complete.rb",[], [])
 
-Robots << robot = Robot.new("Sdr::CompleteDeposit", "sdr_ingest/complete_deposit",[], [])
-robot.queries << Query.new(
-    "#{fedora_url}/objects/#{Druid}/datastreams/provenanceMetadata/content?format=xml", 200,
-    /<agent name="SDR">/
-)
 robot.queries << Query.new(
     "#{storage_url}/objects/#{Druid}", 200,
     /<html>/
 )
 robot.queries << Query.new(
-    "#{workflow_url}/sdr/objects/#{Druid}/workflows/sdrIngestWF", 200,
+    "#{workflow_url}/sdr/objects/#{Druid}/workflows/sdrMigrationWF", 200,
     /completed/
 )
 robot.files << DataFile.new("#{repository_path}")

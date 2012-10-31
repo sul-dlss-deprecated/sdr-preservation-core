@@ -19,9 +19,8 @@ module Sdr
     def transfer_object(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
       original_bag_pathname = locate_old_bag(druid)
-      deposit_bag_pathname = DepositObject.new(druid).bag_pathname(verify=false)
-      #FileUtils.cp_r original_bag_pathname.to_s, deposit_bag_pathname.to_s
-      rsync_object(original_bag_pathname, deposit_bag_pathname)
+      deposit_home = Pathname(Sdr::Config.sdr_deposit_home)
+      rsync_object(original_bag_pathname, deposit_home)
     end
 
 
@@ -56,6 +55,7 @@ module Sdr
         @toc_hash = Hash.new
         toc_file = old_storage_area.join('deposit-complete.toc')
         toc_file.each_line do |line|
+          line.chomp!
           @toc_hash[File.basename(line)] = line
         end
       end
