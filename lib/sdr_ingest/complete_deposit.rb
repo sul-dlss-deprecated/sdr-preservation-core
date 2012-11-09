@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__),'../libdir')
 require 'boot'
 
 module Sdr
-  
+
   # Robot for completing the processing of each ingested object
   class CompleteDeposit < LyberCore::Robots::Robot
 
@@ -26,6 +26,7 @@ module Sdr
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       complete_deposit(work_item.druid)
+      Dor::WorkflowService.update_workflow_status('dor', work_item.druid, 'accessionWF', 'sdr-ingest-received', 'completed')
     end
 
     # @param druid [String] The object identifier
@@ -144,7 +145,7 @@ module Sdr
     end
 
   end
-  
+
 end
 
 # This is the equivalent of a java main method
