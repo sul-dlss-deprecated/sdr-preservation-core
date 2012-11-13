@@ -1,7 +1,7 @@
 source "http://rubygems.org"
 source "http://sul-gems.stanford.edu"
 
-gem "moab-versioning" , ">=1.0.0" #,:path => '/Users/rnanders/Code/Ruby/moab-versioning'
+gem "moab-versioning", ">=1.1.0" # ,:path => '/Users/rnanders/Code/Ruby/moab-versioning' #
 gem "active-fedora"
 gem "bagit"
 gem "fakeweb"
