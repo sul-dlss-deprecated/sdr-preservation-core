@@ -1,6 +1,5 @@
 require File.join(File.dirname(__FILE__),'../libdir')
 require 'boot'
-require 'bagit'
 
 module Sdr
 
@@ -73,11 +72,30 @@ module Sdr
     # @param druid [String] The object identifier
     # @return [Boolean] Use the BagIt gem's validation method to verify checksums
     def validate_bag_data(druid, bag_pathname)
-      bag = BagIt::Bag.new bag_pathname.to_s
-      unless bag.valid?
-        raise LyberCore::Exceptions::ItemError.new(druid, "bag not valid: #{bag_pathname.to_s}")
+      invalid_signatures = Array.new
+      pathname_signature_hash = FileInventory.new.signatures_from_bagit_manifests(bag_pathname)
+      pathname_signature_hash.each do |pathname,signature_from_manifest|
+        #unless pathname.exist?
+        #  invalid_signatures << "File does not exist: #{pathname}"
+        #else
+          signature_from_file = FileSignature.new.signature_from_file(pathname)
+          unless signature_from_file.eql?(signature_from_manifest)
+            invalid_signatures << "Checksum inconsistent for: #{pathname}"
+            invalid_signatures << "  expected: #{signature_from_manifest.fixity.inspect}"
+            invalid_signatures << "  detected: #{signature_from_file.fixity.inspect}"
+          end
+        #end
       end
-      true
+      if invalid_signatures.size > 0
+        errors = bag_pathname.join("validation-errors.txt")
+        errors.open('w') {|file| file.puts invalid_signatures}
+        raise LyberCore::Exceptions::ItemError.new(druid, "bag not valid: #{bag_pathname.to_s} - see #{errors.realpath}")
+      else
+        true
+      end
+    rescue Errno::ENOENT => e
+      # This will trap any cases where files listed in the manifest do not exist
+      raise LyberCore::Exceptions::ItemError.new(druid, "bag not valid: #{bag_pathname.to_s}", e)
     end
 
   end

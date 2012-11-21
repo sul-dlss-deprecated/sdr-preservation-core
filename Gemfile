@@ -3,7 +3,6 @@ source "http://sul-gems.stanford.edu"
 
 gem "moab-versioning", ">=1.1.3" # ,:path => '/Users/rnanders/Code/Ruby/moab-versioning' #
 gem "active-fedora"
-gem "bagit"
 gem "fakeweb"
 gem "jettywrapper"
 gem "nokogiri"

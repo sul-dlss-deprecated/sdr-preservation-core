@@ -259,7 +259,6 @@ PLATFORMS
 
 DEPENDENCIES
   active-fedora
-  bagit
   confstruct
   dor-services
   druid-tools

@@ -93,23 +93,6 @@ environment = case ENV["ROBOT_ENVIRONMENT"]
 end
 require File.join(ROBOT_ROOT,"config/environments/#{environment}")
 
-module Dor
-  module WorkflowService
-    class << self
-      def workflow_resource
-        url = Dor::Config.workflow.url
-        cert = Dor::Config.ssl.cert_file
-        key = Dor::Config.ssl.key_file
-        pass = Dor::Config.ssl.key_pass
-        params = {}
-        params[:ssl_client_cert] = OpenSSL::X509::Certificate.new(File.read(cert)) if cert
-        params[:ssl_client_key]  = OpenSSL::PKey::RSA.new(File.read(key), pass) if key
-        RestClient::Resource.new(url, params)
-      end
-    end
-  end
-end
-
 ENABLE_SOLR_UPDATES = false
 require 'rake'
 require 'active-fedora'
@@ -119,3 +102,5 @@ ActiveFedora.init
 
 require 'sdr/deposit_object'
 require 'sdr/sedora_object'
+
+Dor::WorkflowService.configure Dor::Config.workflow.url

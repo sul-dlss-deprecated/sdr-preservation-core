@@ -12,3 +12,4 @@ doc/*
 .idea
 .bundle
 .rvmrc
+spec/fixtures/packages/bag_bad_fixity/validation-errors.txt

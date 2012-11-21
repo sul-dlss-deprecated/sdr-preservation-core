@@ -65,13 +65,13 @@ describe Sdr::ValidateBag do
   end
 
   specify "ValidateBag#validate_bag_data" do
-    bag = mock('Bag')
-    BagIt::Bag.stub(:new).with(@bag_pathname.to_s).and_return(bag)
-    bag.should_receive(:valid?).and_return(false)
-    lambda{@vb.validate_bag_data(@druid, @bag_pathname)}.should raise_exception(LyberCore::Exceptions::ItemError)
-
-    bag.should_receive(:valid?).and_return(true)
-    @vb.validate_bag_data(@druid, @bag_pathname).should == true
+    druid = 'druid:jq937jp0017'
+    good_bag = @fixtures.join('packages/v0001')
+    @vb.validate_bag_data(druid,good_bag ).should == true
+    bag_missing_file = @fixtures.join('packages/bag_missing_file')
+    lambda{@vb.validate_bag_data(druid,bag_missing_file )}.should raise_exception(LyberCore::Exceptions::ItemError)
+    bag_bad_fixity = @fixtures.join('packages/bag_bad_fixity')
+    lambda{@vb.validate_bag_data(druid,bag_bad_fixity )}.should raise_exception(LyberCore::Exceptions::ItemError)
   end
 
   
