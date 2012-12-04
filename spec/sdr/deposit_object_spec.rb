@@ -14,7 +14,7 @@ describe DepositObject do
     specify "SdrDeposit.bag_pathname" do
       object_pathname = DepositObject.new(@druid).bag_pathname(validate=false)
       object_pathname.should == Pathname(Sdr::Config.sdr_deposit_home).
-          join(@druid)
+          join(@druid.gsub('druid:',''))
     end
 
     specify "SdrDeposit.tarfile_pathname" do
