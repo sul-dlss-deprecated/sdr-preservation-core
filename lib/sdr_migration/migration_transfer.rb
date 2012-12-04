@@ -19,8 +19,8 @@ module Sdr
     def transfer_object(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
       original_bag_pathname = locate_old_bag(druid)
-      deposit_home = Pathname(Sdr::Config.sdr_deposit_home)
-      rsync_object(original_bag_pathname, deposit_home)
+      deposit_bag_pathname = DepositObject.new(druid).bag_pathname()
+      rsync_object(original_bag_pathname, deposit_bag_pathname)
     end
 
 
@@ -70,7 +70,8 @@ module Sdr
     def rsync_object(source_pathname, target_pathname)
       # for options see http://rsync.samba.org/ftp/rsync/rsync.html
       # and http://www.rsync.net/resources/howto/mac_images.html
-      rsync_command = "rsync -qac --inplace #{source_pathname} #{target_pathname}"
+      # trailing slash on the source path means "copy the contents of the source dir to the target dir"
+      rsync_command = "rsync -qac --inplace #{source_pathname}/ #{target_pathname}/"
       LyberCore::Utils::FileUtilities.execute(rsync_command)
       LyberCore::Log.debug("#{source_pathname} transferred to #{target_pathname}")
     rescue Exception => e

@@ -56,7 +56,7 @@ describe Sdr::TransferObject do
   specify "TransferObject#untar_bag" do
 
     parent = @bag_pathname.parent.to_s
-    filename = "#{@druid}.tar"
+    filename = @tarfile_pathname.basename
 
     @to.should_receive(:system).with("cd #{parent}; tar xf #{filename} --force-local").
         and_return(true)

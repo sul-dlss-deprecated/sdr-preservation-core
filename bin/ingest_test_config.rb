@@ -6,7 +6,7 @@ workflow_url = Dor::Config.workflow.url
 user_password = "#{Sdr::Config.sedora.user}:#{Sdr::Config.sedora.password}"
 fedora_url = Sdr::Config.sedora.url.sub('//',"//#{user_password}@")
 deposit_home = Sdr::Config.sdr_deposit_home
-druid_id = Druid.split(/:/)[1]
+druid_id = Druid.split(/:/)[-1]
 druid_id =~ /^([a-z]{2})(\d{3})([a-z]{2})(\d{4})$/
 repository_path = File.join( Sdr::Config.storage_node, $1, $2, $3, $4, druid_id)
 
@@ -31,10 +31,10 @@ robot.queries << Query.new(
 )
 
 Robots << robot = Robot.new("Sdr::TransferObject", "sdr_ingest/transfer_object", [], [])
-robot.files << DataFile.new("#{deposit_home}/#{Druid}")
+robot.files << DataFile.new("#{deposit_home}/#{druid_id}")
 
 Robots << robot = Robot.new("Sdr::ValidateBag", "sdr_ingest/validate_bag", [], [])
-robot.files << DataFile.new("#{deposit_home}/#{Druid}/bag-info.txt")
+robot.files << DataFile.new("#{deposit_home}/#{druid_id}/bag-info.txt")
 
 Robots << robot = Robot.new("Sdr::PopulateMetadata", "sdr_ingest/populate_metadata",[], [])
 robot.queries << Query.new(

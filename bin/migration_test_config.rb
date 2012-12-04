@@ -37,8 +37,8 @@ robot.queries << Query.new(
 )
 
 Robots << robot = Robot.new("Sdr::MigrationTransfer", "sdr_migration/migration_transfer.rb", [], [])
-robot.files << DataFile.new("#{deposit_home}/#{Druid}")
-robot.files << DataFile.new("#{deposit_home}/#{Druid}/bag-info.txt")
+robot.files << DataFile.new("#{deposit_home}/#{druid_id}")
+robot.files << DataFile.new("#{deposit_home}/#{druid_id}/bag-info.txt")
 
 Robots << robot = Robot.new("Sdr::MigrationMetadata", "sdr_migration/migration_metadata.rb",[], [])
 robot.queries << Query.new(
