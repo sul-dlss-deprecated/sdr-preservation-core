@@ -16,7 +16,6 @@ module Sdr
 
     def set_workflow_datastream_location
       if self.sdrIngestWF.new?
-        puts FakeWeb.last_request.url
         sdrIngestWF.mimeType = 'application/xml'
         sdrIngestWF.dsLocation = File.join(Dor::Config.workflow.url,"sdr/objects/#{self.pid}/workflows/sdrIngestWF")
         sdrIngestWF.save
