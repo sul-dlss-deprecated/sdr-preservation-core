@@ -19,8 +19,9 @@ module Sdr
     def transfer_object(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
       original_bag_pathname = locate_old_bag(druid)
-      deposit_bag_pathname = DepositObject.new(druid).bag_pathname()
+      deposit_bag_pathname = DepositObject.new(druid).bag_pathname(verify=false)
       rsync_object(original_bag_pathname, deposit_bag_pathname)
+      generate_inventory_manifests(druid, deposit_bag_pathname)
     end
 
 
@@ -76,6 +77,48 @@ module Sdr
       LyberCore::Log.debug("#{source_pathname} transferred to #{target_pathname}")
     rescue Exception => e
       raise LyberCore::Exceptions::ItemError.new(druid, "Error transferring object", e)
+    end
+
+    def generate_inventory_manifests(druid, deposit_bag_pathname)
+      version_inventory = get_version_inventory(druid, deposit_bag_pathname)
+      version_inventory.write_xml_file(deposit_bag_pathname)
+      version_additions = get_version_additions(druid, version_inventory)
+      version_additions.write_xml_file(deposit_bag_pathname)
+    end
+
+    def get_version_inventory(druid, deposit_bag_pathname)
+      version_inventory = FileInventory.new(:type=>"version",:digital_object_id=>druid, :version_id=>1)
+      content_group = get_data_group(deposit_bag_pathname, 'content')
+      version_inventory.groups << content_group
+      upgrade_content_metadata(deposit_bag_pathname, content_group)
+      metadata_group = get_data_group(deposit_bag_pathname, 'metadata')
+      version_inventory.groups << metadata_group
+      version_inventory
+    end
+
+    def get_data_group(deposit_bag_pathname, group_id)
+      data_pathname = deposit_bag_pathname.join('data', group_id)
+      data_group = Moab::FileGroup.new(:group_id=>group_id)
+      data_group.group_from_directory(data_pathname)
+    end
+
+    def upgrade_content_metadata(deposit_bag_pathname, content_group)
+      content_metadata_pathname = deposit_bag_pathname.join('data/metadata/contentMetadata.xml')
+      original_cm = content_metadata_pathname.read
+      remediator = Stanford::ContentInventory.new
+      remediated_cm = remediator.remediate_content_metadata(original_cm, content_group)
+      write_content_metadata(remediated_cm, content_metadata_pathname)
+      remediated_cm
+    end
+
+    def write_content_metadata(remediated_cm, content_metadata_pathname)
+      content_metadata_pathname.open('w') {|f| f << remediated_cm }
+    end
+
+    def get_version_additions(druid, version_inventory)
+      signature_catalog = SignatureCatalog.new(:digital_object_id => druid)
+      version_additions = signature_catalog.version_additions(version_inventory)
+      version_additions
     end
 
   end
