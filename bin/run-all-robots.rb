@@ -76,7 +76,7 @@ druids.each do |druid|
       begin
         robot_status = Dor::WorkflowService.get_workflow_status('sdr', druid, robot_object.workflow_name, robot_object.workflow_step)
       rescue
-        robot_status='unknown'
+        robot_status = (robot.name == 'Sdr::MigrationStart') ? 'waiting' : 'unknown'
       end
       case robot_status
         when 'completed'
