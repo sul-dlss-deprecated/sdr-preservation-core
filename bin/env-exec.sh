@@ -1,16 +1,17 @@
 #!/bin/bash
-# run-all-robots.sh
+# env-exec.sh
 
 # Ensure that only one copy of the program is running
 SCRIPT=`basename $BASH_SOURCE`
-if [[ `pgrep $SCRIPT | wc -l` -gt 1 ]]; then
-  echo "Only one copy of this script can be run at one time"
-  exit
-fi
+#if [[ `pgrep $SCRIPT | wc -l` -gt 1 ]]; then
+#  echo "Only one copy of this script can be run at one time"
+#  exit
+#fi
 
 # Location of shell scripts
 # http://hustoknow.blogspot.com/2011/01/what-bashsource-does.html
 BIN_DIR=`dirname $BASH_SOURCE`
+BIN_DIR=`cd $BIN_DIR; pwd`
 APP_HOME=`dirname $BIN_DIR`
 
 # The name of the current computer without the domain
@@ -29,6 +30,8 @@ if [[ "$ROBOT_ENVIRONMENT" == "" ]]; then
 fi
 echo "ROBOT_ENVIRONMENT = $ROBOT_ENVIRONMENT"
 
-kinit -k -t /var/sdr2service/sulair-lyberservices service/sulair-lyberservices && aklog
+if [[ `echo $1 | grep 'runner' | wc -l` -gt 0 ]]; then
+  kinit -k -t /var/sdr2service/sulair-lyberservices service/sulair-lyberservices && aklog
+fi
 
-cd $BIN_DIR; bundle exec $BIN_DIR/run-all-robots.rb "$@"
+cd $BIN_DIR; bundle exec $BIN_DIR/"$@"
