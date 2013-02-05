@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__),'../libdir')
+  require File.join(File.dirname(__FILE__),'../libdir')
 require 'boot'
 require 'sdr_ingest/transfer_object'
 
@@ -119,6 +119,19 @@ module Sdr
       signature_catalog = SignatureCatalog.new(:digital_object_id => druid)
       version_additions = signature_catalog.version_additions(version_inventory)
       version_additions
+    end
+
+    def verification_queries(druid)
+      queries = []
+      queries
+    end
+
+    def verification_files(druid)
+      bag_pathname = Pathname(Sdr::Config.sdr_deposit_home).join(druid.sub('druid:',''))
+      files = []
+      files << bag_pathname.to_s
+      files << bag_pathname.join("bag-info.txt").to_s
+      files
     end
 
   end

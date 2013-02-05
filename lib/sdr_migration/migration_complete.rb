@@ -22,6 +22,26 @@ module Sdr
       bag_pathname.rmtree
     end
 
+    def verification_queries(druid)
+      storage_url = Sdr::Config.sdr_storage_url
+      workflow_url = Dor::Config.workflow.url
+      queries = []
+      queries << [
+          "#{storage_url}/objects/#{druid}",
+          200, /<html>/ ]
+      queries << [
+          "#{workflow_url}/sdr/objects/#{druid}/workflows/sdrMigrationWF",
+          200, /completed/ ]
+      queries
+    end
+
+    def verification_files(druid)
+      repository = Stanford::StorageRepository.new
+      files = []
+      files << repository.storage_object_pathname(druid).to_s
+      files
+    end
+
   end
 
 end

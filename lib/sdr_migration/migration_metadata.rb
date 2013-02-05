@@ -27,6 +27,21 @@ module Sdr
       raise LyberCore::Exceptions::FatalError.new("Cannot process item #{druid}",e)
     end
 
+    def verification_queries(druid)
+      user_password = "#{Sdr::Config.sedora.user}:#{Sdr::Config.sedora.password}"
+      fedora_url = Sdr::Config.sedora.url.sub('//',"//#{user_password}@")
+      queries = []
+      queries << [
+        "#{fedora_url}/objects/#{druid}/datastreams?format=xml",
+        200, /versionMetadata/ ]
+      queries
+    end
+
+    def verification_files(druid)
+      files = []
+      files
+    end
+
   end
 
 end

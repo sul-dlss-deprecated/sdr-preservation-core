@@ -95,6 +95,17 @@ module Sdr
       raise LyberCore::Exceptions::ItemError.new(druid, "Unable to delete #{tarfile}", e)
     end
 
+    def verification_queries(druid)
+      queries = []
+      queries
+    end
+
+    def verification_files(druid)
+      files = []
+        files << Pathname(Sdr::Config.sdr_deposit_home).join(druid.sub('druid:','')).to_s
+      files
+    end
+
   end
 
 end

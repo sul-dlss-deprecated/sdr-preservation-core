@@ -98,6 +98,18 @@ module Sdr
       raise LyberCore::Exceptions::ItemError.new(druid, "bag not valid: #{bag_pathname.to_s}", e)
     end
 
+    def verification_queries(druid)
+      queries = []
+      queries
+    end
+
+    def verification_files(druid)
+      bag_pathname = Pathname(Sdr::Config.sdr_deposit_home).join(druid.sub('druid:',''))
+      files = []
+      files << bag_pathname.join("bag-info.txt").to_s
+      files
+    end
+
   end
 
 end

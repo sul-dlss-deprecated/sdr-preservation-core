@@ -144,6 +144,31 @@ module Sdr
       raise LyberCore::Exceptions::FatalError.new("Cannot create new provenanceMetadata xml for #{druid}",e)
     end
 
+    def verification_queries(druid)
+      user_password = "#{Sdr::Config.sedora.user}:#{Sdr::Config.sedora.password}"
+      fedora_url = Sdr::Config.sedora.url.sub('//',"//#{user_password}@")
+      storage_url = Sdr::Config.sdr_storage_url
+      workflow_url = Dor::Config.workflow.url
+      queries = []
+      queries << [
+          "#{fedora_url}/objects/#{druid}/datastreams/provenanceMetadata/content?format=xml",
+          200, /<agent name="SDR">/ ]
+      queries << [
+          "#{storage_url}/objects/#{druid}",
+          200, /<html>/ ]
+      queries << [
+          "#{workflow_url}/sdr/objects/#{druid}/workflows/sdrIngestWF",
+          200, /completed/ ]
+      queries
+    end
+
+    def verification_files(druid)
+      repository = Stanford::StorageRepository.new
+      files = []
+      files << repository.storage_object_pathname(druid).to_s
+      files
+    end
+
   end
 
 end

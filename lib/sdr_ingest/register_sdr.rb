@@ -46,6 +46,28 @@ module Sdr
       raise LyberCore::Exceptions::FatalError.new("Sedora Object cannot be found or created", e)
     end
 
+    def verification_queries(druid)
+      user_password = "#{Sdr::Config.sedora.user}:#{Sdr::Config.sedora.password}"
+      fedora_url = Sdr::Config.sedora.url.sub('//',"//#{user_password}@")
+      queries = []
+      queries << [
+          "#{fedora_url}/objects/#{druid}?format=xml", 200,
+          /<objectProfile/ ]
+      queries << [
+          "#{fedora_url}/objects/#{druid}/datastreams?format=xml",
+           200, /<objectDatastreams/ ]
+      queries << [
+          "#{fedora_url}/objects/#{druid}/datastreams/workflows?format=xml",
+          200, /<dsLabel>Workflows<\/dsLabel>/ ]
+      queries
+    end
+
+    def verification_files(druid)
+      files = []
+      files
+    end
+
+
   end
 
 end

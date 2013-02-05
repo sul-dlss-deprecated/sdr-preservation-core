@@ -41,6 +41,20 @@ module Sdr
       IO.read(File.join("#{ROBOT_ROOT}", "config", "workflows", "sdrMigrationWF", "sdrMigrationWF.xml"))
     end
 
+    def verification_queries(druid)
+      workflow_url = Dor::Config.workflow.url
+      queries = []
+      queries << [
+        "#{workflow_url}/sdr/objects/#{druid}/workflows/sdrMigrationWF",
+        200, /completed/ ]
+      queries
+    end
+
+    def verification_files(druid)
+      files = []
+      files
+    end
+
   end
 
 end

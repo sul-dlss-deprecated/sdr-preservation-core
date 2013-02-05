@@ -119,6 +119,17 @@ module Sdr
       raise LyberCore::Exceptions::FatalError.new("unable to verify identifier", e)
     end
 
+    def verification_queries(druid)
+      queries = []
+      queries
+    end
+
+    def verification_files(druid)
+      files = []
+      files
+    end
+
+
   end
 
 end

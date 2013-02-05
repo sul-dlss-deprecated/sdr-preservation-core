@@ -79,7 +79,22 @@ module Sdr
     rescue Exception => e
       raise LyberCore::Exceptions::FatalError.new("Cannot add #{dsid} datastream for #{sedora_object.pid}",e)
     end
-    
+
+    def verification_queries(druid)
+      user_password = "#{Sdr::Config.sedora.user}:#{Sdr::Config.sedora.password}"
+      fedora_url = Sdr::Config.sedora.url.sub('//',"//#{user_password}@")
+      queries = []
+      queries << [
+          "#{fedora_url}/objects/#{druid}/datastreams?format=xml", 200,
+          /relationshipMetadata/ ]
+      queries
+    end
+
+    def verification_files(druid)
+      files = []
+      files
+    end
+
   end
 end
 
