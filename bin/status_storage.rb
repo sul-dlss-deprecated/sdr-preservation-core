@@ -18,18 +18,6 @@ class StatusStorage
 
   end
 
-  def report_title()
-    "#{`hostname -s`.chomp} storage area status as of #{Time.now.strftime('%Y/%m/%d')}"
-  end
-
-
-  def storage_status_output(areas)
-    printf "%-20s %10s %10s %10s %10s\n", *StorageArea.members
-    areas.each do |area|
-      printf "%-20s %10.0f %10.0f %10.0f %9.1sf%%\n", *area.values
-    end
-  end
-
   def storage_areas()
     areas = []
     storage_filesystems.each do |stat|
@@ -56,6 +44,23 @@ class StatusStorage
     1024*1024*1024
   end
 
+  def report_title()
+    environment = ENV["ROBOT_ENVIRONMENT"].capitalize
+    title = "#{environment} Storage Area Status for #{`hostname -s`.chomp} as of #{Time.now.strftime('%Y/%m/%d')}\n"
+    title << '='*(title.size) + "\n"
+    title
+  end
+
+  def output_storage_status(areas)
+    s = String.new
+    s << (sprintf "%-20s %10s %10s %10s %10s\n", *StorageArea.members)
+    s << (sprintf "%-20s %10s %10s %10s %10s\n", '-'*20, '-'*10, '-'*10, '-'*10, '-'*10)
+    areas.each do |area|
+      s << (sprintf "%-20s %10.0f %10.0f %10.0f %9d%%\n", *area.values)
+    end
+    s
+  end
+
   def warnings(areas)
     warnings = []
     areas.each do |area|
@@ -73,13 +78,12 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  status = StatusStorage.new
+  ss = StatusStorage.new
   puts ""
-  puts status.report_title
-  puts '='*70
-  areas = status.storage_areas
-  status.storage_status_output(areas)
-  warnings = status.warnings(areas)
+  puts ss.report_title
+  areas = ss.storage_areas
+  puts ss.output_storage_status(areas)
+  warnings = ss.warnings(areas)
   if ! warnings.empty?
     puts '-'*70
     puts warnings

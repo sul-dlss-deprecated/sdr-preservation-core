@@ -31,8 +31,8 @@ class RobotRunner
 
   def initialize(flags)
     @robot_workflow = self.class.robot_workflow
-    @loglevel = (flags.upcase.include?('DEBUG')) ? 0 : 1
-    @verify = (flags.upcase.include?('VERIFY')) ? true : false
+    @loglevel = (flags.map(&:upcase).include?('DEBUG')) ? 0 : 1
+    @verify = (flags.map(&:upcase).include?('VERIFY')) ? true : false
     @app_home = ROBOT_ROOT
     @environment = ENV["ROBOT_ENVIRONMENT"]
     @repository_home = Sdr::Config.storage_node
@@ -54,7 +54,7 @@ class RobotRunner
 
   def process_queue()
     result = {:items=>0,:completed=>0,:error=>0,:fatal=>0}
-    druid_queue = DruidQueue.new("#{@app_home}/queue/#{@robot_workflow}", @robot_workflow)
+    druid_queue = DruidQueue.new("#{@app_home}/queue", @robot_workflow)
     while true
       run_status = get_run_status
       case run_status
@@ -68,7 +68,7 @@ class RobotRunner
             logfile = initialize_logfile(druid)
             status = process_druid(druid, logfile)
             result[:items] += 1
-            result[status.to_s] += 1
+            result[status.to_sym] += 1
             logfile = move_logfile(logfile, status)
             if status == 'fatal'
               email_log_file(druid,logfile,status)
@@ -85,11 +85,11 @@ class RobotRunner
   end
 
   def get_run_status
-    run_status_file = Pathname("#{@app_home}/tmp/run-status")
+    run_status_file = Pathname("#{@app_home}/tmp/#{@robot_workflow}-run-state")
     run_status = run_status_file.read.chomp.upcase
     run_status
   rescue Exception => e
-    raise "Run status file #{run_status_file} could not be read: #{e.message}"
+    raise "Run state file #{run_status_file} could not be read: #{e.message}"
   end
 
   def initialize_logfile(druid)

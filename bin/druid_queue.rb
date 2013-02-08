@@ -1,5 +1,8 @@
 #!/usr/bin/env ruby
 
+libdir = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+$LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
+
 require File.join(File.dirname(__FILE__), "directory_queue")
 require 'druid-tools'
 
@@ -8,9 +11,9 @@ class DruidQueue < DirectoryQueue
   def self.syntax
     puts <<-EOF
   
-    Syntax: env-exec.sh druid_queue.rb {ingest|migration} {druid|filename|query_batch_size}
+    Syntax: env-exec.sh druid_queue.rb {ingest|migration} {enqueue|list} {druid|filename|query_batch_size}
     
-    Mode must be one of:
+    Workflow must be one of:
       * ingest = normal SDR ingest
       * migration = migration from bagit to moab structure
     
@@ -22,10 +25,10 @@ class DruidQueue < DirectoryQueue
     EOF
   end
   
-  def initialize(queue_home, mode)
-    raise "Mode not recognized: #{mode}" unless %w{ingest migration}.include?(mode)
-    @mode = mode
-    super(Pathname(queue_home).join(mode))
+  def initialize(queue_home, workflow)
+    raise "Workflow not recognized: #{workflow}" unless %w{ingest migration}.include?(workflow)
+    @workflow = workflow
+    super(Pathname(queue_home).join(workflow))
   end
 
   def enqueue(druid_arg)
@@ -53,10 +56,11 @@ class DruidQueue < DirectoryQueue
     else
       batch_size =  druid_arg
     end
-    if @mode =~ /ingest/
+    require 'boot'
+    if @workflow =~ /ingest/
       druids = Dor::WorkflowService.get_objects_for_workstep(
           completed='start-ingest', waiting='register-sdr', repository='sdr', workflow='sdrIngestWF')
-    elsif @mode =~ /migration/
+    elsif @workflow =~ /migration/
       druids = Dor::WorkflowService.get_objects_for_workstep(
           completed='migration-start', waiting='migration-register', repository='sdr', workflow='sdrMigrationWF')
     end
@@ -84,15 +88,17 @@ end
 # This is the equivalent of a java main method
 if __FILE__ == $0
 
-  QueueHome = Pathname(__FILE__).expand_path.parent.parent.join("queue").to_s
-  Mode = ARGV[0]
-  DruidArg = ARGV[1]
-
-  if ARGV.size != 2
-    DruidQueue.syntax
-  elsif %w{ingest migration}.include?(Mode)
-    druid_queue = DruidQueue.new(QueueHome,Mode)
-    druid_queue.enqueue(DruidArg)
+  if %w{ingest migration}.include?(ARGV[0].to_s)
+    queue_home = Pathname(__FILE__).expand_path.parent.parent.join("queue").to_s
+    druid_queue = DruidQueue.new(queue_home,ARGV[0])
+    case ARGV[1].to_s.upcase
+      when 'ENQUEUE'
+        druid_queue.enqueue(ARGV[2])
+      when 'LIST'
+        puts druid_queue.top_file(n=100)
+      else
+        DruidQueue.syntax
+    end
   else
     DruidQueue.syntax
   end

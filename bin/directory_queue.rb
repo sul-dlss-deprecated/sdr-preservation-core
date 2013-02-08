@@ -14,6 +14,28 @@ class DirectoryQueue
     @delim = ','
   end
 
+  # @return [Integer] The number of items in the queue
+  def queue_size
+    @qdir.children.size
+  end
+
+   # @return [Array<String>] The queue id(s) of the first n item(s) in the queue
+  def top_item(n=1)
+    top_id(n).map{|id| qfile_item(id)}
+  end
+
+  # @return [Array<String>] The queue id(s) of the first n item(s) in the queue
+  def top_id(n=1)
+    top_file(n).map{|filename| filename.split(@delim).last }
+  end
+
+  # @return [Array<String>] The queue id(s) of the first n item(s) in the queue
+  def top_file(n=1)
+    qfiles = @qdir.children.sort.first(n)
+    return [] if qfiles.nil? or qfiles.empty?
+    qfiles.map{|f| f.basename.to_s}
+  end
+
   # @param [Pathname, String] filename The location of the file containing a list of item identifers
   #    to be added to the queue
   # @param [Integer] priority The single digit (1 - 9) priority to assign to all the items in the list,
@@ -47,6 +69,7 @@ class DirectoryQueue
     end
     # remove any duplicates that may be in lower priority queues
     existing.each { |qf| qf.delete if qfile_priority(qf) > priority }
+    sleep 0.01
     qfile
   rescue Exception => e
     puts "Item '#{item}' could not be added to the queue"
@@ -96,26 +119,23 @@ class DirectoryQueue
     t.strftime('%Y%m%d-%H%M%S-')+t.to_f.modulo(1).to_s[2..4]
   end
 
-  # @return [String] The reconstructed object identifer of the first item in the queue
-  #   advisory file locks are used so that competing processes will be guaranteed a unique item id
-  def first_item
-    qfiles = @qdir.children
-    return nil if qfiles.empty?
-    qfile_item(qfiles.first)
-  end
-
   # @return [String] The reconstructed object identifer of the next unlocked item in the queue
   #   advisory file locks are used so that competing processes will be guaranteed a unique item id
   def next_item
     qfiles = @qdir.children
     return nil if qfiles.empty?
-    qfiles.each do |qfile|
+    qfiles.sort.each do |qfile|
       next if qfile.basename == Pathname('.DS_Store')
-      file = File.new(qfile.to_s)
-      if file.flock(File::LOCK_EX | File::LOCK_NB)
-        qfile.delete
-        file.flock(File::LOCK_UN)
-        return qfile_item(qfile)
+      begin
+        file = File.new(qfile.to_s)
+        if file.flock(File::LOCK_EX | File::LOCK_NB)
+          qfile.delete
+          file.flock(File::LOCK_UN)
+          return qfile_item(qfile)
+        end
+      rescue Errno::ENOENT
+        # another process has already deleted this queue file
+        # just move on to the next one in the queue
       end
     end
     nil

@@ -11,8 +11,8 @@ SCRIPT=`basename $BASH_SOURCE`
 # Location of shell scripts
 # http://hustoknow.blogspot.com/2011/01/what-bashsource-does.html
 BIN_DIR=`dirname $BASH_SOURCE`
-BIN_DIR=`cd $BIN_DIR; pwd`
-APP_HOME=`dirname $BIN_DIR`
+export BIN_DIR=`cd $BIN_DIR; pwd`
+export APP_HOME=`dirname $BIN_DIR`
 
 # The name of the current computer without the domain
 HOST=`hostname -s`
@@ -35,3 +35,7 @@ if [[ `echo $1 | grep 'runner' | wc -l` -gt 0 ]]; then
 fi
 
 cd $BIN_DIR; bundle exec $BIN_DIR/"$@"
+
+# grep -v '^Loaded datastream '
+# grep -v '^SOLRIZER'
+# grep -v '^resetting mappings for Solrizer'
