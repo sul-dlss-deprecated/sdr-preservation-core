@@ -1,30 +1,34 @@
 #!/usr/bin/env ruby
 
-libdir = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
-
-require 'rubygems'
-require 'bundler/setup'
+require 'environment'
 require 'boot'
 require 'rest-client'
 require 'nokogiri'
 require 'yaml'
 require 'time'
 
-StatusCounts = Struct.new(:process, :waiting, :error, :completed, :archived)
+StepCounts = Struct.new(:workflow_step, :waiting, :error, :completed)
 
-class StatusWorkflow
+WorkflowSummary = Struct.new(:workflow, :waiting, :error, :recent, :archived)
+
+Robot = Struct.new(:name, :classname, :classpath)
+
+class StatusWorkflow  < Status
 
   def self.syntax()
     puts <<-EOF
 
-    Syntax: env-exec.sh status_workflow.rb {ingest|migration} {detail|summary}
+    Syntax: bundle-exec.sh status_workflow.rb {#{WorkflowNames.join('|')}} {detail|summary|waiting}
 
+    result:
+      detail returns list of workflow steps with waiting,error,completed counts for each
+      summary returns overall workflow's waiting,error,recently completed, and archived counts
+      waiting returns the number of items whose first step has "waiting" status
     EOF
 
   end
 
-  def initialize(workflow='sdrIngestWF')
+  def initialize(workflow)
     @workflow = workflow
     workflow_config_file = "#{ROBOT_ROOT}/config/workflows/#{@workflow}/workflow-config.yaml"
     workflow_config = YAML.load_file(workflow_config_file)
@@ -34,33 +38,58 @@ class StatusWorkflow
     @process_steps = Pathname(process_config_file).each_line.grep(/^(.*):$/).map{|line| line.chomp.chop}
   end
 
+  def robots
+    robots = []
+    @process_steps.each do |name|
+      robot_props = @process_config[name]
+      robots << Robot.new(name, robot_props['classname'], robot_props['classpath'] ) if  robot_props['classname']
+    end
+    robots
+  end
+
   def item_step_status(druid, workflow_step)
     Dor::WorkflowService.get_workflow_status(@repository, druid, @workflow, workflow_step)
   end
+
+  def workflow_waiting
+    waiting_query = compose_query_process_status(@process_steps[1], "waiting")
+    request_count(waiting_query)
+  end
+
 
   def workflow_status_detail
     @process_steps.collect{|process| step_status_counts(process)}
   end
 
   def workflow_status_summary
-    summary = StatusCounts.new()
-    summary.process = @workflow
+    summary = WorkflowSummary.new()
+    summary.workflow = @workflow
     waiting_query = compose_query_process_status(@process_steps[1], "waiting")
-    summary.waiting = request_count(waiting_query).to_i
-    completed_query = compose_query_process_status(@process_steps[-1], "completed")
-    summary.completed = request_count(completed_query).to_i
+    summary.waiting = request_count(waiting_query)
     summary.error = 0
     @process_steps[1..-1].each do |process|
       error_query = compose_query_process_status(process, "error")
-      summary.error += request_count(error_query).to_i
+      summary.error += request_count(error_query)
     end
-    summary.archived = request_archive_count
+    completed_query = compose_query_process_status(@process_steps[-1], "completed")
+    workflow_completed = request_count(completed_query)
+    summary.recent = workflow_completed
+    # make sure class instance variables are initialized
+    @workflow_completed ||= workflow_completed
+    @archive_completed ||= request_archive_count
+    # test whether the current count is less than the previously measured count
+    if workflow_completed < @workflow_completed
+      # if so, then the archiving function must have happened in the meantime
+      @archive_completed = request_archive_count
+    end
+    @workflow_completed = workflow_completed
+    summary.archived = @archive_completed
     summary
   end
 
   def step_status_counts(process)
-    step = StatusCounts.new()
-    step.process = process
+    step = StepCounts.new()
+    step.workflow_step = process
     %w{waiting error completed}.each do |status|
       query = compose_query_process_status(process,status)
       step[status] = request_count(query).to_i
@@ -89,7 +118,7 @@ class StatusWorkflow
   def request_count(query)
     subresource = "workflow_queue?#{query}&count-only=true"
     xml = workflow_service[subresource].get
-    count = Nokogiri::XML(xml).at_xpath('/objects/@count').value
+    count = Nokogiri::XML(xml).at_xpath('/objects/@count').value.to_i
     count
   end
 
@@ -103,8 +132,10 @@ class StatusWorkflow
   def request_archive_count
     subresource = "workflow_archive?repository=#{@repository}&workflow=#{@workflow}&count-only=true"
     xml = workflow_service[subresource].get
-    count = Nokogiri::XML(xml).at_xpath('/objects/@count').value
+    count = Nokogiri::XML(xml).at_xpath('/objects/@count').value.to_i
     count
+  rescue
+    0
   end
 
   def workflow_service
@@ -118,7 +149,7 @@ class StatusWorkflow
     params = {}
     params[:ssl_client_cert] = OpenSSL::X509::Certificate.new(File.read(cert)) if cert
     params[:ssl_client_key]  = OpenSSL::PKey::RSA.new(File.read(key), pass) if key
-    RestClient::Resource.new(url, params)
+    RestClient::Resource.new(url, params,:timeout => 200, :open_timeout => 200 )
   end
 
   def sdr_service
@@ -129,28 +160,23 @@ class StatusWorkflow
 
   end
 
-  def report_title(mode)
-    environment = ENV["ROBOT_ENVIRONMENT"].capitalize
-    title = "#{environment} Workflow Status #{mode} for #{@workflow} on #{`hostname -s`.chomp} as of #{Time.now.strftime('%Y/%m/%d')}\n"
-    title << '='*(title.size) + "\n"
-    title
-  end
-
-  def output_status_detail_counts(status_count_array)
-    s = String.new
-    s << (sprintf "%-20s %10s %10s %10s\n", *StatusCounts.members[0..-2])
-    s << (sprintf "%-20s %10s %10s %10s\n", '-'*20, '-'*10, '-'*10, '-'*10)
-    status_count_array.each do |step|
-      s << (sprintf "%-20s %10d %10d %10d\n", *step.values)
-    end
+  def report_status_detail(detail)
+    s = report_table(
+        "#{@workflow} Step Status",
+        StepCounts.members,
+        detail.map{|step| step.values},
+        [-17, 8, 8, 11]
+    )
     s
   end
 
-  def output_status_summary_counts(status_counts)
-    s = String.new
-    s << (sprintf "%-20s %10s %10s %10s %10s\n", *StatusCounts.members)
-    s << (sprintf "%-20s %10s %10s %10s %10s\n", '-'*20, '-'*10, '-'*10, '-'*10, '-'*10)
-    s << (sprintf "%-20s %10d %10d %10d %10d\n", *status_counts)
+  def report_status_summary(summary)
+    s = report_table(
+        "Workflow Database + Archive",
+        WorkflowSummary.members,
+        [summary.values],
+        [-15, 7, 5, 6, 9]
+    )
     s
   end
 
@@ -158,24 +184,22 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  workflow = ARGV[0].to_s.downcase
-  if %w{ingest migration}.include?(workflow)
+  workflow = ARGV[0].to_s
+  if WorkflowNames.include?(workflow)
     sw = StatusWorkflow.new(workflow)
-    case ARGV[2].to_s .upcase
+    case ARGV[1].to_s .upcase
       when 'DETAIL'
         detail = sw.workflow_status_detail
-        puts ""
-        puts sw.report_title('detail')
-        puts sw.output_status_detail_counts(detail)
-        puts ""
+        puts sw.report_context + sw.report_status_detail(detail)
       when 'SUMMARY'
         summary = sw.workflow_status_summary
-        puts ""
-        puts sw.report_title('summary')
-        puts sw.output_status_summary_counts(summary)
-        puts ""
+        puts sw.report_context + sw.report_status_summary(summary)
+      when 'WAITING'
+        puts "#{sw.workflow_waiting}\n"
       else
         StatusWorkflow.syntax
     end
+  else
+    StatusWorkflow.syntax
   end
 end

@@ -3,31 +3,43 @@ start-ingest:
   error_limit: 5
 
 register-sdr:
-   prerequisite: start-ingest
-   batch_limit: 1000
-   error_limit: 5
+  prerequisite: start-ingest
+  batch_limit: 1000
+  error_limit: 5
+  classname: "Sdr::RegisterSdr"
+  classpath: "sdr_ingest/register_sdr"
 
 transfer-object:
   prerequisite: register-sdr  
   batch_limit: 200
   error_limit: 5
-  
+  classname: "Sdr::TransferObject"
+  classpath: "sdr_ingest/transfer_object"
+
 validate-bag:
   prerequisite: transfer-object 
   batch_limit: 200
   error_limit: 5
-  
+  classname: "Sdr::ValidateBag"
+  classpath: "sdr_ingest/validate_bag"
+
 populate-metadata:
   prerequisite: validate-bag
   batch_limit: 200
   error_limit: 5
-  
+  classname: "Sdr::PopulateMetadata"
+  classpath: "sdr_ingest/populate_metadata"
+
 verify-agreement:
   prerequisite: populate-metadata  
   batch_limit: 200
   error_limit: 5
+  classname: "Sdr::VerifyAgreement"
+  classpath: "sdr_ingest/verify_agreement"
 
 complete-deposit:
   prerequisite: verify-agreement
   batch_limit: 200
   error_limit: 5  
+  classname: "Sdr::CompleteDeposit"
+  classpath: "sdr_ingest/complete_deposit"

@@ -50,7 +50,7 @@ class DirectoryQueue
   # @param [Integer] priority The single digit (1 - 9) priority to assign to all the items in the list,
   #   with lower numbers having higher priority
   # @return [Array<Pathname>] the list of pathnames created in the queue
-  def add_list(list, priority = 2)
+  def add_list(list, priority = 3)
     list.collect {|item| add_item(item, priority)}
   end
 

@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
 
-libdir = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
-$LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
-
-require File.join(File.dirname(__FILE__), "directory_queue")
+require 'environment'
+require 'directory_queue'
 require 'druid-tools'
 
 class DruidQueue < DirectoryQueue
@@ -11,30 +9,33 @@ class DruidQueue < DirectoryQueue
   def self.syntax
     puts <<-EOF
   
-    Syntax: env-exec.sh druid_queue.rb {ingest|migration} {enqueue|list} {druid|filename|query_batch_size}
-    
-    Workflow must be one of:
-      * ingest = normal SDR ingest
-      * migration = migration from bagit to moab structure
-    
-    Druid argument must be one of
+    Syntax: bundle-exec.sh druid_queue.rb {#{WorkflowNames.join('|')}}
+        [enqueue {druid|filename|query_batch_size}]  (add item(s) to queue)
+        [size]     (report how many items are in the queue)
+        [list {n}]  (list the first n items that are in the queue)
+
+    If Request type is 'enqueue', then druid argument must be one of
       * a valid druid
       * name of a file containing a list of druids
       * the next {query_batch_size} druids that are waiting in the workflow
 
+    If request type is 'count', then the size of the queue is reported
+
+    If request type is 'top', then the first (n) items in the queue are reported
+
     EOF
   end
   
-  def initialize(queue_home, workflow)
-    raise "Workflow not recognized: #{workflow}" unless %w{ingest migration}.include?(workflow)
+  def initialize(workflow)
     @workflow = workflow
-    super(Pathname(queue_home).join(workflow))
+    queue_pathname = AppHome.join("log",workflow,"current","queue")
+    super(queue_pathname)
   end
 
   def enqueue(druid_arg)
-    if druid_arg =~ /\A(?:druid:)?([a-z]{2})(\d{3})([a-z]{2})(\d{4})\z/
+    if druid_arg.to_s =~ /\A(?:druid:)?([a-z]{2})(\d{3})([a-z]{2})(\d{4})\z/
       add_item(druid_arg)
-    elsif Pathname(druid_arg).exist?
+    elsif Pathname(druid_arg.to_s).exist?
       add_list_from_file(druid_arg)
     elsif is_integer?(druid_arg)
       add_workflow_waiting(Integer(druid_arg))
@@ -50,21 +51,21 @@ class DruidQueue < DirectoryQueue
   end
 
   def add_workflow_waiting(druid_arg)
-    if druid_arg > 1000
-      puts "Limiting batch size to 1000 or less"
-      batch_size =  1000
+    if druid_arg > 4000
+      puts "Limiting batch size to 4000 or less"
+      batch_size =  4000
     else
       batch_size =  druid_arg
     end
     require 'boot'
-    if @workflow =~ /ingest/
+    if @workflow == 'sdrIngestWF'
       druids = Dor::WorkflowService.get_objects_for_workstep(
-          completed='start-ingest', waiting='register-sdr', repository='sdr', workflow='sdrIngestWF')
-    elsif @workflow =~ /migration/
+          completed='start-ingest', waiting='register-sdr', repository='sdr', workflow=@workflow)
+    elsif @workflow == 'sdrMigrationWF'
       druids = Dor::WorkflowService.get_objects_for_workstep(
-          completed='migration-start', waiting='migration-register', repository='sdr', workflow='sdrMigrationWF')
+          completed='migration-start', waiting='migration-register', repository='sdr', workflow=@workflow)
     end
-    add_list(druids[0..(batch_size-1)])
+    add_list(druids[0...batch_size],4)
   end
 
   # @param [String] item The unfiltered item identifer to be added to the queue
@@ -88,14 +89,16 @@ end
 # This is the equivalent of a java main method
 if __FILE__ == $0
 
-  if %w{ingest migration}.include?(ARGV[0].to_s)
-    queue_home = Pathname(__FILE__).expand_path.parent.parent.join("queue").to_s
-    druid_queue = DruidQueue.new(queue_home,ARGV[0])
+  workflow = ARGV[0].to_s
+  if WorkflowNames.include?(workflow)
+    druid_queue = DruidQueue.new(workflow)
     case ARGV[1].to_s.upcase
       when 'ENQUEUE'
         druid_queue.enqueue(ARGV[2])
+      when 'SIZE'
+        puts druid_queue.queue_size
       when 'LIST'
-        puts druid_queue.top_file(n=100)
+        puts druid_queue.top_file(n=ARGV[2].to_i)
       else
         DruidQueue.syntax
     end
