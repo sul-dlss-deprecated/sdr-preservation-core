@@ -19,13 +19,20 @@ class StatusWorkflow  < Status
     puts <<-EOF
 
     Syntax: bundle-exec.sh status_workflow.rb {#{WorkflowNames.join('|')}} {detail|summary|waiting}
-
-    result:
-      detail returns list of workflow steps with waiting,error,completed counts for each
-      summary returns overall workflow's waiting,error,recently completed, and archived counts
-      waiting returns the number of items whose first step has "waiting" status
     EOF
+    self.options
+  end
 
+  def self.options()
+    puts <<-EOF
+
+    workflow options:
+"
+      detail  = returns list of workflow steps with waiting,error,completed counts for each
+      summary = returns overall workflow's waiting,error,recently completed, and archived counts
+      waiting = returns the number of items whose first step has "waiting" status
+
+    EOF
   end
 
   def initialize(workflow)
@@ -180,25 +187,29 @@ class StatusWorkflow  < Status
     s
   end
 
+  def exec(args)
+    case args.shift.to_s.upcase
+      when 'DETAIL'
+        detail = workflow_status_detail
+        puts report_context + report_status_detail(detail)
+      when 'SUMMARY'
+        summary = workflow_status_summary
+        puts report_context + report_status_summary(summary)
+      when 'WAITING'
+        puts "#{workflow_waiting}\n"
+      else
+        StatusWorkflow.options
+    end
+  end
+
 end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  workflow = ARGV[0].to_s
+  workflow = ARGV.shift.to_s
   if WorkflowNames.include?(workflow)
     sw = StatusWorkflow.new(workflow)
-    case ARGV[1].to_s .upcase
-      when 'DETAIL'
-        detail = sw.workflow_status_detail
-        puts sw.report_context + sw.report_status_detail(detail)
-      when 'SUMMARY'
-        summary = sw.workflow_status_summary
-        puts sw.report_context + sw.report_status_summary(summary)
-      when 'WAITING'
-        puts "#{sw.workflow_waiting}\n"
-      else
-        StatusWorkflow.syntax
-    end
+    sw.exec(ARGV)
   else
     StatusWorkflow.syntax
   end

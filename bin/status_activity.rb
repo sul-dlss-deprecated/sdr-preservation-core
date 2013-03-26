@@ -20,11 +20,18 @@ class StatusActivity < Status
     puts <<-EOF
 
     Syntax: bundle-exec.sh status_activity.rb {#{WorkflowNames.join('|')}} {history|errors|realtime}
+    EOF
+    self.options
+  end
 
-    Report mode must be one of
-      * history = recent ingest details
-      * errors = error details
-      * realtime = what is happening right now
+  def self.options
+    puts <<-EOF
+
+    activity options:
+
+      history  = recent ingest details
+      errors   = error details
+      realtime = what is happening right now
 
     EOF
   end
@@ -130,35 +137,41 @@ class StatusActivity < Status
     s
   end
 
-end
-
-# This is the equivalent of a java main method
-if __FILE__ == $0
-  workflow = ARGV[0].to_s
-  if WorkflowNames.include?(workflow)
-    sa = StatusActivity.new(workflow)
-    case ARGV[1].to_s.upcase
+  def exec(args)
+    case args.shift.to_s.upcase
       when 'HISTORY'
-        puts sa.report_ingest_history(30)
+        puts report_ingest_history(30)
       when 'ERRORS'
-        errors = sa.error_history
-        puts sa.report_context + sa.report_error_history(errors)
+        errors = error_history
+        puts report_context + report_error_history(errors)
       when 'REALTIME'
-        rts = sa.real_time_statistics
+        rts = real_time_statistics
+        rpt = report_context + report_realtime_activity(*rts)
         while true
-          if ARGV[2].to_s.upcase == 'LOOP'
+          if args.shift.to_s.upcase == 'LOOP'
             print `clear`
-            puts sa.report_context + sa.report_realtime_activity(*rts)
+            puts rpt
             STDOUT.flush
-            sleep (ARGV[3] ? ARGV[3].to_i : 20)
+            seconds = args.shift
+            sleep (seconds ? seconds.to_i : 20)
           else
             puts rpt
             break
           end
         end
       else
-        StatusActivity.syntax
+        StatusActivity.options
     end
+  end
+
+end
+
+# This is the equivalent of a java main method
+if __FILE__ == $0
+  workflow = ARGV.shift.to_s
+  if WorkflowNames.include?(workflow)
+    sa = StatusActivity.new(workflow)
+    sa.exec(ARGV)
   else
     StatusActivity.syntax
   end

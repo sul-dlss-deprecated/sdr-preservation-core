@@ -13,16 +13,20 @@ class StatusMonitor
     puts <<-EOF
 
     Syntax: bundle-exec.sh status_monitor.rb  {#{WorkflowNames.join('|')}} {report|queue}
-
-    report = just check status once and output reports
-       options:  loop n  (re-run the report every n seconds )
-
-    queue = check status and enqueue new objects if appropriate
-
     EOF
-
+    self.options
   end
 
+  def self.options()
+    puts <<-EOF
+
+    monitor options:
+
+      report [loop n] = Report overall status.  Optionally re-run the report every n seconds
+      queue           = Check status and enqueue new objects if appropriate
+
+    EOF
+  end
 
   def initialize(workflow)
     @workflow = workflow
@@ -136,33 +140,38 @@ class StatusMonitor
     s << (sprintf "%s", error_rpt)
   end
 
+  def exec(args)
+    case args.shift.to_s.upcase
+       when 'REPORT'
+         while true
+           monitor_status
+           rpt = report_status
+           if args.shift.to_s.upcase == 'LOOP'
+             puts `clear`
+             puts rpt
+             STDOUT.flush
+             seconds = args.shift
+             sleep (seconds ? seconds.to_i : 20)
+           else
+             puts rpt
+             break
+           end
+         end
+       when 'QUEUE'
+         monitor_queue
+       else
+         StatusMonitor.options
+     end
+  end
+
 end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  workflow = ARGV[0].to_s
+  workflow = ARGV.shift.to_s
   if WorkflowNames.include?(workflow)
     sm = StatusMonitor.new(workflow)
-    case ARGV[1].to_s.upcase
-      when 'REPORT'
-        while true
-          sm.monitor_status
-          rpt = sm.report_status
-          if ARGV[2].to_s.upcase == 'LOOP'
-            puts `clear`
-            puts rpt
-            STDOUT.flush
-            sleep (ARGV[3] ? ARGV[3].to_i : 20)
-          else
-            puts rpt
-            break
-          end
-        end
-      when 'QUEUE'
-        sm.monitor_queue
-      else
-        StatusMonitor.syntax
-    end
+    sm.exec(ARGV)
   else
     StatusMonitor.syntax
   end

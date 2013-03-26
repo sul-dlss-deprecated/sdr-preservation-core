@@ -9,13 +9,23 @@ class StatusProcess < Status
     puts <<-EOF
 
     Syntax: bundle-exec.sh status_process.rb {#{WorkflowNames.join('|')}}
-        [config {state} {max} {open} {close}]
-        [state [RUN|STOP]] = allow processes to start, or cause processes to terminate
-        [max {number of processes}] = how many parallel pipelines to run
-        [window {open} {close}] = the range of hours in which workflow is operational
-        [start?] = return true if ok to start a new pipeline process
-        [stop?] = return true if pipeline process should be terminated
-        [list]  (what pipeline processes are running and what are they doing)
+    EOF
+    self.options
+  end
+
+  def self.options
+    puts <<-EOF
+
+    process options:
+
+      config {state} {max} {open} {close}
+        state [RUN|STOP] = allow processes to start, or cause processes to terminate
+        max {number of processes} = how many parallel pipelines to run
+        window {open} {close} = the range of hours in which workflow is operational
+      pipeline = run robot pipelines based on values of config settings
+      start? = return true if ok to start a new pipeline process
+      stop?  = return true if pipeline process should be terminated
+      list   = what pipeline processes are running and what are they doing)
 
     EOF
   end
@@ -42,12 +52,14 @@ class StatusProcess < Status
   end
 
   def set_state(state)
+    return if state.nil?
     config = read_config
     config[:state] = state.upcase
     write_config(config)
   end
 
   def set_max(max)
+    return if max.nil?
     config = read_config
     config[:max] = max.to_i
     write_config(config)
@@ -122,37 +134,43 @@ class StatusProcess < Status
     s
   end
 
+  def exec(args)
+    case args.shift.to_s.upcase
+      when 'CONFIG'
+        set_config(*args) if args.size == 4
+        puts read_config.inspect
+      when 'STATE'
+        set_state(args.shift) if args.size == 1
+        puts read_config.inspect
+      when 'MAX'
+        set_max(args.shift) if args.size == 1
+        puts read_config.inspect
+      when 'WINDOW'
+        set_window(*args)  if args.size == 2
+        puts read_config.inspect
+      when 'PIPELINE'
+        `echo #{BinHome}/run-pipelines.sh sdrIngestWF | at now`
+      when 'START?'
+        start,why_not = start_process?
+        puts start.to_s
+      when 'STOP?'
+        stop,why = stop_process?
+        puts stop.to_s
+      when 'LIST'
+        puts report_context +  report_process_list
+      else
+        StatusProcess.options
+    end
+  end
+
 end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  workflow = ARGV[0].to_s
+  workflow = ARGV.shift.to_s
   if WorkflowNames.include?(workflow)
     sp = StatusProcess.new(workflow)
-    case ARGV[1].to_s.upcase
-      when 'CONFIG'
-        sp.set_config(*ARGV[2..5]) if ARGV[5]
-        puts sp.read_config.inspect
-      when 'STATE'
-        sp.set_state(ARGV[2]) if ARGV[2]
-        puts sp.read_config.inspect
-      when 'MAX'
-        sp.set_max(ARGV[2]) if ARGV[2]
-        puts sp.read_config.inspect
-      when 'WINDOW'
-        sp.set_window(*ARGV[2..3]) if ARGV[3]
-        puts sp.read_config.inspect
-      when 'START?'
-        start,why_not = sp.start_process?
-        puts start.to_s
-      when 'STOP?'
-        stop,why = sp.stop_process?
-        puts stop.to_s
-      when 'LIST'
-        puts sp.report_context +  sp.report_process_list
-      else
-        StatusProcess.syntax
-    end
+    sp.exec(ARGV)
   else
     StatusProcess.syntax
   end

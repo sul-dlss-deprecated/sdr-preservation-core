@@ -71,11 +71,15 @@ class StatusStorage < Status
     warnings
   end
 
+  def exec(args)
+    areas = storage_areas
+    puts report_context + report_storage_status(areas,args.shift)
+  end
+
 end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
   ss = StatusStorage.new
-  areas = ss.storage_areas
-  puts ss.report_context + ss.report_storage_status(areas,ARGV[0])
+  ss.exec(ARGV)
 end

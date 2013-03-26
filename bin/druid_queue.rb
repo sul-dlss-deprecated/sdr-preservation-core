@@ -10,18 +10,27 @@ class DruidQueue < DirectoryQueue
     puts <<-EOF
   
     Syntax: bundle-exec.sh druid_queue.rb {#{WorkflowNames.join('|')}}
-        [enqueue {druid|filename|query_batch_size}]  (add item(s) to queue)
-        [size]     (report how many items are in the queue)
-        [list {n}]  (list the first n items that are in the queue)
+    EOF
+    self.options
+  end
+
+  def self.options
+    puts <<-EOF
+
+    queue options:
+
+      enqueue {druid|filename|query_batch_size} =  add item(s) to queue
+      size     = report how many items are in the queue
+      list {n} = list the first n items that are in the queue
 
     If Request type is 'enqueue', then druid argument must be one of
       * a valid druid
       * name of a file containing a list of druids
       * the next {query_batch_size} druids that are waiting in the workflow
 
-    If request type is 'count', then the size of the queue is reported
+    If request type is 'size', then the size of the queue is reported
 
-    If request type is 'top', then the first (n) items in the queue are reported
+    If request type is 'list n', then the first (n) items in the queue are listed
 
     EOF
   end
@@ -84,24 +93,28 @@ class DruidQueue < DirectoryQueue
     dt.druid
   end
 
+  def exec(args)
+    case args.shift.to_s.upcase
+      when 'ENQUEUE'
+        enqueue(args.shift)
+      when 'SIZE'
+        puts queue_size
+      when 'LIST'
+        puts top_file(n=args.shift.to_i)
+      else
+        DruidQueue.options
+    end
+  end
+
 end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
 
-  workflow = ARGV[0].to_s
+  workflow = ARGV.shift.to_s
   if WorkflowNames.include?(workflow)
     druid_queue = DruidQueue.new(workflow)
-    case ARGV[1].to_s.upcase
-      when 'ENQUEUE'
-        druid_queue.enqueue(ARGV[2])
-      when 'SIZE'
-        puts druid_queue.queue_size
-      when 'LIST'
-        puts druid_queue.top_file(n=ARGV[2].to_i)
-      else
-        DruidQueue.syntax
-    end
+    druid_queue.exec(ARGV)
   else
     DruidQueue.syntax
   end
