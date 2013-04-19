@@ -27,7 +27,7 @@ class StatusWorkflow  < Status
     puts <<-EOF
 
     workflow options:
-"
+
       detail  = returns list of workflow steps with waiting,error,completed counts for each
       summary = returns overall workflow's waiting,error,recently completed, and archived counts
       waiting = returns the number of items whose first step has "waiting" status

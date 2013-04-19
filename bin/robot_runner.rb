@@ -74,6 +74,9 @@ class RobotRunner
     druid_queue = DruidQueue.new(@workflow)
     sequential_errors = 0
     error_sleep = [0,60,300,1000]
+    druid = nil
+    status = nil
+    logfile = nil
     while true
       stop,why = @status_process.stop_process?
       return why if stop
@@ -109,21 +112,31 @@ class RobotRunner
         sleep 300
       end
     end
+  rescue Exception => e
+    @item_counts[:fatal] += 1
+    @status_process.set_state("FATAL ERROR")
+    email_log_file(druid, logfile, 'process_queue error') if logfile
+    `echo "#{$!.inspect}\n#{$@}" | mail -s '#{@workflow} - process_queue error detail for #{druid}' $USER `
+    return "fatal error"
   end
 
 
   def initialize_logfile(druid)
     druid_id = druid.split(/:/)[-1]
-    log = "#{AppHome}/log/#{@workflow}/current/active/#{druid_id}"
-    logfile = Pathname(log)
-    logfile.parent.mkpath
-    LyberCore::Log.set_logfile(log)
+    activelog = Pathname("#{AppHome}/log/#{@workflow}/current/active/#{druid_id}")
+    errorlog = Pathname("#{AppHome}/log/#{@workflow}/current/error/#{druid_id}")
+    if errorlog.exist?
+      activelog.make_link(errorlog)
+      errorlog.unlink
+    end
+    activelog.parent.mkpath
+    LyberCore::Log.set_logfile(activelog.to_s)
     LyberCore::Log.set_level(@loglevel || Logger::INFO)
     LyberCore::Log.info "druid = #{druid}"
     LyberCore::Log.info "workflow = #{@workflow}"
     LyberCore::Log.info "environment = #{@environment}"
     LyberCore::Log.info "timestamp = #{Time.now.iso8601}"
-    logfile
+    activelog
   end
 
   # run all robots (in sequence) to process the specified druid
@@ -246,7 +259,13 @@ class RobotRunner
     logdir = status == 'fatal' ? 'error' : status
     log_destination=logfile.parent.parent.join(logdir,logfile.basename)
     log_destination.parent.mkpath
-    log_destination.make_link(logfile)
+    if log_destination.exist?
+      log_destination.open('a') do |f|
+        f << logfile.read
+      end
+    else
+      log_destination.make_link(logfile)
+    end
     logfile.unlink
     log_destination
   end

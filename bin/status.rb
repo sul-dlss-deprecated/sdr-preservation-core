@@ -2,7 +2,7 @@ class Status
 
   def report_context
     environment = ENV["ROBOT_ENVIRONMENT"].capitalize
-    context = "\n#{environment} Status on #{`hostname -s`.chomp}\n"
+    context = "\n#{environment} Status on #{`hostname -s`.chomp} as of #{Time.now.strftime('%Y-%m-%d')}\n"
     context
   end
 
