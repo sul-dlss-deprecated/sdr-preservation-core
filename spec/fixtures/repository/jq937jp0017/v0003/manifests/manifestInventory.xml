@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fileInventory type="manifests" objectId="druid:jq937jp0017" versionId="3" inventoryDatetime="2012-11-13T22:24:25Z" fileCount="4" byteCount="15266" blockCount="17">
+  <fileGroup groupId="manifests" dataSource="/Users/rnanders/Code/Ruby/moab-versioning/spec/fixtures/derivatives/ingests/jq937jp0017/v0003/manifests" fileCount="4" byteCount="15266" blockCount="17">
+    <file>
+      <fileSignature size="4451" md5="9b4b46f70ca4d0b4dbb437fd38286aad" sha1="3f36c8d2f07c3f3d9acb429fd254219c1a5cb4e1" sha256="8945a9ecc6cc50325a3bb55e1d0e822ac1ad2dc4ed8021f641abb93ef14e7536"/>
+      <fileInstance path="fileInventoryDifference.xml" datetime="2012-11-13T22:24:25Z"/>
+    </file>
+    <file>
+      <fileSignature size="5613" md5="ba748e2e87926cd05132d8ae89796497" sha1="bc3412b3e1edf563e1aee10e53ed5edafe143a5e" sha256="4c75c9b324b01c5785b7ea9c279f5596d75f30f2862c10be8eda6aa76d972c11"/>
+      <fileInstance path="signatureCatalog.xml" datetime="2012-11-13T22:24:25Z"/>
+    </file>
+    <file>
+      <fileSignature size="1631" md5="6d160c8e4c96ec2a84ac3eda93df4dfd" sha1="a702b7b337195adb081c8a07cb8e7210433a7dcd" sha256="19ad80fef2c7d24f308c59b34bf4c0fd870dd027e3f783b5afccfaea2556477f"/>
+      <fileInstance path="versionAdditions.xml" datetime="2012-11-13T22:23:48Z"/>
+    </file>
+    <file>
+      <fileSignature size="3571" md5="bc8b3331fb180f3eb733882ac90b0277" sha1="bb49afc125a4411cb4a79d3debd5f418ffafc151" sha256="7a5bc970c57c6d04d8d7d45f364c0b5a53a5469540dc483f01b9c3d4be2656cd"/>
+      <fileInstance path="versionInventory.xml" datetime="2012-11-13T22:23:48Z"/>
+    </file>
+  </fileGroup>
+</fileInventory>

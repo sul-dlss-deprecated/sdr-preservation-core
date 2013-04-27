@@ -1,0 +1,40 @@
+recovery-start:
+  batch_limit: 1000
+  error_limit: 5
+  classname: "Sdr::RecoveryStart"
+  classpath: "sdr_recovery/recovery_start.rb"
+
+recovery-register:
+  prerequisite: recovery-start
+  batch_limit: 1000
+  error_limit: 5
+  classname: "Sdr::RecoveryRegister"
+  classpath: "sdr_recovery/recovery_register.rb"
+
+recovery-validate:
+  prerequisite: recovery-register
+  batch_limit: 200
+  error_limit: 5
+  classname: "Sdr::RecoveryTransfer"
+  classpath: "sdr_recovery/recovery_transfer.rb"
+
+recovery-restore:
+  prerequisite: recovery-validate
+  batch_limit: 200
+  error_limit: 5
+  classname: "Sdr::RecoveryRestore"
+  classpath: "sdr_recovery/recovery_restore.rb"
+
+recovery-metadata:
+  prerequisite: recovery-restore
+  batch_limit: 200
+  error_limit: 5
+  classname: "Sdr::RecoveryMetadata"
+  classpath: "sdr_recovery/recovery_metadata.rb"
+
+recovery-cleanup:
+  prerequisite: recovery-metadata
+  batch_limit: 200
+  error_limit: 5  
+  classname: "Sdr::RecoveryCleanup"
+  classpath: "sdr_recovery/recovery_cleanup.rb"

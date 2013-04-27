@@ -54,6 +54,7 @@ module Sdr
     sdr_deposit_home "/services-disk02/deposit"
     old_storage_node "/services-disk/sdr2objects"
     storage_node "/services-disk02/sdr2objects"
+    sdr_recovery_home nil
     example_objects "/services-disk02/examples"
   end
 end

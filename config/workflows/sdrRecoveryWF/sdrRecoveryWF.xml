@@ -1,0 +1,8 @@
+<workflow id="sdrRecoveryWF">
+     <process name="recovery-start" status="completed" />
+     <process name="recovery-register" status="waiting" />
+     <process name="recovery-validate" status="waiting" />
+     <process name="recovery-restore" status="waiting" />
+     <process name="recovery-metadata" status="waiting"/>
+     <process name="recovery-cleanup" lifecycle="recovered" status="waiting" />
+</workflow>
