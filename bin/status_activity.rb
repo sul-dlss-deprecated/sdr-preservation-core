@@ -93,8 +93,8 @@ class StatusActivity < Status
     ie.druid = logfile.basename.to_s
     errors = logfile.each_line.grep(/ERROR/) + logfile.each_line.grep(/FATAL/)
     return nil if errors.empty?
-    error_line = errors.first.chomp
-    offset = error_line.index(ie.druid)+11 || error_line.index("::")+3
+    error_line = errors.last.chomp
+    offset = error_line.index(ie.druid) ? error_line.index(ie.druid)+11 : error_line.index("::")+3
     ie.error = error_line[offset..-1]
     ie
   end

@@ -7,7 +7,7 @@
 #
 # command line:
 #               cd ~/sdr2/current/bin
-#               echo ./run-pipelines.sh sdrIngestWF | at now
+#               echo ./run-pipelines.sh {sdrIngestWF|sdrMigrationWF|sdrRecoveryWF} | at now
 
 # exit the script if simple command fails
 set -e

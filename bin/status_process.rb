@@ -149,7 +149,7 @@ class StatusProcess < Status
         set_window(*args)  if args.size == 2
         puts read_config.inspect
       when 'PIPELINE'
-        `echo #{BinHome}/run-pipelines.sh sdrIngestWF | at now`
+        `echo #{BinHome}/run-pipelines.sh #{@workflow} | at now`
       when 'START?'
         start,why_not = start_process?
         puts start.to_s

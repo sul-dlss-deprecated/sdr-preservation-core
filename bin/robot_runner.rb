@@ -77,11 +77,13 @@ class RobotRunner
     druid = nil
     status = nil
     logfile = nil
+    sleeping = nil
     while true
       stop,why = @status_process.stop_process?
       return why if stop
       druid = druid_queue.next_item
       if druid
+        sleeping = false
         logfile = initialize_logfile(druid)
         status = process_druid(druid, logfile)
         logfile = move_logfile(logfile, status)
@@ -108,8 +110,9 @@ class RobotRunner
             sequential_errors = 0
         end
       else
-        @status_process.write_process_status($$, "sleeping", "empty queue")
-        sleep 300
+        @status_process.write_process_status($$, "sleeping", "empty queue") unless sleeping
+        sleeping = true
+        sleep 10
       end
     end
   rescue Exception => e

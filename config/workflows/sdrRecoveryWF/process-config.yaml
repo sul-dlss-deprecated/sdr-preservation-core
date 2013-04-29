@@ -15,8 +15,8 @@ recovery-validate:
   prerequisite: recovery-register
   batch_limit: 200
   error_limit: 5
-  classname: "Sdr::RecoveryTransfer"
-  classpath: "sdr_recovery/recovery_transfer.rb"
+  classname: "Sdr::RecoveryValidate"
+  classpath: "sdr_recovery/recovery_validate.rb"
 
 recovery-restore:
   prerequisite: recovery-validate

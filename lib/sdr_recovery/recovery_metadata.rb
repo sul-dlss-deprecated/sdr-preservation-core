@@ -21,8 +21,14 @@ module Sdr
       self.metadata_datastreams.each do |dsname|
         begin
           filepath = cv.find_filepath('metadata', "#{dsname}.xml")
-          set_datastream_content(sedora_object, filepath, dsname)
+          if filepath.exist?
+            sedora_object.datastreams[dsname].content = filepath.read
+            LyberCore::Log.info("datastream #{dsname} content set from #{filepath}")
+          else
+            LyberCore::Log.info("datastream #{dsname} not set because #{filepath} does not exist")
+          end
         rescue Moab::FileNotFoundException
+          LyberCore::Log.info("datastream #{dsname} not set because metadata file was not found")
         end
       end
       sedora_object.save

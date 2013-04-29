@@ -33,7 +33,7 @@ module Sdr
     def recovery_restore(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter recovery_restore")
       repository = Stanford::StorageRepository.new
-      storage_object = repository.storage_object(druid)
+      storage_object = repository.storage_object(druid,create=true)
       recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(druid.sub('druid:',''))
       storage_object.restore_object(recovery_path)
     rescue Exception => e

@@ -32,6 +32,19 @@ class Menu
     @latest_item =  @status_home.join("latest-item.txt")
     @ingest_history =  @status_home.join("ingest-history.txt")
     @error_report = @status_home.join("error-history.txt")
+    initialize_log_current
+  end
+
+  def initialize_log_current
+    current = AppHome.join('log',@workflow,'current')
+    unless current.exist?
+      current.mkpath
+      subdirs=%w{active completed error processes queue status}
+      subdirs.each { |subdir| current.join(subdir).mkdir }
+      active = current.join('active')
+      FileUtils.touch active.join('ingest-history.txt').to_s
+      @status_process.set_config('RUN',1,6,22)
+    end
   end
 
   def menu(args=nil)
