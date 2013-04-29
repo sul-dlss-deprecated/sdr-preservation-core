@@ -16,20 +16,10 @@ module Sdr
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter populate_metadata")
       repository = Stanford::StorageRepository.new
       storage_object = repository.storage_object(druid)
-      cv = storage_object.current_version
+      current_version = storage_object.current_version
       sedora_object = Sdr::SedoraObject.find(druid)
-      self.metadata_datastreams.each do |dsname|
-        begin
-          filepath = cv.find_filepath('metadata', "#{dsname}.xml")
-          if filepath.exist?
-            sedora_object.datastreams[dsname].content = filepath.read
-            LyberCore::Log.info("datastream #{dsname} content set from #{filepath}")
-          else
-            LyberCore::Log.info("datastream #{dsname} not set because #{filepath} does not exist")
-          end
-        rescue Moab::FileNotFoundException
-          LyberCore::Log.info("datastream #{dsname} not set because metadata file was not found")
-        end
+      self.metadata_datastreams.each do |dsid|
+        set_datastream_content(sedora_object, current_version, dsid)
       end
       sedora_object.save
       sedora_object
@@ -39,6 +29,7 @@ module Sdr
       raise LyberCore::Exceptions::FatalError.new("Cannot process item #{druid}",e)
     end
 
+    # @return [Array<String>] The list of datastream IDs that should be saved to sedora
     def metadata_datastreams
       md = Array.new
       md << 'identityMetadata'
@@ -46,6 +37,26 @@ module Sdr
       md << 'provenanceMetadata'
       md << 'relationshipMetadata'
       md
+    end
+
+    # @param sedora_object [SedoraObject] The Fedora object to which datatream content is to be saved
+    # @param current_version [Object] The version that is used to locate the metadata file
+    # @param dsid [String] The datastream identifier, which is also the basename of the XML data file
+    # @return [void] Perform the following steps:
+    #   - Determine the metadata files full path in the bagit object,
+    #   - determine if the metadata file exists, and if so
+    #   - copy the content of the metadata file to the datastream.
+    # @raise [LyberCore::Exceptions::FatalError] if we can't find the file
+    def set_datastream_content(sedora_object, current_version, dsid)
+      filepath = current_version.find_filepath('metadata', "#{dsid}.xml")
+      if filepath.exist?
+        sedora_object.datastreams[dsid].content = filepath.read
+        LyberCore::Log.info("datastream #{dsid} content set from #{filepath}")
+      else
+        LyberCore::Log.info("datastream #{dsid} not set because #{filepath} does not exist")
+      end
+    rescue Moab::FileNotFoundException
+      LyberCore::Log.info("datastream #{dsid} not set because metadata file was not found")
     end
 
     def verification_queries(druid)

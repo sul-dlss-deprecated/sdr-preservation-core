@@ -32,7 +32,7 @@ describe Sdr::RecoveryRestore do
     storage_object = mock(Moab::StorageObject)
     recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(@druid.sub('druid:',''))
     Stanford::StorageRepository.should_receive(:new).and_return(repository)
-    repository.should_receive(:storage_object).with(@druid).and_return(storage_object)
+    repository.should_receive(:storage_object).with(@druid,true).and_return(storage_object)
     storage_object.should_receive(:restore_object).with(recovery_path)
     @rr.recovery_restore(@druid)
   end

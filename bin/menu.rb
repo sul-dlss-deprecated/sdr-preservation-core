@@ -41,8 +41,8 @@ class Menu
       current.mkpath
       subdirs=%w{active completed error processes queue status}
       subdirs.each { |subdir| current.join(subdir).mkdir }
-      active = current.join('active')
-      FileUtils.touch active.join('ingest-history.txt').to_s
+      status = current.join('status')
+      FileUtils.touch status.join('ingest-history.txt').to_s
       @status_process.set_config('RUN',1,6,22)
     end
   end
