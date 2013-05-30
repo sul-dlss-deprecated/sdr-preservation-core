@@ -34,6 +34,9 @@ describe Sdr::RecoveryRestore do
     Stanford::StorageRepository.should_receive(:new).and_return(repository)
     repository.should_receive(:storage_object).with(@druid,true).and_return(storage_object)
     storage_object.should_receive(:restore_object).with(recovery_path)
+    verification_result = mock(VerificationResult)
+    verification_result.stub(:verified).and_return(true)
+    storage_object.should_receive(:verify_object_storage).and_return(verification_result)
     @rr.recovery_restore(@druid)
   end
 

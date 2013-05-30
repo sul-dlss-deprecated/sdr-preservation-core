@@ -1,0 +1,6 @@
+audit-validate:
+  batch_limit: 200
+  error_limit: 5
+  classname: "Sdr::AuditValidate"
+  classpath: "sdr_audit/audit_validate.rb"
+

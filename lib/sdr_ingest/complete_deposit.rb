@@ -35,7 +35,11 @@ module Sdr
       bag_pathname = DepositObject.new(druid).bag_pathname()
       repository = Stanford::StorageRepository.new
       new_version = repository.store_new_object_version(druid, bag_pathname)
-      new_version.verify_storage
+      result = new_version.verify_version_storage
+      if result.verified == false
+        LyberCore::Log.info result.to_json(verbose=false)
+        raise LyberCore::Exceptions::ItemError.new(druid, "Failed verification",e)
+      end
       update_provenance(druid)
       bag_pathname.rmtree
     end

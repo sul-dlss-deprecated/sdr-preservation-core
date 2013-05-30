@@ -36,6 +36,11 @@ module Sdr
       storage_object = repository.storage_object(druid,create=true)
       recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(druid.sub('druid:',''))
       storage_object.restore_object(recovery_path)
+      result = storage_object.verify_object_storage
+      if result.verified == false
+        LyberCore::Log.info result.to_json(verbose=false)
+        raise LyberCore::Exceptions::ItemError.new(druid, "Failed validation",e)
+      end
     rescue Exception => e
       raise LyberCore::Exceptions::ItemError.new(druid, "Failed restore",e)
     end

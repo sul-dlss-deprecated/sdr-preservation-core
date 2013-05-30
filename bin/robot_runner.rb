@@ -185,7 +185,7 @@ class RobotRunner
         robot_status = Dor::WorkflowService.get_workflow_status(
             'sdr', druid, @workflow, robot.name)
       rescue
-        robot_status = ['Sdr::MigrationStart','Sdr::RecoveryStart'].include?(robot.classname) ? 'waiting' : 'unknown'
+        robot_status = ['Sdr::MigrationStart','Sdr::RecoveryStart','Sdr::AuditValidate'].include?(robot.classname) ? 'waiting' : 'unknown'
       end
       #@breakdown.check_status += (Time.now - t0)
       #t0=Time.now
