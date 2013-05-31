@@ -1,5 +1,5 @@
 <workflow id="sdrAuditWF">
      <process name="audit-start" status="completed" />
-     <process name="audit-validate" status="waiting" />
+     <process name="audit-verify" status="waiting" />
      <process name="audit-metadata" status="waiting"/>
 </workflow>

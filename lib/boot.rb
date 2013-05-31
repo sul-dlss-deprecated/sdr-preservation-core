@@ -56,6 +56,7 @@ module Sdr
     storage_node "/services-disk02/sdr2objects"
     sdr_recovery_home nil
     example_objects "/services-disk02/examples"
+    audit_verbose false
   end
 end
 

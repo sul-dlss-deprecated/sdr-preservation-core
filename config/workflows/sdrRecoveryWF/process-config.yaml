@@ -11,15 +11,15 @@ recovery-register:
   classname: "Sdr::RecoveryRegister"
   classpath: "sdr_recovery/recovery_register.rb"
 
-recovery-validate:
+recovery-verify:
   prerequisite: recovery-register
   batch_limit: 200
   error_limit: 5
-  classname: "Sdr::RecoveryValidate"
-  classpath: "sdr_recovery/recovery_validate.rb"
+  classname: "Sdr::RecoveryVerify"
+  classpath: "sdr_recovery/recovery_verify.rb"
 
 recovery-restore:
-  prerequisite: recovery-validate
+  prerequisite: recovery-verify
   batch_limit: 200
   error_limit: 5
   classname: "Sdr::RecoveryRestore"

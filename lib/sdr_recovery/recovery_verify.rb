@@ -4,17 +4,17 @@ require 'boot'
 module Sdr
 
   # Robot for validating recovered object versions
-  class RecoveryValidate < LyberCore::Robots::Robot
+  class RecoveryVerify < LyberCore::Robots::Robot
 
     # define class instance variables and getter method so that we can inherit from this class
     @workflow_name = 'sdrRecoveryWF'
-    @workflow_step = 'recovery-validate'
+    @workflow_step = 'recovery-verify'
     class << self
       attr_accessor :workflow_name
       attr_accessor :workflow_step
     end
 
-    # @return [RecoveryValidate] set workflow name, step name, log location, log severity level
+    # @return [RecoveryVerify] set workflow name, step name, log location, log severity level
     def initialize(opts = {})
       super(self.class.workflow_name, self.class.workflow_step, opts)
     end
@@ -25,13 +25,13 @@ module Sdr
     #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      recovery_validate(work_item.druid)
+      recovery_verify(work_item.druid)
     end
 
     # @param druid [String] The object identifier
-    # @return [Boolean] Validate the bag containing the digital object
-    def recovery_validate(druid)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter recovery_validate")
+    # @return [Boolean] Verify the bag containing the digital object
+    def recovery_verify(druid)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter recovery_verify")
       recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(druid.sub('druid:',''))
       recovery_object = Moab::StorageObject.new(druid,recovery_path)
       result = recovery_object.verify_object_storage
@@ -60,6 +60,6 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = Sdr::RecoveryValidate.new()
+  dm_robot = Sdr::RecoveryVerify.new()
   dm_robot.start
 end

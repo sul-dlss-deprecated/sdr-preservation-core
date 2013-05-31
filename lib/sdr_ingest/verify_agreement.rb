@@ -36,7 +36,7 @@ module Sdr
     # @return [Boolean] Find the APO or Agreement identifier in the object metadata,
     #   and verify that the identifer belongs to a previously ingested object
     def verify_agreement(druid)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter validate_agreement")
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter verify_agreement")
       LyberCore::Log.debug("Druid being processed is #{druid}")
       if apo_id = find_apo_id(druid) and verify_identifier(apo_id)
         LyberCore::Log.debug("APO id #{apo_id} was verified")
