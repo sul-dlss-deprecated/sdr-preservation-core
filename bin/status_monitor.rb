@@ -22,14 +22,15 @@ class StatusMonitor
 
     monitor options:
 
-      report [loop n] = Report overall status.  Optionally re-run the report every n seconds
-      queue           = Check status and enqueue new objects if appropriate
+      report [n] = Report overall status and re-run the report every n seconds
+      queue      = Check status and enqueue new objects if appropriate
 
     EOF
   end
 
   def initialize(workflow)
     @workflow = workflow
+    @environment = ENV['ROBOT_ENVIRONMENT']
     @druid_queue = DruidQueue.new(@workflow)
     @status_activity = StatusActivity.new(@workflow)
     @status_process = StatusProcess.new(@workflow)
@@ -49,9 +50,9 @@ class StatusMonitor
       unless @status_process.stop_process?.first
         workflow_waiting = @status_workflow.workflow_waiting
         if workflow_waiting > 0
-          @druid_queue.enqueue(4000)
+          @druid_queue.enqueue(Sdr::Config.enqueue_max)
           queue_size = @druid_queue.queue_size
-          message = "Queued #{queue_size} items to #{@workflow}"
+          message = "queued #{queue_size} items"
           @status_process.write_process_log(message)
           email(message)
         end
@@ -93,6 +94,7 @@ class StatusMonitor
   end
 
   def email(subject, message=nil)
+    subject = "#{@workflow} (#{@environment}) - #{subject}"
     case message
       when Pathname
         `cat #{message} | mail -s '#{subject}' $USER `
@@ -113,7 +115,7 @@ class StatusMonitor
   def monitor_errors
     if !@error_report.exist? or Time.now.day != @error_report.mtime.day
       errors = @status_activity.error_history.last(3)
-      report = @status_activity.report_error_history(errors)
+      report = @status_activity.report_error_history(errors,5)
       @error_report.open('w'){|f| f.write(report)}
     end
   end
@@ -143,22 +145,31 @@ class StatusMonitor
   def exec(args)
     case args.shift.to_s.upcase
        when 'REPORT'
+         seconds = (args.shift || 10).to_i
+         oldrpt = nil
          while true
            monitor_status
            rpt = report_status
-           if args.shift.to_s.upcase == 'LOOP'
-             puts `clear`
+           if rpt != oldrpt
+             # overwrite previous output (curser top left, clear screen)
+             print "\e[f\e[J" unless oldrpt.nil?
              puts rpt
              STDOUT.flush
-             seconds = args.shift
-             sleep (seconds ? seconds.to_i : 20)
-           else
-             puts rpt
-             break
+             oldrpt = rpt
+           end
+           begin
+             timeout(seconds) do
+               # exit method if user hits enter key
+               gets
+               return
+             end
+           rescue Timeout::Error
+             # loop again if specified number of seconds have elapsed
            end
          end
+
        when 'QUEUE'
-         monitor_queue
+         monitor_queue if @status_process.process_count > 0
        else
          StatusMonitor.options
      end

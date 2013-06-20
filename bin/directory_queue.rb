@@ -20,17 +20,18 @@ class DirectoryQueue
   end
 
    # @return [Array<String>] The queue id(s) of the first n item(s) in the queue
-  def top_item(n=1)
+  def top_item(n)
     top_id(n).map{|id| qfile_item(id)}
   end
 
   # @return [Array<String>] The queue id(s) of the first n item(s) in the queue
-  def top_id(n=1)
+  def top_id(n)
     top_file(n).map{|filename| filename.split(@delim).last }
   end
 
   # @return [Array<String>] The queue id(s) of the first n item(s) in the queue
-  def top_file(n=1)
+  def top_file(n)
+    n ||= 10
     qfiles = @qdir.children.sort.first(n)
     return [] if qfiles.nil? or qfiles.empty?
     qfiles.map{|f| f.basename.to_s}

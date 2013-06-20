@@ -19,18 +19,18 @@ class DruidQueue < DirectoryQueue
 
     queue options:
 
-      enqueue {druid|filename|query_batch_size} =  add item(s) to queue
+      add {druid|filename|query_batch_size} =  add item(s) to queue
       size     = report how many items are in the queue
-      list {n} = list the first n items that are in the queue
+      head {n} = list the first n items that are in the queue (default is 10)
 
-    If Request type is 'enqueue', then druid argument must be one of
-      * a valid druid
+    If Request type is 'add', then druid argument must be one of
+      * a valid druid (with or without "druid:" prefix)
       * name of a file containing a list of druids
-      * the next {query_batch_size} druids that are waiting in the workflow
+      * the number of druids to get from the workflow waiting list
 
     If request type is 'size', then the size of the queue is reported
 
-    If request type is 'list n', then the first (n) items in the queue are listed
+    If request type is 'head n', then the first (n) items in the queue are listed
 
     EOF
   end
@@ -44,12 +44,16 @@ class DruidQueue < DirectoryQueue
   def enqueue(druid_arg)
     if druid_arg.to_s =~ /\A(?:druid:)?([a-z]{2})(\d{3})([a-z]{2})(\d{4})\z/
       add_item(druid_arg)
+      true
     elsif Pathname(druid_arg.to_s).exist?
       add_list_from_file(druid_arg)
+      true
     elsif is_integer?(druid_arg)
       add_workflow_waiting(Integer(druid_arg))
+      true
     else
       DruidQueue.syntax
+      false
     end
   end
 
@@ -95,12 +99,14 @@ class DruidQueue < DirectoryQueue
 
   def exec(args)
     case args.shift.to_s.upcase
-      when 'ENQUEUE'
-        enqueue(args.shift)
+      when 'ADD'
+        puts "queue size = #{queue_size}" if enqueue(args.shift)
       when 'SIZE'
-        puts queue_size
-      when 'LIST'
-        puts top_file(n=args.shift.to_i)
+        puts "queue size = #{queue_size}"
+      when 'HEAD'
+        list = top_file(n=(args.shift || 10).to_i)
+        list = ['empty queue'] if list.empty?
+        puts list
       else
         DruidQueue.options
     end

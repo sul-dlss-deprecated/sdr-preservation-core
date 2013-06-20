@@ -196,7 +196,7 @@ class StatusWorkflow  < Status
         summary = workflow_status_summary
         puts report_context + report_status_summary(summary)
       when 'WAITING'
-        puts "#{workflow_waiting}\n"
+        puts "waiting = #{workflow_waiting}\n"
       else
         StatusWorkflow.options
     end

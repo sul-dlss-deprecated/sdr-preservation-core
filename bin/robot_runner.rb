@@ -53,13 +53,13 @@ class RobotRunner
   end
 
   def run_pipeline
-    subject = "Starting #{@workflow} pipeline"
+    subject = "#{@workflow} (#{@environment}) - starting pipeline"
     @status_process.write_process_log(subject)
     email_run_status(subject)
     status = process_queue
     message = @item_counts.inspect
     @status_process.write_process_log(message)
-    subject = "Stopping #{@workflow} pipeline: #{status}"
+    subject = "#{@workflow} (#{@environment}) - stopping pipeline: #{status}"
     @status_process.write_process_log(subject)
     email_run_status(subject, message)
     @status_process.delete_pid_file
@@ -96,8 +96,8 @@ class RobotRunner
           when 'error'
             @item_counts[:error] += 1
             sequential_errors += 1
+            email_log_file(druid, logfile, status)
             if sequential_errors > 1
-              email_log_file(druid, logfile, status)
               @status_process.write_process_status($$, "sleeping", "#{sequential_errors} errors")
               sleep (error_sleep[sequential_errors] || error_sleep.last)
               if sequential_errors > 3
@@ -119,7 +119,7 @@ class RobotRunner
     @item_counts[:fatal] += 1
     @status_process.set_state("FATAL ERROR")
     email_log_file(druid, logfile, 'process_queue error') if logfile
-    `echo "#{$!.inspect}\n#{$@}" | mail -s '#{@workflow} - process_queue error detail for #{druid}' $USER `
+    `echo "#{$!.inspect}\n#{$@}" | mail -s '#{@workflow} (#{@environment}) - process_queue error detail for #{druid}' $USER `
     return "fatal error"
   end
 
@@ -185,7 +185,7 @@ class RobotRunner
         robot_status = Dor::WorkflowService.get_workflow_status(
             'sdr', druid, @workflow, robot.name)
       rescue
-        robot_status = ['Sdr::MigrationStart','Sdr::RecoveryStart','Sdr::AuditValidate'].include?(robot.classname) ? 'waiting' : 'unknown'
+        robot_status = ['Sdr::MigrationStart','Sdr::RecoveryStart','Sdr::AuditVerify'].include?(robot.classname) ? 'waiting' : 'unknown'
       end
       #@breakdown.check_status += (Time.now - t0)
       #t0=Time.now
@@ -207,7 +207,7 @@ class RobotRunner
           end
         else
           LyberCore::Log.error "#{druid} #{robot.name} unexpected status = #{robot_status}"
-          return 'fatal'
+          return 'error'
       end
     rescue Exception
       LyberCore::Log.error "#{$!.inspect}\n#{$@}"
@@ -274,7 +274,7 @@ class RobotRunner
   end
 
   def email_log_file(druid, logfile, status)
-    `cat #{logfile} | mail -s '#{@workflow} - #{status} occurred for #{druid}' $USER `
+    `cat #{logfile} | mail -s '#{@workflow} (#{@environment}) - #{status} occurred for #{druid}' $USER `
   end
 
   def write_ingest_detail(druid)

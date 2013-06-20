@@ -38,7 +38,7 @@ module Sdr
       result = new_version.verify_version_storage
       if result.verified == false
         LyberCore::Log.info result.to_json(verbose=false)
-        raise LyberCore::Exceptions::ItemError.new(druid, "Failed verification",e)
+        raise LyberCore::Exceptions::ItemError.new(druid, "Failed verification")
       end
       update_provenance(druid)
       bag_pathname.rmtree

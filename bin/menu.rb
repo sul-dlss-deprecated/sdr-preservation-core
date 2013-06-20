@@ -19,6 +19,7 @@ class Menu
   end
 
   def initialize(workflow)
+    @environs = ENV['ROBOT_ENVIRONMENT'][0..3].sub('deve','dev')
     @workflow = workflow
     @druid_queue = DruidQueue.new(@workflow)
     @status_activity = StatusActivity.new(@workflow)
@@ -53,10 +54,10 @@ class Menu
       @menu << 'menu                                = Display this menu'
       @menu << 'storage                             = Report storage filesystem status'
       @menu << 'workflow {detail|summary|waiting}   = Report workflow database status'
-      @menu << 'queue {enqueue item(s)|size|list n} = Add to queue or report queue status '
-      @menu << 'process {config|pipeline|list}      = Configure, run, or report status of robot pipelines'
-      @menu << 'activity {history|errors|realtime}  = Report current or recent robot activity '
-      @menu << 'monitor {report [loop n]|queue}     = Report overall status or queue new workflow db items'
+      @menu << 'queue   {add item(s)|size|head n}   = Add to queue or report queue status '
+      @menu << 'process  {config|start|stop|list}   = Configure, run, or report status of robot pipelines'
+      @menu << 'log {completed|errors|realtime}[n]  = Report current or recent robot activity '
+      @menu << 'monitor   {report [n]|queue}        = Report overall status or queue new workflow db items'
       @menu << 'quit                                = Exit'
     end
     title = "Menu for #{@workflow}:"
@@ -79,7 +80,7 @@ class Menu
     @status_process.exec(args)
   end
 
-  def activity(args)
+  def log(args)
     @status_activity.exec(args)
   end
 
@@ -105,9 +106,10 @@ class Menu
         puts "Command not recognised: #{cmd} #{args.join(' ')}"
         menu
       end
-      puts ">"
+      puts ""
       STDOUT.flush
-      args = gets.strip.split(/\s+/)
+      system "printf '#{@workflow} (#{@environs}) > ' >&2"
+      args = STDIN.gets.strip.split(/\s+/)
     end
   end
 

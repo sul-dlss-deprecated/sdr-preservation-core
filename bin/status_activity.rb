@@ -5,6 +5,7 @@ require 'status_process'
 require 'druid_queue'
 require 'pathname'
 require 'time'
+require 'timeout'
 
 
 ActivityStatus = Struct.new(:queue, :active, :completed, :error)
@@ -27,11 +28,11 @@ class StatusActivity < Status
   def self.options
     puts <<-EOF
 
-    activity options:
+    log report options:
 
-      history  = recent ingest details
-      errors   = error details
-      realtime = what is happening right now
+      completed [n] = report recent ingest details (default is 10)
+      errors    [n] = report error details
+      realtime  [n] = report activity, looping every n seconds (default is 10)
 
     EOF
   end
@@ -99,8 +100,8 @@ class StatusActivity < Status
     ie
   end
 
-  def report_ingest_history(n=nil)
-    n ||= 100
+  def report_ingest_history(n)
+    n ||= 10
     lines = @history_file.readlines
     lines = lines.last(n) if n
     s = report_table(
@@ -112,11 +113,12 @@ class StatusActivity < Status
     s
   end
 
-  def report_error_history(errors)
+  def report_error_history(errors,n)
+    n ||= 10
     s = report_table(
         "#{@workflow} Error History",
         ErrorDetail.members,
-        errors.map{|error| error.values},
+        errors.first(n).map{|error| error.values},
         [-16, -11, -77]
     )
     s
@@ -139,24 +141,32 @@ class StatusActivity < Status
 
   def exec(args)
     case args.shift.to_s.upcase
-      when 'HISTORY'
-        puts report_ingest_history(30)
-      when 'ERRORS'
+      when /^COMP/
+        puts report_ingest_history(n=(args.shift || 10).to_i)
+      when /^ERR/
         errors = error_history
-        puts report_context + report_error_history(errors)
+        puts report_context + report_error_history(errors, n=(args.shift || 10).to_i)
       when 'REALTIME'
-        rts = real_time_statistics
-        rpt = report_context + report_realtime_activity(*rts)
+        seconds = (args.shift || 10).to_i
+        oldrpt = nil
         while true
-          if args.shift.to_s.upcase == 'LOOP'
-            print `clear`
+          rts = real_time_summary
+          rpt = report_realtime_activity(rts,nil,0)
+          if rpt != oldrpt
+            # overwrite previous output by moving curser up 7 rows
+            print "\e[7A" unless oldrpt.nil?
             puts rpt
             STDOUT.flush
-            seconds = args.shift
-            sleep (seconds ? seconds.to_i : 20)
-          else
-            puts rpt
-            break
+            oldrpt = rpt
+          end
+          begin
+            timeout(seconds) do
+              # exit method if user hits enter key
+              gets
+              return
+            end
+          rescue Timeout::Error
+            # loop again if specified number of seconds have elapsed
           end
         end
       else

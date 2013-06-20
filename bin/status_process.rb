@@ -22,8 +22,10 @@ class StatusProcess < Status
         state [RUN|STOP] = allow processes to start, or cause processes to terminate
         max {number of processes} = how many parallel pipelines to run
         window {open} {close} = the range of hours in which workflow is operational
-      pipeline = run robot pipelines based on values of config settings
+      start  = run robot pipeline(s) if config settings allow it
+      start! = change config state to START and run robot pipeline if otherwise OK
       start? = return true if ok to start a new pipeline process
+      stop   = change config state to STOP.  Pipelines will stop after current object
       stop?  = return true if pipeline process should be terminated
       list   = what pipeline processes are running and what are they doing)
 
@@ -33,6 +35,7 @@ class StatusProcess < Status
   def initialize(workflow)
     raise "Workflow not recognized: #{workflow}" unless WorkflowNames.include?(workflow)
     @workflow = workflow
+    @environment = ENV['ROBOT_ENVIRONMENT']
     @config_file = AppHome.join("log",@workflow,"current","status","process.config")
     @process_log_file = AppHome.join("log",@workflow,"current","status","process.log")
     @pid_dir = AppHome.join("log",@workflow,"current","processes")
@@ -80,7 +83,7 @@ class StatusProcess < Status
     elsif process_count < config[:max]
       return true, "RUN"
     else
-      return false, "Processes maximum reached"
+      return false, "Process maximum reached"
     end
   end
 
@@ -124,14 +127,14 @@ class StatusProcess < Status
 
   def report_process_list()
     stop,why = stop_process?
-    s = report_table(
+    list = report_table(
         stop ? "Pipelines closed: #{why}" :
         "#{@workflow} Processes (#{read_config[:max]} max, #{process_count} running)",
         ['pid','druid','workflow step'],
         @pid_dir.children.map{|pidfile| pidfile.read.chomp.split(/\|/)},
         [-10, -11, -25]
     )
-    s
+    list
   end
 
   def exec(args)
@@ -148,11 +151,50 @@ class StatusProcess < Status
       when 'WINDOW'
         set_window(*args)  if args.size == 2
         puts read_config.inspect
-      when 'PIPELINE'
-        `echo #{BinHome}/run-pipelines.sh #{@workflow} | at now`
+      when 'START'
+        start,why_not = start_process?
+        if start
+          `echo #{BinHome}/run-pipelines.sh #{@workflow} | at now`
+        elsif args.shift.to_s.upcase != 'CRON'
+          puts "Cannot start: #{why_not}."
+          puts "Change state or use 'process start!' command." unless why_not == 'Process maximum reached'
+        end
       when 'START?'
         start,why_not = start_process?
         puts start.to_s
+      when 'START!'
+        if args.shift.to_s.upcase == 'CRON'
+          set_state('RUN') unless read_config[:state] == 'STOP'
+          exec(['start', 'CRON'])
+        else
+          set_state('RUN')
+          exec(['start'])
+        end
+      when 'STOP'
+        stopped,why = stop_process?
+        unless stopped
+          set_state("STOP")
+          stopped,why = stop_process?
+        end
+        puts why
+        firstloop = true
+        while true
+            # overwrite previous output by moving curser up 7 rows
+            print "\e[7A" unless firstloop
+            puts report_process_list
+            STDOUT.flush
+            firstloop = false
+            return if process_count == 0
+          begin
+            timeout(10) do
+              # exit method if user hits enter key
+              gets
+              return
+            end
+          rescue Timeout::Error
+            # loop again if specified number of seconds have elapsed
+          end
+        end
       when 'STOP?'
         stop,why = stop_process?
         puts stop.to_s
