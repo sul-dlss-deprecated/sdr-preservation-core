@@ -153,9 +153,11 @@ class StatusProcess < Status
         puts read_config.inspect
       when 'START'
         start,why_not = start_process?
-        if start
+        if args.shift.to_s.upcase == 'CRON'
+          `echo #{BinHome}/run-pipelines.sh #{@workflow} | at now > /dev/null 2>&1` if start
+        elsif start
           `echo #{BinHome}/run-pipelines.sh #{@workflow} | at now`
-        elsif args.shift.to_s.upcase != 'CRON'
+        else
           puts "Cannot start: #{why_not}."
           puts "Change state or use 'process start!' command." unless why_not == 'Process maximum reached'
         end

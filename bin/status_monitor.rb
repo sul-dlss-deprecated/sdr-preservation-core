@@ -46,17 +46,25 @@ class StatusMonitor
   end
 
   def monitor_queue
-    if @druid_queue.queue_size < 1
-      unless @status_process.stop_process?.first
+    queue_size = @druid_queue.queue_size
+    if queue_size < 1
+      stopped,why_not = @status_process.stop_process?
+      unless stopped
         workflow_waiting = @status_workflow.workflow_waiting
         if workflow_waiting > 0
           @druid_queue.enqueue(Sdr::Config.enqueue_max)
           queue_size = @druid_queue.queue_size
           message = "queued #{queue_size} items"
           @status_process.write_process_log(message)
-          email(message)
+          return message
+        else
+          return "workflow waiting = 0"
         end
+      else
+        return why_not
       end
+    else
+      return "queue currently has #{queue_size} items"
     end
   end
 
@@ -168,10 +176,11 @@ class StatusMonitor
            end
          end
 
-       when 'QUEUE'
-         monitor_queue if @status_process.process_count > 0
-       else
-         StatusMonitor.options
+      when 'QUEUE'
+        outcome =  monitor_queue
+        puts outcome unless args.shift.to_s.upcase == 'CRON'
+     else
+       StatusMonitor.options
      end
   end
 
