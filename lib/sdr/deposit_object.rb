@@ -7,6 +7,8 @@ module Sdr
 
     self.prefix = self.superclass.prefix
 
+    # @param verify [Boolean] If true, raise an error if the directory does not exist
+    # @return [Pathname] The temp location of the bag containing the object version being deposited
     def bag_pathname(verify=true)
       bag_pathname = Pathname(Sdr::Config.sdr_deposit_home).join(@druid.sub('druid:',''))
       if verify and not bag_pathname.directory?
@@ -15,6 +17,7 @@ module Sdr
       bag_pathname
     end
 
+    # @return [Pathname] The temp location of the tarfile containing the object version being deposited
     def tarfile_pathname()
       Pathname(Sdr::Config.sdr_deposit_home).join("#{@druid.sub('druid:','')}.tar")
     end

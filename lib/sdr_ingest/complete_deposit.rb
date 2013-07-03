@@ -41,7 +41,7 @@ module Sdr
         raise LyberCore::Exceptions::ItemError.new(druid, "Failed verification")
       end
       update_provenance(druid)
-      bag_pathname.rmtree
+      cleanup_deposit_files(druid, bag_pathname)
     end
 
     # @param druid [String] The object identifier
@@ -146,6 +146,22 @@ module Sdr
       end
     rescue Exception => e
       raise LyberCore::Exceptions::FatalError.new("Cannot create new provenanceMetadata xml for #{druid}",e)
+    end
+
+    # @param druid [String] The object identifier
+    # @param bag_pathname [Object] The temp location of the bag containing the object version being deposited
+    # @return [Boolean] Cleanup the temp deposit files, raising an error if cleanup failes after 3 attempts
+    def cleanup_deposit_files(druid, bag_pathname)
+      # retry up to 3 times
+      tries ||= 3
+      bag_pathname.rmtree
+      return true
+    rescue Exception => e
+      if (tries -= 1) > 0
+          retry
+      else
+        raise LyberCore::Exceptions::ItemError.new(druid, "Failed cleanup deposit (3 attempts)", e)
+      end
     end
 
     def verification_queries(druid)

@@ -23,7 +23,7 @@ module Sdr
         raise LyberCore::Exceptions::ItemError.new(druid, "Failed validation",e)
       end
       #update_provenance(druid)
-      bag_pathname.rmtree
+      cleanup_deposit_files(druid, bag_pathname)
     end
 
     def verification_queries(druid)
