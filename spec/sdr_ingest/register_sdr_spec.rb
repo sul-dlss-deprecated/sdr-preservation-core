@@ -29,6 +29,7 @@ describe Sdr::RegisterSdr do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @rs.should_receive(:register_item).with(@druid)
+    Dor::WorkflowService.should_receive(:update_workflow_status).with('sdr', @druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting')
     @rs.process_item(work_item)
   end
 

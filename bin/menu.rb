@@ -57,6 +57,7 @@ class Menu
       @menu << 'queue   {add item(s)|size|head n}   = Add to queue or report queue status '
       @menu << 'process  {config|start|stop|list}   = Configure, run, or report status of robot pipelines'
       @menu << 'log {completed|errors|realtime}[n]  = Report current or recent robot activity '
+      @menu << 'log        {tree|view} [id|path]    = view contents of file or storage structure '
       @menu << 'monitor   {report [n]|queue}        = Report overall status or queue new workflow db items'
       @menu << 'quit                                = Exit'
     end

@@ -4,7 +4,7 @@ require 'boot'
 module Sdr
 
   # Robot for validating recovered object versions
-  class RecoveryVerify < LyberCore::Robots::Robot
+  class RecoveryVerify < SdrRobot
 
     # define class instance variables and getter method so that we can inherit from this class
     @workflow_name = 'sdrRecoveryWF'

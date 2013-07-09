@@ -14,7 +14,7 @@ describe Sdr::RecoveryRestore do
 
   specify "RecoveryComplete#initialize" do
     @rr.should be_instance_of RecoveryRestore
-    @rr.class.superclass.should == LyberCore::Robots::Robot
+    @rr.class.superclass.should == Sdr::SdrRobot
     @rr.should be_kind_of LyberCore::Robots::Robot
     @rr.workflow_name.should == 'sdrRecoveryWF'
     @rr.workflow_step.should == 'recovery-restore'

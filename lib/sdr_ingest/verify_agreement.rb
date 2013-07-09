@@ -4,7 +4,7 @@ require 'boot'
 module Sdr
 
   # Robot for verifying that an APO or agreement object exists for each object
-  class VerifyAgreement < LyberCore::Robots::Robot
+  class VerifyAgreement < SdrRobot
 
     # A cache of APO/agreement object identifiers that have already been verified to exist in Sedora
     attr_reader :valid_identifiers

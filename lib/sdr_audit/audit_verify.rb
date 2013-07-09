@@ -4,7 +4,7 @@ require 'boot'
 module Sdr
 
   # Robot for validating storage objects
-  class AuditVerify < LyberCore::Robots::Robot
+  class AuditVerify < SdrRobot
 
     # define class instance variables and getter method so that we can inherit from this class
     @workflow_name = 'sdrAuditWF'

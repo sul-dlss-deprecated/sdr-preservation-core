@@ -4,7 +4,7 @@ require 'boot'
 module Sdr
 
   # Robot for Validating BagIt bags that are transferred to SDR's deposit area.
-  class ValidateBag < LyberCore::Robots::Robot
+  class ValidateBag < SdrRobot
 
     # define class instance variables and getter method so that we can inherit from this class
     @workflow_name = 'sdrIngestWF'

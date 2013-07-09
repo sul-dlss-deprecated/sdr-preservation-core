@@ -4,7 +4,7 @@ require 'boot'
 module Sdr
 
   # A robot for creating +Sedora+ objects and workflow datastreams unless they exist
-  class RegisterSdr < LyberCore::Robots::Robot
+  class RegisterSdr < SdrRobot
 
     # define class instance variables and getter method so that we can inherit from this class
     @workflow_name = 'sdrIngestWF'
@@ -26,6 +26,8 @@ module Sdr
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
       register_item(work_item.druid)
+      # temporary measure until sdr-ingest-transfer creates this row in workflow table
+      update_workflow_status('sdr', work_item.druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting') if @workflow_name == 'sdrIngestWF'
     end
 
     # @param druid [String] The object identifier

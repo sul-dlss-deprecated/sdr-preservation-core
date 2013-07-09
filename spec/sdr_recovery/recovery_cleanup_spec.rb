@@ -14,7 +14,7 @@ describe Sdr::RecoveryCleanup do
 
   specify "RecoveryCleanup#initialize" do
     @rc.should be_instance_of RecoveryCleanup
-    @rc.class.superclass.should == LyberCore::Robots::Robot
+    @rc.class.superclass.should == Sdr::SdrRobot
     @rc.should be_kind_of LyberCore::Robots::Robot
     @rc.workflow_name.should == 'sdrRecoveryWF'
     @rc.workflow_step.should == 'recovery-cleanup'

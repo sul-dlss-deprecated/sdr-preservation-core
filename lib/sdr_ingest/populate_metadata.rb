@@ -4,7 +4,7 @@ require 'boot'
 module Sdr
 
   # A robot for adding core datastreams to the Fedora object using metadata files from the bagit object.
-  class PopulateMetadata < LyberCore::Robots::Robot
+  class PopulateMetadata < SdrRobot
     
     # define class instance variables and getter method so that we can inherit from this class
     @workflow_name = 'sdrIngestWF'

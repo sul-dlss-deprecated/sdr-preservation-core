@@ -4,7 +4,7 @@ require 'boot'
 module Sdr
 
   # Robot for initializing the workflow of each migrated object
-  class MigrationStart < LyberCore::Robots::Robot
+  class MigrationStart < SdrRobot
     @workflow_name = 'sdrMigrationWF'
     @workflow_step = 'migration-start'
     class << self
@@ -32,7 +32,7 @@ module Sdr
       wf_xml = read_sdr_migration_workflow_xml()
      # Now bootstrap SDR workflow queue to start SDR robots
      # Set the repo as 'sdr', and do not create a workflows datastream in sedora
-      Dor::WorkflowService.create_workflow('sdr', druid, 'sdrMigrationWF', wf_xml, opts = {:create_ds => false})
+      create_workflow_rows('sdr', druid, 'sdrMigrationWF', wf_xml, opts = {:create_ds => false})
     end
 
     # Read in the XML file needed to initialize the SDR workflow

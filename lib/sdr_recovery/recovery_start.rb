@@ -4,7 +4,7 @@ require 'boot'
 module Sdr
 
   # Robot for initializing the workflow of each migrated object
-  class RecoveryStart < LyberCore::Robots::Robot
+  class RecoveryStart < SdrRobot
     @workflow_name = 'sdrRecoveryWF'
     @workflow_step = 'recovery-start'
     class << self
@@ -30,9 +30,9 @@ module Sdr
     # @return [void] Transfer the object from the DOR export area to the SDR deposit area.
     def create_recovery_workflow(druid)
       wf_xml = read_sdr_recovery_workflow_xml()
-     # Now bootstrap SDR workflow queue to start SDR robots
-     # Set the repo as 'sdr', and do not create a workflows datastream in sedora
-      Dor::WorkflowService.create_workflow('sdr', druid, 'sdrRecoveryWF', wf_xml, opts = {:create_ds => false})
+      # Now bootstrap SDR workflow queue to start SDR robots
+      # Set the repo as 'sdr', and do not create a workflows datastream in sedora
+      create_workflow_rows('sdr', druid, 'sdrRecoveryWF', wf_xml, opts = {:create_ds => false})
     end
 
     # Read in the XML file needed to initialize the SDR workflow

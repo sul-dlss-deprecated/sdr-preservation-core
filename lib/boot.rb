@@ -103,62 +103,29 @@ require 'sdr/sedora_configurator'
 ActiveFedora.configurator = Sdr::SedoraConfigurator.new
 ActiveFedora.init
 
+require 'sdr/sdr_robot'
 require 'sdr/deposit_object'
 require 'sdr/sedora_object'
 
-Dor::WorkflowService.configure Dor::Config.workflow.url
-
-# Monkey patch so that 3 attempts will be made to set robot status
-module LyberCore
-  module Robots
-
-    class   Robot
-
-      # @param work_item [LyberCore::Robots::WorkItem] The object being processed
-      # @return [Boolean] process the object, then set success or error status
-      def process_work_item(work_item)
-        begin
-          #call overridden method
-          process_item(work_item)
-          set_success(work_item)
-        rescue LyberCore::Exceptions::FatalError => fatal_error
-          raise fatal_error
-        rescue Exception => e
-          set_error(work_item,e)
-        end
+module Dor
+  module WorkflowService
+    class << self
+      # @param [String] url points to the workflow service
+      # @param [Hash] opts optional params
+      # @option opts [String] :client_cert_file path to an SSL client certificate
+      # @option opts [String] :client_key_file path to an SSL key file
+      # @option opts [String] :client_key_pass password for the key file
+      def configure(url, opts={})
+        params = {}
+        params[:ssl_client_cert] = OpenSSL::X509::Certificate.new(File.read(opts[:client_cert_file])) if opts[:client_cert_file]
+        params[:ssl_client_key]  = OpenSSL::PKey::RSA.new(File.read(opts[:client_key_file]), opts[:client_key_pass]) if opts[:client_key_file]
+        params[:timeout] = 120
+        params[:open_timeout] = 120
+        @@resource = RestClient::Resource.new(url, params)
       end
-
-      # @param work_item [LyberCore::Robots::WorkItem] The object being processed
-      # @return [Boolean] Make up to 3 attempts to set robot status to completed
-      def set_success(work_item)
-        # retry up to 3 times
-        tries ||= 3
-        work_item.set_success
-        return true
-      rescue Exception => e
-        if (tries -= 1) > 0
-            retry
-        else
-          raise LyberCore::Exceptions::ItemError.new(work_item.druid, "Failed to set success (3 attempts)", e)
-        end
-      end
-
-      # @param work_item [LyberCore::Robots::WorkItem] The object being processed
-      # @return [Boolean] Make up to 3 attempts to set robot status to error
-      def set_error(work_item,e)
-        # retry up to 3 times
-        tries ||= 3
-        work_item.set_error(e)
-        return true
-      rescue Exception => e
-        if (tries -= 1) > 0
-            retry
-        else
-          raise LyberCore::Exceptions::ItemError.new(work_item.druid, "Failed to set error (3 attempts)", e)
-        end
-      end
-
     end
-
   end
 end
+
+Dor::WorkflowService.configure Dor::Config.workflow.url
+

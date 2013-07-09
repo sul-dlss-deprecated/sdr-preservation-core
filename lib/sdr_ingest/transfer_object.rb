@@ -4,7 +4,7 @@ require 'boot'
 module Sdr
 
   # Robot for transferring objects from the DOR export area to the SDR deposit area.
-  class TransferObject < LyberCore::Robots::Robot
+  class TransferObject < SdrRobot
 
     # define class instance variables and getter method so that we can inherit from this class
     @workflow_name = 'sdrIngestWF'

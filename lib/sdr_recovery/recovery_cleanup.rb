@@ -4,7 +4,7 @@ require 'boot'
 module Sdr
 
   # A robot for file cleanup after the object recovery 
-  class RecoveryCleanup < LyberCore::Robots::Robot
+  class RecoveryCleanup < SdrRobot
 
     @workflow_name = 'sdrRecoveryWF'
     @workflow_step = 'recovery-cleanup'

@@ -30,9 +30,11 @@ class StatusActivity < Status
 
     log report options:
 
-      completed [n] = report recent ingest details (default is 10)
-      errors    [n] = report error details
-      realtime  [n] = report activity, looping every n seconds (default is 10)
+      completed  [n] = report recent ingest details (default is 10)
+      errors     [n] = report error details
+      realtime   [n] = report activity, looping every n seconds (default is 10)
+      tree [id|path] = display folder structure of storage area
+      view [id|path] = find and display file content using "cat" command
 
     EOF
   end
@@ -140,7 +142,8 @@ class StatusActivity < Status
   end
 
   def exec(args)
-    case args.shift.to_s.upcase
+    command = args.shift.to_s.upcase
+    case command
       when /^COMP/
         puts report_ingest_history(n=(args.shift || 10).to_i)
       when /^ERR/
@@ -169,6 +172,40 @@ class StatusActivity < Status
             # loop again if specified number of seconds have elapsed
           end
         end
+      when 'TREE'
+        dirname = args.shift.to_s
+        if dirname =~ /^([a-z]{2})(\d{3})([a-z]{2})(\d{4})$/
+          dirname = `echo druid:#{dirname} | ~/bin/druid-path-02.sh`
+          system "tree -idf --noreport #{dirname}"
+          return
+        else
+          pathname = Pathname(dirname)
+          if pathname.directory?
+            system "tree -s #{dirname}"
+            return
+          end
+        end
+        puts "Directory was not found : #{dirname}"
+      when 'VIEW'
+        filename = args.shift.to_s
+        if filename == 'nil'
+          system "tail -n +1 #{@current_dir.join('active').to_s}/*"
+        elsif filename =~ /^([a-z]{2})(\d{3})([a-z]{2})(\d{4})$/
+          %w{active error status completed}.each do |logdir|
+            logfile = @current_dir.join(logdir, filename)
+            if logfile.exist?
+              system "cat #{logfile.to_s}"
+              return
+            end
+          end
+        else
+          pathname = Pathname(filename)
+          if pathname.file?
+            system "cat #{pathname.to_s}"
+            return
+          end
+        end
+        puts "File was not found : #{filename}"
       else
         StatusActivity.options
     end

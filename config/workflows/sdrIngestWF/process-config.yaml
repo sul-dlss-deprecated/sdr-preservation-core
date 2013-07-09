@@ -43,3 +43,10 @@ complete-deposit:
   error_limit: 5  
   classname: "Sdr::CompleteDeposit"
   classpath: "sdr_ingest/complete_deposit"
+
+ingest-cleanup:
+  prerequisite: complete-deposit
+  batch_limit: 200
+  error_limit: 5
+  classname: "Sdr::IngestCleanup"
+  classpath: "sdr_ingest/ingest_cleanup"

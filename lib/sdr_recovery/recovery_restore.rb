@@ -5,7 +5,7 @@ require 'sdr_ingest/complete_deposit'
 module Sdr
 
   # A robot for copying the recovered object versions to online storage
-  class RecoveryRestore < LyberCore::Robots::Robot
+  class RecoveryRestore < SdrRobot
 
     @workflow_name = 'sdrRecoveryWF'
     @workflow_step = 'recovery-restore'
