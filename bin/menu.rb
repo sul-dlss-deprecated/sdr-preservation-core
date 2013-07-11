@@ -56,8 +56,8 @@ class Menu
       @menu << 'workflow {detail|summary|waiting}   = Report workflow database status'
       @menu << 'queue   {add item(s)|size|head n}   = Add to queue or report queue status '
       @menu << 'process  {config|start|stop|list}   = Configure, run, or report status of robot pipelines'
-      @menu << 'log {completed|errors|realtime}[n]  = Report current or recent robot activity '
-      @menu << 'log        {tree|view} [id|path]    = view contents of file or storage structure '
+      @menu << 'list     {comp..|err..|realtime}[n] = Report current or recent robot activity '
+      @menu << 'view     {log|file|tree} [id|path]  = view contents of file or storage structure '
       @menu << 'monitor   {report [n]|queue}        = Report overall status or queue new workflow db items'
       @menu << 'quit                                = Exit'
     end
@@ -81,7 +81,7 @@ class Menu
     @status_process.exec(args)
   end
 
-  def log(args)
+  def list  (args)
     @status_activity.exec(args)
   end
 
@@ -91,6 +91,10 @@ class Menu
 
   def monitor(args)
     @status_monitor.exec(args)
+  end
+
+  def view(args)
+    @status_activity.exec(args)
   end
 
   def exec(args)

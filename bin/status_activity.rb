@@ -28,13 +28,17 @@ class StatusActivity < Status
   def self.options
     puts <<-EOF
 
-    log report options:
+    list options:
 
       completed  [n] = report recent ingest details (default is 10)
       errors     [n] = report error details
       realtime   [n] = report activity, looping every n seconds (default is 10)
+
+    view options:
+
+      log       [id] = find and display log file content using "cat" command
+      file    [path] = find and display file content using "cat" command
       tree [id|path] = display folder structure of storage area
-      view [id|path] = find and display file content using "cat" command
 
     EOF
   end
@@ -172,11 +176,35 @@ class StatusActivity < Status
             # loop again if specified number of seconds have elapsed
           end
         end
+      when 'LOG'
+        objid = args.shift.to_s.split(/:/)[-1]
+        if objid == 'nil'
+          system "tail -n +1 #{@current_dir.join('active').to_s}/*"
+          return
+        elsif objid =~ /^([a-z]{2})(\d{3})([a-z]{2})(\d{4})$/
+          %w{active error status completed}.each do |logdir|
+            logfile = @current_dir.join(logdir, objid)
+            if logfile.exist?
+              system "cat #{logfile.to_s}"
+              return
+            end
+          end
+        end
+        puts "Log file was not found for object: #{objid}"
+      when 'FILE'
+        filename = args.shift.to_s
+        pathname = Pathname(filename)
+        if pathname.file?
+          system "cat #{pathname.to_s}"
+          return
+        end
+        puts "File was not found : #{filename}"
       when 'TREE'
         dirname = args.shift.to_s
         if dirname =~ /^([a-z]{2})(\d{3})([a-z]{2})(\d{4})$/
-          dirname = `echo druid:#{dirname} | ~/bin/druid-path-02.sh`
-          system "tree -idf --noreport #{dirname}"
+          repository = Stanford::StorageRepository.new
+          storage_path = repository.storage_object_pathname(dirname)
+          system "tree -idf --noreport #{storage_path}"
           return
         else
           pathname = Pathname(dirname)
@@ -186,26 +214,6 @@ class StatusActivity < Status
           end
         end
         puts "Directory was not found : #{dirname}"
-      when 'VIEW'
-        filename = args.shift.to_s
-        if filename == 'nil'
-          system "tail -n +1 #{@current_dir.join('active').to_s}/*"
-        elsif filename =~ /^([a-z]{2})(\d{3})([a-z]{2})(\d{4})$/
-          %w{active error status completed}.each do |logdir|
-            logfile = @current_dir.join(logdir, filename)
-            if logfile.exist?
-              system "cat #{logfile.to_s}"
-              return
-            end
-          end
-        else
-          pathname = Pathname(filename)
-          if pathname.file?
-            system "cat #{pathname.to_s}"
-            return
-          end
-        end
-        puts "File was not found : #{filename}"
       else
         StatusActivity.options
     end
@@ -224,15 +232,4 @@ if __FILE__ == $0
   end
 
 end
-
-
-#[sdr2service@sdr-services 01]$ grep ^ERROR */error/* | grep -v SystemExit
-#error/zn813dy5100:ERROR [2013-01-24 14:43:49] (4417)  :: #<LyberCore::Exceptions::ItemError: druid:zn813dy5100 - Item error; caused by #<NoMethodError: undefined method `size' for nil:NilClass>>
-#error/fs553nc0117:ERROR [2013-01-24 16:07:36] (19599)  :: #<LyberCore::Exceptions::ItemError: druid:fs553nc0117 - Item error; caused by #<RuntimeError: Inconsistent size for Thesis.pdf: 7883829 != 7883189>>
-#error/sy486tp5223:ERROR [2013-01-24 20:46:55] (22287)  :: #<LyberCore::Exceptions::ItemError: druid:sy486tp5223 - Item error; caused by #<RuntimeError: Inconsistent size for 0-AMadsen-DissFinal-eSubmission.pdf: 12504148 != 10256526>>
-#error/ct692vv3660:ERROR [2013-01-25 05:04:32] (12129)  :: #<LyberCore::Exceptions::ItemError: druid:ct692vv3660 - Item error; caused by #<RuntimeError: Inconsistent size for OpLvlAgrmt_ETDs_v01.docx: 27995 != 28062>>
-#error/zf098jx2047:ERROR [2013-01-25 06:54:41] (16134)  :: #<LyberCore::Exceptions::ItemError: druid:zf098jx2047 - Item error; caused by #<RuntimeError: Inconsistent size for Vermylen Dissertation (Registrar).pdf: 16219976 != 16228184>>
-#error/kn816bg5418:ERROR [2013-01-25 13:10:34] (26810)  :: #<LyberCore::Exceptions::ItemError: druid:kn816bg5418 - Item error; caused by #<RuntimeError: Inconsistent size for Aamir Thesis v71 without copyright and signature page.pdf: 4480500 != 6617220>>
-#error/yp464xx6754:ERROR [2013-01-25 13:57:37] (26810)  :: #<LyberCore::Exceptions::ItemError: druid:yp464xx6754 - Item error; caused by #<RuntimeError: Inconsistent size for thesis.pdf: 529516 != 528438>>
-#error/fq899hc0553:ERROR [2013-01-25 14:17:58] (26810)  :: #<LyberCore::Exceptions::ItemError: druid:fq899hc0553 - Item error; caused by #<RuntimeError: Inconsistent size for Leyen_Dissertation_8_21_2011_final.pdf: 8224069 != 8282209>>
 
