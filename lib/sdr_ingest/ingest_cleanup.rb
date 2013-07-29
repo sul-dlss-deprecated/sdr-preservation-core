@@ -31,7 +31,7 @@ module Sdr
     # @param druid [String] The object identifier
     # @return [void] complete ingest of the item, update provenance, cleanup deposit data.
     def ingest_cleanup(druid)
-      bag_pathname = DepositObject.new(druid).bag_pathname()
+      bag_pathname = DepositObject.new(druid).bag_pathname(verify=false)
       cleanup_deposit_files(druid, bag_pathname) if bag_pathname.exist?
       update_provenance(druid)
       update_workflow_status('dor', druid, 'accessionWF', 'sdr-ingest-received', 'completed')
