@@ -10,7 +10,7 @@ module Sdr
     # @return [Boolean] retry request up to :tries times, sleeping :interval seconds after each failed attempt
     def transmit(opts={}, &request)
       tries ||= opts[:tries] || 3
-      interval ||= opts[:interval] || 60
+      interval ||= opts[:interval] || 20
       request.call(nil)
     rescue Exception => e
       if (tries -= 1) > 0
@@ -27,6 +27,10 @@ module Sdr
 
     def get_workflow_xml(repo, druid, workflow, opts={})
       transmit(opts) {Dor::WorkflowService.get_workflow_xml(repo, druid, workflow)}
+    end
+
+    def get_workflow_status(repo, druid, workflow, step_name, opts={})
+      transmit(opts) {Dor::WorkflowService.get_workflow_status(repo, druid, workflow, step_name)}
     end
 
     def update_workflow_status(repo, druid, workflow, process, status, opts={})
