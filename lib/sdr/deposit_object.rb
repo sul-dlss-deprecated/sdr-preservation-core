@@ -17,6 +17,7 @@ module Sdr
       bag_pathname
     end
 
+    # @depricated
     # @return [Pathname] The temp location of the tarfile containing the object version being deposited
     def tarfile_pathname()
       Pathname(Sdr::Config.sdr_deposit_home).join("#{@druid.sub('druid:','')}.tar")

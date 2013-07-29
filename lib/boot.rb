@@ -49,8 +49,11 @@ module Sdr
       user  'fedoraAdmin'
       password "see above"
     end
+    ingest_transfer do
+      account "lyberadmin@sul-lyberservices-dev.stanford.edu"
+      export_dir "/dor/export/"
+    end
     logdir File.join(ROBOT_ROOT, 'log')
-    dor_export "lyberadmin@lyberservices-prod.stanford.edu:/dor/export/"
     sdr_deposit_home "/services-disk02/deposit"
     old_storage_node "/services-disk/sdr2objects"
     storage_node "/services-disk02/sdr2objects"

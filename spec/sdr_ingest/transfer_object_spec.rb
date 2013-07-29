@@ -28,55 +28,25 @@ describe Sdr::TransferObject do
     @to.process_item(work_item)
   end
 
-  specify "TransferObject#transfer_object" do
-    @to.should_receive(:transfer_bag).with(@druid, @bag_pathname, @tarfile_pathname)
-    @to.should_receive(:untar_bag).with(@druid, @bag_pathname, @tarfile_pathname)
-    @to.should_receive(:cleanup_tarfile).with(@druid, @tarfile_pathname)
-    @to.transfer_object(@druid)
+
+  specify "TransferObject#tarpipe_command" do
+    cmd = @to.tarpipe_command(@druid)
+    cmd.should ==  'ssh lyberadmin@sul-lyberservices-dev.stanford.edu "tar -C /dor/export/ --dereference -cf - jc837rq9922 " | tar -C /Users/rnanders/Code/Ruby/sdr2/spec/fixtures/import -xf -'
   end
 
-  specify "TransferObject#transfer_bag" do
+  specify "TransferObject#transfer_object" do
 
-    Pathname.any_instance.stub(:exists?).and_return(true)
-    lambda{@to.transfer_bag(@druid, @bag_pathname, @tarfile_pathname)}.should raise_exception(LyberCore::Exceptions::ItemError)
+    Pathname.any_instance.stub(:exist?).and_return(true)
+    lambda{@to.transfer_object(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
 
-    Pathname.any_instance.stub(:exists?).and_return(false)
+    Pathname.any_instance.stub(:exist?).and_return(false)
     Pathname.any_instance.should_receive(:mkpath)
-    LyberCore::Utils::FileUtilities.should_receive(:transfer_object).with(
-        @tarfile_pathname.basename.to_s,
-        Sdr::Config.dor_export,
-        @bag_pathname.parent.to_s
-    )
-    @to.transfer_bag(@druid, @bag_pathname, @tarfile_pathname)
+    @to.should_receive(:tarpipe_command).with(@druid).and_return('thecommand')
+    LyberCore::Utils::FileUtilities.should_receive(:execute).with('thecommand')
+    @to.transfer_object(@druid)
 
-    LyberCore::Utils::FileUtilities.stub!(:transfer_object).and_raise("rsync failed")
-    lambda {transfer_robot.process_item(mock_workitem)}.should raise_error
+    LyberCore::Utils::FileUtilities.stub!(:execute).and_raise("cmd failed")
+    lambda {@to.transfer_object(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
    end
-
-  specify "TransferObject#untar_bag" do
-
-    parent = @bag_pathname.parent.to_s
-    filename = @tarfile_pathname.basename
-
-    @to.should_receive(:system).with("cd #{parent}; tar xf #{filename} --force-local").
-        and_return(true)
-    @to.untar_bag(@druid,@bag_pathname, @tarfile_pathname)
-
-    @to.should_receive(:system).with("cd #{parent}; tar xf #{filename} --force-local").
-        and_return(false)
-    lambda{@to.untar_bag(@druid, @bag_pathname, @tarfile_pathname)}.should raise_exception(LyberCore::Exceptions::ItemError)
-
-   end
-
-  specify "TransferObject#cleanup_tarfile" do
-
-    @tarfile_pathname.should_receive(:delete)
-    @to.cleanup_tarfile(@druid, @tarfile_pathname)
-
-    @tarfile_pathname.should_receive(:delete).and_raise(Exception)
-    lambda{@to.cleanup_tarfile(@druid, @tarfile_pathname)}.should raise_exception(LyberCore::Exceptions::ItemError)
-
-   end
-
 
 end

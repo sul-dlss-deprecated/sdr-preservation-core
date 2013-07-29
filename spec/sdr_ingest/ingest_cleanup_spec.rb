@@ -51,7 +51,6 @@ describe Sdr::IngestCleanup do
   end
 
   specify "IngestCleanup#ingest_cleanup" do
-    Pathname.any_instance.should_receive(:directory?).and_return(true)
     Pathname.any_instance.should_receive(:exist?).and_return(true)
     Pathname.any_instance.should_receive(:rmtree)
     @ic.should_receive(:update_provenance).with(@druid)
