@@ -31,7 +31,7 @@ describe Sdr::TransferObject do
 
   specify "TransferObject#tarpipe_command" do
     cmd = @to.tarpipe_command(@druid)
-    cmd.should ==  'ssh lyberadmin@sul-lyberservices-dev.stanford.edu "tar -C /dor/export/ --dereference -cf - jc837rq9922 " | tar -C /Users/rnanders/Code/Ruby/sdr2/spec/fixtures/import -xf -'
+    cmd.should ==  "ssh lyberadmin@sul-lyberservices-dev.stanford.edu \"tar -C /dor/export/ --dereference -cf - jc837rq9922 \" | tar -C #{ROBOT_ROOT}/spec/fixtures/import -xf -"
   end
 
   specify "TransferObject#transfer_object" do
