@@ -43,16 +43,23 @@ module Sdr
       deposit_object = DepositObject.new(druid)
       bag_pathname = deposit_object.bag_pathname(verify=false)
       LyberCore::Log.debug("bag_pathname is : #{bag_pathname}")
-      if bag_pathname.exist?
-        raise LyberCore::Exceptions::ItemError.new(druid, "Deposit bag already exists at destination: #{bag_pathname.to_s}")
-      else
-        begin
-          bag_pathname.parent.mkpath
-          LyberCore::Utils::FileUtilities.execute(tarpipe_command(druid))
-        rescue Exception => e
-          raise LyberCore::Exceptions::ItemError.new(druid, "Error transferring object", e)
-        end
-      end
+      raise "#{bag_pathname} already exists at destination" if bag_pathname.exist?
+      raise "versionMetadata.xml not found in export" unless verify_version_metadata(druid)
+      bag_pathname.parent.mkpath
+      LyberCore::Utils::FileUtilities.execute(tarpipe_command(druid))
+      rescue Exception => e
+        raise LyberCore::Exceptions::ItemError.new(druid, "Error transferring object", e)
+    end
+
+    # @param druid [String] The object identifier
+    # @return [Boolean] Test existence of versionMetadata file in export.  Return true if found, false if not
+    def verify_version_metadata(druid)
+      vmpath = File.join(Sdr::Config.ingest_transfer.export_dir,
+               druid.sub('druid:',''),"/data/metadata/versionMetadata.xml")
+      exists_cmd = "if ssh " + Sdr::Config.ingest_transfer.account +
+        " test -e " + vmpath + ";" +
+        " then echo exists; else echo notfound; fi"
+      (LyberCore::Utils::FileUtilities.execute(exists_cmd) == 'exists')
     end
 
     # @see http://en.wikipedia.org/wiki/User:Chdev/tarpipe

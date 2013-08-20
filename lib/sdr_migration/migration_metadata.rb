@@ -27,6 +27,19 @@ module Sdr
       raise LyberCore::Exceptions::FatalError.new("Cannot process item #{druid}",e)
     end
 
+    # @param druid [String] The object identifier
+    # @param bag_pathname [Pathname] The location of the BagIt bag being ingested
+    # @return [void] Add a v1 versionMetadata datastream unless it already exists
+    def remediate_version_metadata(druid, bag_pathname)
+      vm_pathname = bag_pathname.join('data/metadata',"versionMetadata.xml")
+      unless vm_pathname.exist?
+        template_pathname = Pathname("#{ROBOT_ROOT}/config/versionMetadata-template.xml")
+        vm_pathname.open('w') do |vm|
+          vm << template_pathname.read.sub(/druid/,druid)
+        end
+      end
+    end
+
     def verification_queries(druid)
       user_password = "#{Sdr::Config.sedora.user}:#{Sdr::Config.sedora.password}"
       fedora_url = Sdr::Config.sedora.url.sub('//',"//#{user_password}@")

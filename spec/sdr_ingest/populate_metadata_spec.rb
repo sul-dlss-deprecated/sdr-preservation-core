@@ -38,7 +38,6 @@ describe Sdr::PopulateMetadata do
     Pathname.any_instance.should_receive(:directory?).and_return(:true)
     sedora_object = mock(SedoraObject)
     Sdr::SedoraObject.stub(:find).with(@druid).and_return(sedora_object)
-    @pm.should_receive(:remediate_version_metadata).exactly(1).times
     @pm.should_receive(:set_datastream_content).exactly(4).times
     sedora_object.should_receive(:save)
     @pm.populate_metadata(@druid)

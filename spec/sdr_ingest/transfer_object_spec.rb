@@ -34,6 +34,14 @@ describe Sdr::TransferObject do
     cmd.should ==  "ssh lyberadmin@sul-lyberservices-dev.stanford.edu \"tar -C /dor/export/ --dereference -cf - jc837rq9922 \" | tar -C #{ROBOT_ROOT}/spec/fixtures/import -xf -"
   end
 
+  specify "TransferObject#verify_version_metadata" do
+    vmcmd = 'if ssh lyberadmin@sul-lyberservices-dev.stanford.edu test -e /dor/export/jc837rq9922/data/metadata/versionMetadata.xml; then echo exists; else echo notfound; fi'
+    LyberCore::Utils::FileUtilities.should_receive(:execute).with(vmcmd).and_return("exists")
+    @to.verify_version_metadata(@druid).should == true
+    LyberCore::Utils::FileUtilities.should_receive(:execute).with(vmcmd).and_return("not")
+    @to.verify_version_metadata(@druid).should == false
+  end
+
   specify "TransferObject#transfer_object" do
 
     Pathname.any_instance.stub(:exist?).and_return(true)
@@ -41,12 +49,18 @@ describe Sdr::TransferObject do
 
     Pathname.any_instance.stub(:exist?).and_return(false)
     Pathname.any_instance.should_receive(:mkpath)
+    @to.should_receive(:verify_version_metadata).with(@druid).and_return(true)
     @to.should_receive(:tarpipe_command).with(@druid).and_return('thecommand')
     LyberCore::Utils::FileUtilities.should_receive(:execute).with('thecommand')
     @to.transfer_object(@druid)
 
+    @to.should_receive(:verify_version_metadata).with(@druid).and_return(true)
     LyberCore::Utils::FileUtilities.stub!(:execute).and_raise("cmd failed")
     lambda {@to.transfer_object(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
+
+    @to.should_receive(:verify_version_metadata).with(@druid).and_return(false)
+    lambda {@to.transfer_object(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
+
    end
 
 end

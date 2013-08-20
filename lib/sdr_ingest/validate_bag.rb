@@ -33,45 +33,80 @@ module Sdr
     def validate_bag(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter validate_bag")
       bag_pathname = DepositObject.new(druid).bag_pathname()
-      validate_bag_structure(druid, bag_pathname)
-      validate_bag_data(druid, bag_pathname)
+      verify_bag_structure(bag_pathname)
+      verify_version_number(druid, bag_pathname)
+      validate_bag_data(bag_pathname)
+      true
+    rescue Exception => e
+      raise LyberCore::Exceptions::ItemError.new(druid, "Bag validation failure", e)
     end
 
-    # @param druid [String] The object identifier
-    # @return [Boolean] Ensure that the bag, expected subdirs, and tag files all exist
-    def validate_bag_structure(druid, bag_pathname)
-
-      LyberCore::Log.debug("bag_dir is : #{bag_pathname.to_s}")
-
-      # bag_dir must exist and be a directory
-      unless bag_pathname.directory?
-        raise LyberCore::Exceptions::ItemError.new(druid, "#{bag_pathname.to_s} does not exist or is not a directory")
-      end
-
-      # data_dir must exist and be a directory
-      data_dir = bag_pathname.join("data")
-      unless data_dir.directory?
-        raise LyberCore::Exceptions::ItemError.new(druid, "#{data_dir.to_s} does not exist or is not a directory")
-      end
-
-      # The bagit text file must exist and be a file
-      bagit_txt_file = bag_pathname.join("bagit.txt")
-      unless bagit_txt_file.file?
-        raise LyberCore::Exceptions::ItemError.new(druid, "#{bagit_txt_file.to_s} does not exist or is not a file")
-      end
-
-      # bag_info_txt_file must exist and be a file
-      bag_info_txt_file = bag_pathname.join("bag-info.txt")
-      unless bag_info_txt_file.file?
-        raise LyberCore::Exceptions::ItemError.new(druid, "#{bag_info_txt_file.to_s} does not exist or is not a file")
-      end
-
-     true
+    # @param [Pathname] bag_pathname the location of the bag to be verified
+    # @return [Boolean] Test the existence of expected files, return true if files exist, raise exception if not
+    def verify_bag_structure(bag_pathname)
+      verify_pathname(bag_pathname)
+      verify_pathname(bag_pathname.join('data'))
+      verify_pathname(bag_pathname.join('bagit.txt'))
+      verify_pathname(bag_pathname.join('bag-info.txt'))
+      verify_pathname(bag_pathname.join('manifest-sha256.txt'))
+      verify_pathname(bag_pathname.join('tagmanifest-sha256.txt'))
+      verify_pathname(bag_pathname.join('versionAdditions.xml'))
+      verify_pathname(bag_pathname.join('versionInventory.xml'))
+      true
     end
 
-    # @param druid [String] The object identifier
+    # @param [Pathname] pathname The file whose existence should be verified
+    # @return [Boolean] Test the existence of the specified path.  Return true if file exists, raise exception if not
+    def verify_pathname(pathname)
+      raise "#{pathname.basename} not found at #{pathname}" unless pathname.exist?
+      true
+    end
+
+    # @param [Pathname] bag_pathname the location of the bag whose versionMetadata is to be verified
+    # @param [Integer] storage_version_id the version identifer expected to be used in the versionMetadata
+    # @return [Boolean] Test existence and correct version number of versionMetadata. Return true if OK, raise exception if not
+    def verify_version_number(druid, bag_pathname)
+      expected = Stanford::StorageRepository.new.storage_object(druid).current_version_id + 1
+      vmfile = bag_pathname.join('data','metadata','versionMetadata.xml')
+      verify_version_id(vmfile, expected, vmfile_version_id(vmfile))
+      inventory_file = bag_pathname.join('versionAdditions.xml')
+      verify_version_id(inventory_file, expected, inventory_version_id(inventory_file))
+      inventory_file = bag_pathname.join('versionInventory.xml')
+      verify_version_id(inventory_file, expected, inventory_version_id(inventory_file))
+      true
+    end
+
+    # @param [Pathname] pathname The location of the file containing a version number
+    # @param [Integer] expected The version number that should be in the file
+    # @param [Integer] found The version number that is actually in the file
+    def verify_version_id(pathname, expected, found)
+      raise "Version mismatch in #{pathname}, expected #{expected}, found #{found}" unless (expected == found)
+      true
+    end
+
+    # @param [Pathname] pathname the location of the versionMetadata file
+    # @return [Integer] the versionId found in the last version element, or nil if missing
+    def vmfile_version_id(pathname)
+      verify_pathname(pathname)
+      doc = Nokogiri::XML(File.open(pathname.to_s))
+      nodeset = doc.xpath("/versionMetadata/version")
+      version_id = nodeset.last['versionId']
+      version_id.nil? ? nil : version_id.to_i
+    end
+
+    # @param [Pathname] pathname the location of the inventory file
+    # @return [Integer] the versionId found in the last version element, or nil if missing
+    def inventory_version_id(pathname)
+      verify_pathname(pathname)
+      doc = Nokogiri::XML(File.open(pathname.to_s))
+      nodeset = doc.xpath("/fileInventory")
+      version_id = nodeset.first['versionId']
+      version_id.nil? ? nil : version_id.to_i
+    end
+
+    # @param [Pathname] bag_pathname the location of the bag whose data is to be validated
     # @return [Boolean] Use the BagIt gem's validation method to verify checksums
-    def validate_bag_data(druid, bag_pathname)
+    def validate_bag_data(bag_pathname)
       invalid_signatures = Array.new
       pathname_signature_hash = FileInventory.new.signatures_from_bagit_manifests(bag_pathname)
       pathname_signature_hash.each do |pathname,signature_from_manifest|
@@ -89,13 +124,10 @@ module Sdr
       if invalid_signatures.size > 0
         errors = bag_pathname.join("validation-errors.txt")
         errors.open('w') {|file| file.puts invalid_signatures}
-        raise LyberCore::Exceptions::ItemError.new(druid, "bag not valid: #{bag_pathname.to_s} - see #{errors.realpath}")
+        raise "Bag data validation error(s): #{bag_pathname.to_s} - see #{errors.realpath}"
       else
         true
       end
-    rescue Errno::ENOENT => e
-      # This will trap any cases where files listed in the manifest do not exist
-      raise LyberCore::Exceptions::ItemError.new(druid, "bag not valid: #{bag_pathname.to_s}", e)
     end
 
     def verification_queries(druid)
