@@ -11,6 +11,15 @@ module Sdr
     @workflow_name = 'sdrRecoveryWF'
     @workflow_step = 'recovery-register'
 
+    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @return [void] process an object from the queue through this robot
+    #   Overrides LyberCore::Robots::Robot.process_item method.
+    #   See LyberCore::Robots::Robot#process_queue
+    def process_item(work_item)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
+      register_item(work_item.druid)
+    end
+
     def verification_queries(druid)
       user_password = "#{Sdr::Config.sedora.user}:#{Sdr::Config.sedora.password}"
       fedora_url = Sdr::Config.sedora.url.sub('//',"//#{user_password}@")

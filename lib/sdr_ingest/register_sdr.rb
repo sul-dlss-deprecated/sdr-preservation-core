@@ -25,9 +25,15 @@ module Sdr
     #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      register_item(work_item.druid)
+      druid=work_item.druid
+      accession_status = get_workflow_status('dor', druid, 'accessionWF', 'sdr-ingest-transfer')
+      unless accession_status == 'completed'
+        raise LyberCore::Exceptions::ItemError.new(
+                  druid, "accessionWF:sdr-ingest-transfer status is #{accession_status}")
+      end
+      register_item(druid)
       # temporary measure until sdr-ingest-transfer creates this row in workflow table
-      update_workflow_status('sdr', work_item.druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting') if @workflow_name == 'sdrIngestWF'
+      update_workflow_status('sdr',druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting') if @workflow_name == 'sdrIngestWF'
     end
 
     # @param druid [String] The object identifier

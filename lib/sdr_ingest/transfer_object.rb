@@ -43,12 +43,29 @@ module Sdr
       deposit_object = DepositObject.new(druid)
       bag_pathname = deposit_object.bag_pathname(verify=false)
       LyberCore::Log.debug("bag_pathname is : #{bag_pathname}")
+      cleanup_deposit_files(druid, bag_pathname) if bag_pathname.exist?
       raise "#{bag_pathname} already exists at destination" if bag_pathname.exist?
       raise "versionMetadata.xml not found in export" unless verify_version_metadata(druid)
       bag_pathname.parent.mkpath
       LyberCore::Utils::FileUtilities.execute(tarpipe_command(druid))
       rescue Exception => e
         raise LyberCore::Exceptions::ItemError.new(druid, "Error transferring object", e)
+    end
+
+    # @param druid [String] The object identifier
+    # @param bag_pathname [Object] The temp location of the bag containing the object version being deposited
+    # @return [Boolean] Cleanup the temp deposit files, raising an error if cleanup failes after 3 attempts
+    def cleanup_deposit_files(druid, bag_pathname)
+      # retry up to 3 times
+      tries ||= 3
+      bag_pathname.rmtree
+      return true
+    rescue Exception => e
+      if (tries -= 1) > 0
+          retry
+      else
+        raise LyberCore::Exceptions::ItemError.new(druid, "Failed cleanup deposit (3 attempts)", e)
+      end
     end
 
     # @param druid [String] The object identifier

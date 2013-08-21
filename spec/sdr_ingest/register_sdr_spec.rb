@@ -28,9 +28,15 @@ describe Sdr::RegisterSdr do
   specify "RegisterSdr#process_item" do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
+    @rs.should_receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
+        and_return("completed")
     @rs.should_receive(:register_item).with(@druid)
     Dor::WorkflowService.should_receive(:update_workflow_status).with('sdr', @druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting')
     @rs.process_item(work_item)
+    @rs.should_receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
+        and_return("error")
+    lambda{@rs.process_item(work_item)}.should raise_exception(/druid:jc837rq9922 - accessionWF:sdr-ingest-transfer status is error/)
+
   end
 
   specify "RegisterSdr#register_item existing item with fakeweb" do
