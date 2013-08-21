@@ -66,7 +66,7 @@ module Sdr
     # @param [Integer] storage_version_id the version identifer expected to be used in the versionMetadata
     # @return [Boolean] Test existence and correct version number of versionMetadata. Return true if OK, raise exception if not
     def verify_version_number(druid, bag_pathname)
-      expected = Stanford::StorageRepository.new.storage_object(druid).current_version_id + 1
+      expected = Stanford::StorageRepository.new.storage_object(druid,create=true).current_version_id + 1
       vmfile = bag_pathname.join('data','metadata','versionMetadata.xml')
       verify_version_id(vmfile, expected, vmfile_version_id(vmfile))
       inventory_file = bag_pathname.join('versionAdditions.xml')

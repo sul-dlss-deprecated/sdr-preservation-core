@@ -76,7 +76,7 @@ module Sdr
       exists_cmd = "if ssh " + Sdr::Config.ingest_transfer.account +
         " test -e " + vmpath + ";" +
         " then echo exists; else echo notfound; fi"
-      (LyberCore::Utils::FileUtilities.execute(exists_cmd) == 'exists')
+      (LyberCore::Utils::FileUtilities.execute(exists_cmd).chomp == 'exists')
     end
 
     # @see http://en.wikipedia.org/wiki/User:Chdev/tarpipe
