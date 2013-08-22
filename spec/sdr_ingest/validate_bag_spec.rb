@@ -84,7 +84,7 @@ describe Sdr::ValidateBag do
     mock_repository = mock(Stanford::StorageRepository)
     Stanford::StorageRepository.should_receive(:new).and_return(mock_repository)
     mock_storage_object = mock(Moab::StorageObject)
-    mock_repository.should_receive(:storage_object).with(druid).and_return(mock_storage_object)
+    mock_repository.should_receive(:storage_object).with(druid,true).and_return(mock_storage_object)
     mock_storage_object.should_receive(:current_version_id).and_return(0)
     bag_pathname = @fixtures.join('packages/v0001')
     @vb.verify_version_number(druid, bag_pathname).should == true
