@@ -197,6 +197,8 @@ class StatusWorkflow  < Status
         puts report_context + report_status_summary(summary)
       when 'WAITING'
         puts "waiting = #{workflow_waiting}\n"
+      when 'ARCHIVED'
+        puts "archived = #{request_archive_count}\n"
       else
         StatusWorkflow.options
     end

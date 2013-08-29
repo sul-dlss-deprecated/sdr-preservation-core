@@ -73,7 +73,12 @@ class StatusStorage < Status
 
   def exec(args)
     areas = storage_areas
-    puts report_context + report_storage_status(areas,args.shift)
+    case args.shift.to_s.upcase
+      when 'TERABYTES'
+        puts "terabytes = #{areas.inject(0){|result,area| result + area.used/1024}}"
+      else
+        puts report_context + report_storage_status(areas,args.shift)
+    end
   end
 
 end
