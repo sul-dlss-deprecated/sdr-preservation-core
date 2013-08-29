@@ -42,14 +42,16 @@ module Sdr
     # @return [Boolean] Cleanup the temp deposit files, raising an error if cleanup failes after 3 attempts
     def cleanup_deposit_files(druid, bag_pathname)
       # retry up to 3 times
-      tries ||= 3
+      sleep_time = [0,2,6]
+      attempts ||= 0
       bag_pathname.rmtree
       return true
     rescue Exception => e
-      if (tries -= 1) > 0
-          retry
+      if (attempts += 1) < sleep_time.size
+        sleep sleep_time[attempts].to_i
+        retry
       else
-        raise LyberCore::Exceptions::ItemError.new(druid, "Failed cleanup deposit (3 attempts)", e)
+        raise LyberCore::Exceptions::ItemError.new(druid, "Failed cleanup deposit (#{attempts} attempts)", e)
       end
     end
 
