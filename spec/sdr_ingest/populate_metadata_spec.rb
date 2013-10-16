@@ -79,6 +79,7 @@ describe Sdr::PopulateMetadata do
 
   specify "PopulateMetadata#set_datastream_content with fakeweb" do
 #    http://fedoraAdmin:fedoraAdmin@localhost:8983/fedora/objects/druid%3Ajc837rq9922?format=xml
+    Rubydora::Repository.any_instance.stub(:version => 3.6)
     FakeWeb.clean_registry
     FakeWeb.allow_net_connect = true
     #FakeWeb.allow_net_connect = "#{@druid_url}?format=xml"
@@ -86,7 +87,7 @@ describe Sdr::PopulateMetadata do
     #FakeWeb.allow_net_connect = "#{@druid_url}/datastreams/sdrIngestWF?format=xml"
     #FakeWeb.allow_net_connect = "#{@druid_url}/datastreams/workflows?format=xml"
     FakeWeb.register_uri(:get, "#{@sedora}/describe?xml=true", :status => ["200", "OK"])
-    FakeWeb.register_uri(:get, "#{@druid_url}?format=xml", :status => ["200", "OK"])
+    FakeWeb.register_uri(:get, "#{@druid_url}?format=xml", :status => ["200", "OK"], :body => '<objectProfile />')
     FakeWeb.register_uri(:get, "#{@druid_url}/datastreams?format=xml", :status => ["200", "OK"])
     FakeWeb.register_uri(:get, "#{@druid_url}/datastreams/workflows?format=xml", :status => ["200", "OK"])
     FakeWeb.register_uri(:get, "#{@druid_url}/datastreams/sdrIngestWF?format=xml", :status => ["200", "OK"])
