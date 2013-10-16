@@ -9,17 +9,20 @@
 # The fix is to uninstall v 0.9.0 and use v 0.8.7
 # v 0.9.0 was installed in the global gemset on my system -- Richard
 
+# Load config for current environment.
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
+
 require 'rake'
 require 'rake/testtask'
 require 'rspec/core/rake_task'
 
-#require 'jettywrapper'
+require 'jettywrapper'
 
 # Import external rake tasks
 Dir.glob('lib/tasks/*.rake').each { |r| import r }
 
 task :default  => :spec
-task :hudson  => [:test_with_jetty, :yard]
+task :hudson  => [:test_with_jetty]
 
 
 desc "Set up environment variables. Unless otherwise specified ROBOT_ENVIRONMENT defaults to local"
