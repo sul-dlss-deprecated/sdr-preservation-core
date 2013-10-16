@@ -20,7 +20,7 @@ describe Sdr::RecoveryVerify do
   end
 
   specify "RecoveryVerify#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @rv.should_receive(:recovery_verify).with(@druid)
     @rv.process_item(work_item)

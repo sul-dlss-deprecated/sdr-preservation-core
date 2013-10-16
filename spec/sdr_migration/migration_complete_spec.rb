@@ -21,7 +21,7 @@ describe Sdr::MigrationComplete do
   end
 
   specify "MigrationComplete#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @rs.should_receive(:complete_deposit).with(@druid)
     @rs.process_item(work_item)

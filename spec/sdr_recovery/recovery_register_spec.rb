@@ -21,7 +21,7 @@ describe Sdr::RecoveryRegister do
   end
 
   specify "RecoveryRegister#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @rr.should_receive(:register_item).with(@druid)
     @rr.process_item(work_item)

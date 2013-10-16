@@ -28,7 +28,7 @@ describe Sdr::PopulateMetadata do
   end
 
   specify "PopulateMetadata#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @pm.should_receive(:populate_metadata).with(@druid)
     @pm.process_item(work_item)
@@ -36,7 +36,7 @@ describe Sdr::PopulateMetadata do
 
   specify "PopulateMetadata#populate_metadata" do
     Pathname.any_instance.should_receive(:directory?).and_return(:true)
-    sedora_object = mock(SedoraObject)
+    sedora_object = double(SedoraObject)
     Sdr::SedoraObject.stub(:find).with(@druid).and_return(sedora_object)
     @pm.should_receive(:set_datastream_content).exactly(4).times
     sedora_object.should_receive(:save)
@@ -57,14 +57,14 @@ describe Sdr::PopulateMetadata do
   end
 
   specify "PopulateMetadata#set_datastream_content" do
-    sedora_object = mock(SedoraObject)
+    sedora_object = double(SedoraObject)
     Pathname.any_instance.stub(:file?).and_return(true)
     Pathname.any_instance.stub(:read).and_return('<identityMetadata objectId="druid:jc837rq9922">')
     dsid = 'identityMetadata'
-    identity_metatdata = mock(dsid)
+    identity_metatdata = double(dsid)
     sedora_object.should_receive(:datastreams).and_return({'identityMetadata'=>identity_metatdata})
     identity_metatdata.should_receive(:content=).with(/<identityMetadata objectId="druid:jc837rq9922">/)
-    sedora_object.should_not_receive(:pid).and_return(@druid)
+    sedora_object.should_not_receive(:pid)
     @pm.set_datastream_content(sedora_object, @bag_pathname, dsid)
 
     #def set_datastream_content(sedora_object, bag_pathname, dsid)

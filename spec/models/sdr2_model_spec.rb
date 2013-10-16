@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
+require 'spec_helper'
 require 'rubygems'
 require 'lyber_core'
 require 'sdr2_model'

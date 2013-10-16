@@ -21,14 +21,14 @@ describe Sdr::RecoveryMetadata do
   end
 
   specify "RecoveryMetadata#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @rm.should_receive(:populate_metadata).with(@druid)
     @rm.process_item(work_item)
   end
 
   specify "RecoveryMetadata#populate_metadata" do
-    mock_so = mock(Sdr::SedoraObject)
+    mock_so = double(Sdr::SedoraObject)
     Sdr::SedoraObject.should_receive(:find).with(@druid).and_return(mock_so)
     @rm.should_receive(:set_datastream_content).any_number_of_times
     mock_so.should_receive(:save).once

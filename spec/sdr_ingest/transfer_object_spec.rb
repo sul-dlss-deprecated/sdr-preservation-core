@@ -22,7 +22,7 @@ describe Sdr::TransferObject do
   end
 
   specify "TransferObject#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @to.should_receive(:transfer_object).with(@druid)
     @to.process_item(work_item)
@@ -55,7 +55,7 @@ describe Sdr::TransferObject do
     @to.transfer_object(@druid)
 
     @to.should_receive(:verify_version_metadata).with(@druid).and_return(true)
-    LyberCore::Utils::FileUtilities.stub!(:execute).and_raise("cmd failed")
+    LyberCore::Utils::FileUtilities.stub(:execute).and_raise("cmd failed")
     lambda {@to.transfer_object(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
 
     @to.should_receive(:verify_version_metadata).with(@druid).and_return(false)
