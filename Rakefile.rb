@@ -55,15 +55,12 @@ end
 
 
 desc "Run RSpec Examples wrapped in a test instance of jetty"
-task :test_with_jetty do
+task :test_with_jetty => ['jetty:clean'] do
   if (ENV['RAILS_ENV'] == "test")
     jetty_params = { 
-      :jetty_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty'), 
       :quiet => false, 
-      :jetty_port => 8983, 
-      :solr_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty/solr'),
-      :fedora_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty/fedora/default'),
-      :startup_wait => 30
+      :jetty_port => 8983,
+      :startup_wait => 45
       }
     error = Jettywrapper.wrap(jetty_params) do  
       Rake::Task["spec"].invoke
