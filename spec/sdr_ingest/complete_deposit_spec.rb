@@ -5,8 +5,7 @@ describe Sdr::CompleteDeposit do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
-    deposit_object=DepositObject.new(@druid)
-    @bag_pathname = deposit_object.bag_pathname(validate=false)
+    @bag_pathname = @fixtures.join('import','jc837rq9922')
   end
 
   before(:each) do
@@ -23,20 +22,23 @@ describe Sdr::CompleteDeposit do
   specify "CompleteDeposit#process_item" do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @cd.should_receive(:complete_deposit).with(@druid)
+    mock_so = mock(StorageObject)
+    mock_path = mock(Pathname)
+    StorageServices.should_receive(:find_storage_object).with(@druid,true).and_return(mock_so)
+    mock_so.should_receive(:object_pathname).and_return(mock_path)
+    mock_path.should_receive(:mkpath)
+    @cd.should_receive(:complete_deposit).with(@druid,mock_so)
     @cd.process_item(work_item)
   end
 
   specify "CompleteDeposit#complete_deposit" do
-    repository = mock(Stanford::StorageRepository)
-    Stanford::StorageRepository.should_receive(:new).and_return(repository)
+    storage_object = mock(StorageObject)
     new_version = mock(StorageObjectVersion)
-    repository.should_receive(:store_new_object_version).with(@druid, @bag_pathname).and_return(new_version)
+    storage_object.should_receive(:ingest_bag).and_return(new_version)
     result = mock(VerificationResult)
     result.stub(:verified).and_return(true)
     new_version.should_receive(:verify_version_storage).and_return(result)
-    Pathname.any_instance.should_receive(:directory?).and_return(true)
-    @cd.complete_deposit(@druid)
+    @cd.complete_deposit(@druid,storage_object)
   end
 
 end

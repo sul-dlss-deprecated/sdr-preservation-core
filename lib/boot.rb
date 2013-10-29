@@ -30,10 +30,12 @@ module Dor
 end
 
 #
-# This config object is created in moab-versioning/lib/moab/config.rb
+# The Moab::Config object is created in moab-versioning/lib/moab/config.rb
 # module Moab
 #   Config = Confstruct::Configuration.new do
-#     repository_home  nil
+#     storage_roots nil
+#     storage_trunk nil
+#     deposit_trunk nil
 #     path_method 'druid_tree'
 #   end
 # end
@@ -54,11 +56,8 @@ module Sdr
       export_dir "/dor/export/"
     end
     logdir File.join(ROBOT_ROOT, 'log')
-    sdr_deposit_home "/services-disk02/deposit"
-    old_storage_node "/services-disk/sdr2objects"
-    storage_node "/services-disk02/sdr2objects"
+    migration_source "/services-disk/sdr2objects"
     sdr_recovery_home nil
-    example_objects "/services-disk02/examples"
     enqueue_max 10
     audit_verbose false
   end
@@ -107,7 +106,6 @@ ActiveFedora.configurator = Sdr::SedoraConfigurator.new
 ActiveFedora.init
 
 require 'sdr/sdr_robot'
-require 'sdr/deposit_object'
 require 'sdr/sedora_object'
 
 module Dor

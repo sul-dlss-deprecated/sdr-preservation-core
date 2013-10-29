@@ -15,11 +15,11 @@ module Sdr
 
 
     # @param druid [String] The object identifier
+    # @param deposit_bag_pathname [Pathname] The location of the BagIt bag being ingested
     # @return [void] Transfer the object from the DOR export area to the SDR deposit area.
-    def transfer_object(druid)
+    def transfer_object(druid,deposit_bag_pathname)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
       original_bag_pathname = locate_old_bag(druid)
-      deposit_bag_pathname = DepositObject.new(druid).bag_pathname(verify=false)
       rsync_object(original_bag_pathname, deposit_bag_pathname)
       generate_inventory_manifests(druid, deposit_bag_pathname)
     end
@@ -28,7 +28,7 @@ module Sdr
     # @param druid [String] The object identifier
     # @return [Pathname] Find the original ingest location of the specified object
     def locate_old_bag(druid)
-      old_storage_area = Pathname(Sdr::Config.old_storage_node)
+      old_storage_area = Pathname(Sdr::Config.migration_source)
       tree_based_pathname = tree_based_location(druid, old_storage_area)
       return tree_based_pathname if tree_based_pathname && tree_based_pathname.exist?
       date_based_pathname = date_based_location(druid, old_storage_area)
@@ -127,10 +127,10 @@ module Sdr
     end
 
     def verification_files(druid)
-      bag_pathname = Pathname(Sdr::Config.sdr_deposit_home).join(druid.sub('druid:',''))
+      storage_object = StorageServices.find_storage_object(druid,include_deposit=true)
       files = []
-      files << bag_pathname.to_s
-      files << bag_pathname.join("bag-info.txt").to_s
+        files << storage_object.deposit_bag_pathname.to_s
+        files << storage_object.deposit_bag_pathname.join("bag-info.txt").to_s
       files
     end
 

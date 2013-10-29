@@ -202,8 +202,7 @@ class StatusActivity < Status
       when 'TREE'
         dirname = args.shift.to_s
         if dirname =~ /^([a-z]{2})(\d{3})([a-z]{2})(\d{4})$/
-          repository = Stanford::StorageRepository.new
-          storage_path = repository.storage_object_pathname(dirname)
+          storage_path = StorageServices.object_path(dirname)
           system "tree -idf --noreport #{storage_path}"
           return
         else

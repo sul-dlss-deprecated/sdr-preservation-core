@@ -12,11 +12,10 @@ module Sdr
     @workflow_step = 'migration-complete'
 
     # @param druid [String] The object identifier
+    # @param storage_object [StorageObject] The representation of a digitial object's storage directory
     # @return [void] complete ingest of the item,  cleanup temp deposit data.
-    def complete_deposit(druid)
-      bag_pathname = DepositObject.new(druid).bag_pathname()
-      repository = Stanford::StorageRepository.new
-      new_version = repository.store_new_object_version(druid, bag_pathname)
+    def complete_deposit(druid,storage_object)
+      new_version = storage_object.ingest_bag
       result = new_version.verify_version_storage
       if result.verified == false
         LyberCore::Log.info result.to_json(verbose=false)
@@ -40,9 +39,8 @@ module Sdr
     end
 
     def verification_files(druid)
-      repository = Stanford::StorageRepository.new
       files = []
-      files << repository.storage_object_pathname(druid).to_s
+      files << StorageServices.object_path(druid).to_s
       files
     end
 

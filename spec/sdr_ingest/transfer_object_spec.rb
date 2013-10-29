@@ -5,9 +5,7 @@ describe Sdr::TransferObject do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
-    deposit_object = DepositObject.new(@druid)
-    @bag_pathname = deposit_object.bag_pathname(validate=false)
-    @tarfile_pathname =deposit_object.tarfile_pathname()
+    @bag_pathname = @fixtures.join('import','jc837rq9922')
   end
 
   before(:each) do
@@ -24,13 +22,13 @@ describe Sdr::TransferObject do
   specify "TransferObject#process_item" do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @to.should_receive(:transfer_object).with(@druid)
+    @to.should_receive(:transfer_object).with(@druid,@fixtures.join('packages','jc837rq9922'))
     @to.process_item(work_item)
   end
 
 
   specify "TransferObject#tarpipe_command" do
-    cmd = @to.tarpipe_command(@druid)
+    cmd = @to.tarpipe_command(@druid, "#{ROBOT_ROOT}/spec/fixtures/import")
     cmd.should ==  "ssh lyberadmin@sul-lyberservices-dev.stanford.edu \"tar -C /dor/export/ --dereference -cf - jc837rq9922 \" | tar -C #{ROBOT_ROOT}/spec/fixtures/import -xf -"
   end
 
@@ -44,22 +42,20 @@ describe Sdr::TransferObject do
 
   specify "TransferObject#transfer_object" do
 
-    Pathname.any_instance.stub(:exist?).and_return(true)
-    lambda{@to.transfer_object(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
-
     Pathname.any_instance.stub(:exist?).and_return(false)
-    Pathname.any_instance.should_receive(:mkpath)
+    Pathname.any_instance.stub(:mkpath)
     @to.should_receive(:verify_version_metadata).with(@druid).and_return(true)
-    @to.should_receive(:tarpipe_command).with(@druid).and_return('thecommand')
+    @to.should_receive(:tarpipe_command).with(@druid,@bag_pathname.parent).and_return('thecommand')
     LyberCore::Utils::FileUtilities.should_receive(:execute).with('thecommand')
-    @to.transfer_object(@druid)
+    @to.transfer_object(@druid,@bag_pathname)
 
     @to.should_receive(:verify_version_metadata).with(@druid).and_return(true)
+    @to.should_receive(:tarpipe_command).with(@druid,@bag_pathname.parent).and_return('thecommand')
     LyberCore::Utils::FileUtilities.stub!(:execute).and_raise("cmd failed")
-    lambda {@to.transfer_object(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
+    lambda {@to.transfer_object(@druid,@bag_pathname)}.should raise_exception(LyberCore::Exceptions::ItemError)
 
     @to.should_receive(:verify_version_metadata).with(@druid).and_return(false)
-    lambda {@to.transfer_object(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
+    lambda {@to.transfer_object(@druid,@bag_pathname)}.should raise_exception(LyberCore::Exceptions::ItemError)
 
    end
 

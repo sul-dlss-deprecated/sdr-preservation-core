@@ -99,9 +99,9 @@ GEM
       posix-spawn (~> 0.3.6)
     gyoku (0.4.6)
       builder (>= 2.1.2)
-    happymapper (0.4.0)
+    happymapper (0.4.1)
       libxml-ruby (~> 2.0)
-    hashery (2.1.0)
+    hashery (2.1.1)
     highline (1.6.15)
     hike (1.2.1)
     hooks (0.2.1)
@@ -116,7 +116,7 @@ GEM
       mediashelf-loggable
     journey (1.0.4)
     json (1.8.0)
-    libxml-ruby (2.6.0)
+    libxml-ruby (2.7.0)
     logger (1.2.8)
     lyber-core (2.2.1)
       actionpack
@@ -153,7 +153,7 @@ GEM
       treetop (~> 1.4.8)
     mediashelf-loggable (0.4.9)
     mime-types (1.19)
-    moab-versioning (1.2.7)
+    moab-versioning (1.2.10)
       confstruct
       happymapper
       hashery (>= 2.0.0)
@@ -273,7 +273,7 @@ DEPENDENCIES
   jettywrapper
   lyber-core
   lyberteam-devel (>= 1.0.0)
-  moab-versioning (>= 1.2.7)
+  moab-versioning (= 1.2.10)
   mongo
   nokogiri
   rake (>= 0.8.7)

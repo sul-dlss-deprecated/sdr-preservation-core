@@ -25,16 +25,20 @@ module Sdr
     #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      validate_bag(work_item.druid)
+      storage_object = StorageServices.find_storage_object(work_item.druid,include_deposit=true)
+      bag_pathname = storage_object.deposit_bag_pathname
+      current_version_id  = storage_object.current_version_id
+      validate_bag(work_item.druid,bag_pathname, current_version_id)
     end
 
     # @param druid [String] The object identifier
+    # @param bag_pathname [Pathname] The location of the BagIt bag being ingested
+    # @param current_version_id [Integer] The version number of the object's current version (or 0 if none)
     # @return [Boolean] Validate the bag containing the digital object
-    def validate_bag(druid)
+    def validate_bag(druid, bag_pathname, current_version_id)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter validate_bag")
-      bag_pathname = DepositObject.new(druid).bag_pathname()
       verify_bag_structure(bag_pathname)
-      verify_version_number(druid, bag_pathname)
+      verify_version_number(bag_pathname, current_version_id)
       validate_bag_data(bag_pathname)
       true
     rescue Exception => e
@@ -63,10 +67,10 @@ module Sdr
     end
 
     # @param [Pathname] bag_pathname the location of the bag whose versionMetadata is to be verified
-    # @param [Integer] storage_version_id the version identifer expected to be used in the versionMetadata
+    # @param current_version_id [Integer] The version number of the object's current version (or 0 if none)
     # @return [Boolean] Test existence and correct version number of versionMetadata. Return true if OK, raise exception if not
-    def verify_version_number(druid, bag_pathname)
-      expected = Stanford::StorageRepository.new.storage_object(druid,create=true).current_version_id + 1
+    def verify_version_number(bag_pathname, current_version_id)
+      expected = current_version_id + 1
       vmfile = bag_pathname.join('data','metadata','versionMetadata.xml')
       verify_version_id(vmfile, expected, vmfile_version_id(vmfile))
       inventory_file = bag_pathname.join('versionAdditions.xml')
@@ -136,9 +140,9 @@ module Sdr
     end
 
     def verification_files(druid)
-      bag_pathname = Pathname(Sdr::Config.sdr_deposit_home).join(druid.sub('druid:',''))
+      storage_object = StorageServices.find_storage_object(druid,include_deposit=true)
       files = []
-      files << bag_pathname.join("bag-info.txt").to_s
+      files << storage_object.deposit_bag_pathname.join("bag-info.txt").to_s
       files
     end
 

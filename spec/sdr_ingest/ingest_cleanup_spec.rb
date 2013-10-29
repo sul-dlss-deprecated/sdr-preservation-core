@@ -5,8 +5,7 @@ describe Sdr::IngestCleanup do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
-    deposit_object=DepositObject.new(@druid)
-    @bag_pathname = deposit_object.bag_pathname(validate=false)
+    @bag_pathname = @fixtures.join('import','jc837rq9922')
 
     @sdr_workflow = %{<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <workflow objectId="druid:jc837rq9922" id="sdrIngestWF">
@@ -46,7 +45,7 @@ describe Sdr::IngestCleanup do
   specify "IngestCleanup#process_item" do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @ic.should_receive(:ingest_cleanup).with(@druid)
+    @ic.should_receive(:ingest_cleanup).with(@druid,@fixtures.join('packages','jc837rq9922'))
     @ic.process_item(work_item)
   end
 
@@ -55,7 +54,7 @@ describe Sdr::IngestCleanup do
     Pathname.any_instance.should_receive(:rmtree)
     @ic.should_receive(:update_provenance).with(@druid)
     Dor::WorkflowService.should_receive(:update_workflow_status)
-    @ic.ingest_cleanup(@druid)
+    @ic.ingest_cleanup(@druid,@bag_pathname)
   end
 
   specify "IngestCleanup#update_provenance" do

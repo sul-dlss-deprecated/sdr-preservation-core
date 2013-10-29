@@ -28,11 +28,9 @@ describe Sdr::RecoveryRestore do
   end
 
   specify "RecoveryComplete#recovery_restore" do
-    repository = mock(Stanford::StorageRepository)
     storage_object = mock(Moab::StorageObject)
     recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(@druid.sub('druid:',''))
-    Stanford::StorageRepository.should_receive(:new).and_return(repository)
-    repository.should_receive(:storage_object).with(@druid,true).and_return(storage_object)
+    StorageServices.should_receive(:storage_object).with(@druid,true).and_return(storage_object)
     storage_object.should_receive(:restore_object).with(recovery_path)
     verification_result = mock(VerificationResult)
     verification_result.stub(:verified).and_return(true)

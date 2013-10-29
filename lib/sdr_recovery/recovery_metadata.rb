@@ -11,11 +11,11 @@ module Sdr
     @workflow_step = 'recovery-metadata'
 
     # @param druid [String] The object identifier
+    # @param bag_pathname [Pathname] The location of the BagIt bag being ingested
     # @return [SedoraObject] Add metadata datastreams to the Fedora object
-    def populate_metadata(druid)
+    def populate_metadata(druid,bag_pathname)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter populate_metadata")
-      repository = Stanford::StorageRepository.new
-      storage_object = repository.storage_object(druid)
+      storage_object = StorageServices.storage_object(druid)
       current_version = storage_object.current_version
       sedora_object = Sdr::SedoraObject.find(druid)
       self.metadata_datastreams.each do |dsid|

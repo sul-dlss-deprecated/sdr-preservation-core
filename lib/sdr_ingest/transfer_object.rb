@@ -25,10 +25,13 @@ module Sdr
     #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      transfer_object(work_item.druid)
+      storage_object = StorageServices.find_storage_object(work_item.druid,include_deposit=true)
+      bag_pathname = storage_object.deposit_bag_pathname
+      transfer_object(work_item.druid,bag_pathname)
     end
 
     # @param druid [String] The object identifier
+    # @param bag_pathname [Pathname] The location of the BagIt bag being ingested
     # @return [void] Transfer and untar the object from the DOR export area to the SDR deposit area.
     #   Note: POSIX tar has a limit of 100 chars in a filename
     #     some implementations of gnu TAR work around this by adding a ././@LongLink file containing the full name
@@ -38,16 +41,14 @@ module Sdr
     #   Also, beware of incompatabilities between BSD tar and other TAR formats
     #     regarding the handling of vendor extended attributes.
     #     See: http://xorl.wordpress.com/2012/05/15/admin-mistakes-gnu-bsd-tar-and-posix-compatibility/
-    def transfer_object(druid)
+    def transfer_object(druid, bag_pathname)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
-      deposit_object = DepositObject.new(druid)
-      bag_pathname = deposit_object.bag_pathname(verify=false)
-      LyberCore::Log.debug("bag_pathname is : #{bag_pathname}")
+      deposit_home = bag_pathname.parent
+      deposit_home.mkpath
+      LyberCore::Log.debug("deposit bag_pathname is : #{bag_pathname}")
       cleanup_deposit_files(druid, bag_pathname) if bag_pathname.exist?
-      raise "#{bag_pathname} already exists at destination" if bag_pathname.exist?
       raise "versionMetadata.xml not found in export" unless verify_version_metadata(druid)
-      bag_pathname.parent.mkpath
-      LyberCore::Utils::FileUtilities.execute(tarpipe_command(druid))
+      LyberCore::Utils::FileUtilities.execute(tarpipe_command(druid,deposit_home))
       rescue Exception => e
         raise LyberCore::Exceptions::ItemError.new(druid, "Error transferring object", e)
     end
@@ -81,11 +82,11 @@ module Sdr
 
     # @see http://en.wikipedia.org/wiki/User:Chdev/tarpipe
     # ssh ${user}@${remotehost} "tar -cf - ${srcdir}" | tar -C ${destdir} -xf -
-    def tarpipe_command(druid)
+    def tarpipe_command(druid, deposit_home)
       'ssh ' + Sdr::Config.ingest_transfer.account +
       ' "tar -C ' + Sdr::Config.ingest_transfer.export_dir  +
       ' --dereference -cf - ' + druid.sub('druid:','') +
-      ' " | tar -C ' + Sdr::Config.sdr_deposit_home +
+      ' " | tar -C ' + deposit_home.to_s +
       ' -xf -'
     end
 
@@ -95,8 +96,9 @@ module Sdr
     end
 
     def verification_files(druid)
+      storage_object = StorageServices.find_storage_object(druid,include_deposit=true)
       files = []
-        files << Pathname(Sdr::Config.sdr_deposit_home).join(druid.sub('druid:','')).to_s
+        files << storage_object.deposit_bag_pathname.to_s
       files
     end
 

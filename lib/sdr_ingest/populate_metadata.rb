@@ -25,15 +25,16 @@ module Sdr
     #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      druid = work_item.druid
-      populate_metadata(druid)
+      storage_object = StorageServices.find_storage_object(work_item.druid,include_deposit=true)
+      bag_pathname = storage_object.deposit_bag_pathname
+      populate_metadata(work_item.druid,bag_pathname)
     end
 
     # @param druid [String] The object identifier
+    # @param bag_pathname [Pathname] The location of the BagIt bag being ingested
     # @return [SedoraObject] Add the core metadata datastreams to the Fedora object
-    def populate_metadata(druid)
+    def populate_metadata(druid,bag_pathname)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter fill_datastreams")
-      bag_pathname = DepositObject.new(druid).bag_pathname()
       sedora_object = Sdr::SedoraObject.find(druid)
       set_datastream_content(sedora_object, bag_pathname, 'identityMetadata')
       set_datastream_content(sedora_object, bag_pathname, 'versionMetadata')

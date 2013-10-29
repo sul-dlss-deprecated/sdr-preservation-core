@@ -25,13 +25,15 @@ module Sdr
     #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      ingest_cleanup(work_item.druid)
+      storage_object = StorageServices.find_storage_object(work_item.druid,include_deposit=true)
+      bag_pathname = storage_object.deposit_bag_pathname
+      ingest_cleanup(work_item.druid,bag_pathname )
     end
 
     # @param druid [String] The object identifier
+    # @param bag_pathname [Pathname] The location of the BagIt bag being ingested
     # @return [void] complete ingest of the item, update provenance, cleanup deposit data.
-    def ingest_cleanup(druid)
-      bag_pathname = DepositObject.new(druid).bag_pathname(verify=false)
+    def ingest_cleanup(druid,bag_pathname )
       cleanup_deposit_files(druid, bag_pathname) if bag_pathname.exist?
       update_provenance(druid)
       update_workflow_status('dor', druid, 'accessionWF', 'sdr-ingest-received', 'completed')
@@ -174,9 +176,8 @@ module Sdr
     end
 
     def verification_files(druid)
-      repository = Stanford::StorageRepository.new
       files = []
-      files << repository.storage_object_pathname(druid).to_s
+      files << StorageServices.object_path(druid).to_s
       files
     end
 

@@ -79,7 +79,7 @@ class StatusMonitor
     areas = @status_storage.storage_areas
     report = @status_storage.report_storage_status(areas,@freegb_threshold)
     @storage_report.open('w'){|f| f.write(report)}
-    @freegb = areas.select{|area| area.filesystem == Pathname(Sdr::Config.storage_node).parent.to_s}.first.free
+    @freegb = areas.select{|area| area.filesystem == StorageServices.storage_roots.last.to_s}.first.free
     test_freegb(@freegb)
     @freegb
   end

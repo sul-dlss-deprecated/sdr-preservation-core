@@ -24,7 +24,7 @@ describe Sdr::MigrationTransfer do
   specify "MigrationTransfer#process_item" do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @mt.should_receive(:transfer_object).with(@druid)
+    @mt.should_receive(:transfer_object).with(@druid,@fixtures.join('packages','jq937jp0017'))
     @mt.process_item(work_item)
   end
   

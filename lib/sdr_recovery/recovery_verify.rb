@@ -48,9 +48,7 @@ module Sdr
     end
 
     def verification_files(druid)
-      bag_pathname = Pathname(Sdr::Config.sdr_deposit_home).join(druid.sub('druid:',''))
       files = []
-      files << bag_pathname.join("bag-info.txt").to_s
       files
     end
 

@@ -32,8 +32,7 @@ module Sdr
     # @return [Boolean] Reconcile manifests against the files in the digital object's storage location
     def audit_verify(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter audit_verify")
-      repository = Stanford::StorageRepository.new
-      storage_object = repository.storage_object(druid,create=false)
+      storage_object = StorageServices.storage_object(druid,create=false)
       result = storage_object.verify_object_storage
       if result.verified
         LyberCore::Log.info "Verification Result:\n" + result.to_json(verbose=Sdr::Config.audit_verbose)
@@ -50,9 +49,9 @@ module Sdr
     end
 
     def verification_files(druid)
-      bag_pathname = Pathname(Sdr::Config.sdr_deposit_home).join(druid.sub('druid:',''))
+      storage_object = StorageServices.find_storage_object(druid,include_deposit=true)
       files = []
-      files << bag_pathname.join("bag-info.txt").to_s
+      files << storage_object.deposit_bag_pathname.join("bag-info.txt").to_s
       files
     end
 

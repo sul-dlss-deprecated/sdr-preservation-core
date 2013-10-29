@@ -25,15 +25,16 @@ module Sdr
     #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      complete_deposit(work_item.druid)
+      storage_object = StorageServices.find_storage_object(work_item.druid,include_deposit=true)
+      storage_object.object_pathname.mkpath
+      complete_deposit(work_item.druid,storage_object)
     end
 
     # @param druid [String] The object identifier
+    # @param storage_object [StorageObject] The representation of a digitial object's storage directory
     # @return [void] complete ingest of the item, update provenance, cleanup deposit data.
-    def complete_deposit(druid)
-      bag_pathname = DepositObject.new(druid).bag_pathname()
-      repository = Stanford::StorageRepository.new
-      new_version = repository.store_new_object_version(druid, bag_pathname)
+    def complete_deposit(druid,storage_object)
+      new_version = storage_object.ingest_bag
       result = new_version.verify_version_storage
       if result.verified == false
         LyberCore::Log.info result.to_json(verbose=false)
@@ -52,9 +53,8 @@ module Sdr
     end
 
     def verification_files(druid)
-      repository = Stanford::StorageRepository.new
       files = []
-      files << repository.storage_object_pathname(druid).to_s
+      files << StorageServices.object_path(druid).to_s
       files
     end
 

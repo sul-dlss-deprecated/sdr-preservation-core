@@ -5,8 +5,7 @@ describe Sdr::ValidateBag do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
-    deposit_object = DepositObject.new(@druid)
-    @bag_pathname = deposit_object.bag_pathname(validate=false)
+    @bag_pathname = @fixtures.join('import','jc837rq9922')
   end
 
   before(:each) do
@@ -23,21 +22,20 @@ describe Sdr::ValidateBag do
   specify "ValidateBag#process_item" do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @vb.should_receive(:validate_bag).with(@druid)
+    @vb.should_receive(:validate_bag).with(@druid,@fixtures.join('packages','jc837rq9922'), 0)
     @vb.process_item(work_item)
   end
 
   specify "ValidateBag#validate_bag" do
     @vb.should_receive(:verify_bag_structure).with(@bag_pathname)
-    @vb.should_receive(:verify_version_number).with(@druid,@bag_pathname)
+    @vb.should_receive(:verify_version_number).with(@bag_pathname,0)
     @vb.should_receive(:validate_bag_data).with(@bag_pathname)
-    Pathname.any_instance.should_receive(:directory?).and_return(true)
-    @vb.validate_bag(@druid)
+    @vb.validate_bag(@druid,@bag_pathname,0)
   end
 
   specify "ValidateBag#validate_bag_structure" do
     @bag_pathname.stub(:to_s).and_return('bagdir')
-    @bag_pathname.stub(:directory?).and_return(false)
+    @bag_pathname.stub(:exist?).and_return(false)
     lambda{@vb.verify_bag_structure(@bag_pathname)}.should raise_exception(/jc837rq9922 not found at bagdir/)
     @bag_pathname.stub(:exist?).and_return(true)
 
@@ -80,14 +78,9 @@ describe Sdr::ValidateBag do
   end
 
   specify "ValidateBag#verify_version_number" do
-    druid = 'druid:jq937jp0017'
-    mock_repository = mock(Stanford::StorageRepository)
-    Stanford::StorageRepository.should_receive(:new).and_return(mock_repository)
-    mock_storage_object = mock(Moab::StorageObject)
-    mock_repository.should_receive(:storage_object).with(druid,true).and_return(mock_storage_object)
-    mock_storage_object.should_receive(:current_version_id).and_return(0)
     bag_pathname = @fixtures.join('packages/v0001')
-    @vb.verify_version_number(druid, bag_pathname).should == true
+    @vb.verify_version_number(bag_pathname,0).should == true
+    lambda{@vb.verify_version_number( bag_pathname,1)}.should raise_exception(/Version mismatch/)
   end
 
   specify "ValidateBag#verify_version_id" do

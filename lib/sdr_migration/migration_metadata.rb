@@ -12,10 +12,10 @@ module Sdr
     @workflow_step = 'migration-metadata'
 
     # @param druid [String] The object identifier
+    # @param bag_pathname [Pathname] The location of the BagIt bag being ingested
     # @return [SedoraObject] Add the versionMetadata datastream to the Fedora object
-    def populate_metadata(druid)
+    def populate_metadata(druid,bag_pathname)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter populate_metadata")
-      bag_pathname = DepositObject.new(druid).bag_pathname()
       remediate_version_metadata(druid, bag_pathname)
       sedora_object = Sdr::SedoraObject.find(druid)
       set_datastream_content(sedora_object, bag_pathname, 'versionMetadata')

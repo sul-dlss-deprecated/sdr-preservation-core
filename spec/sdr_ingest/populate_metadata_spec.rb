@@ -12,8 +12,7 @@ describe Sdr::PopulateMetadata do
     @sedora = url.sub(/[:]\/\//, "://#{user}:#{password}@")
     @druid_url = "#{@sedora}/objects/druid%3A#{@object_id}"
 
-    deposit_object = DepositObject.new(@druid)
-    @bag_pathname = deposit_object.bag_pathname(validate=false)
+    @bag_pathname = @fixtures.join('import','jc837rq9922')
   end
 
   before(:each) do
@@ -30,30 +29,16 @@ describe Sdr::PopulateMetadata do
   specify "PopulateMetadata#process_item" do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @pm.should_receive(:populate_metadata).with(@druid)
+    @pm.should_receive(:populate_metadata).with(@druid,@fixtures.join('packages','jc837rq9922'))
     @pm.process_item(work_item)
   end
 
   specify "PopulateMetadata#populate_metadata" do
-    Pathname.any_instance.should_receive(:directory?).and_return(:true)
     sedora_object = mock(SedoraObject)
     Sdr::SedoraObject.stub(:find).with(@druid).and_return(sedora_object)
     @pm.should_receive(:set_datastream_content).exactly(4).times
     sedora_object.should_receive(:save)
-    @pm.populate_metadata(@druid)
-
-    #def fill_datastreams(druid)
-    #  LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter populate_metadata")
-    #  bag_pathname = find_bag(druid)
-    #  sedora_object = Sdr::SedoraObject.find(druid)
-    #  set_datastream_content(sedora_object, bag_pathname, 'identityMetadata')
-    #  set_datastream_content(sedora_object, bag_pathname, 'provenanceMetadata')
-    #  sedora_object.save
-    #rescue ActiveFedora::ObjectNotFoundError => e
-    #  raise LyberCore::Exceptions::FatalError.new("Cannot find object #{druid}",e)
-    #rescue  Exception => e
-    #  raise LyberCore::Exceptions::FatalError.new("Cannot process item #{druid}",e)
-    #end
+    @pm.populate_metadata(@druid,@bag_pathname)
   end
 
   specify "PopulateMetadata#set_datastream_content" do

@@ -33,7 +33,6 @@ class RobotRunner
     @loglevel = (args.map(&:upcase).include?('DEBUG')) ? 0 : 1
     @verify = (args.map(&:upcase).include?('VERIFY')) ? true : false
     @environment = ENV["ROBOT_ENVIRONMENT"]
-    @repository_home = Sdr::Config.storage_node
     @status_process = StatusProcess.new(@workflow)
     @item_counts = {:completed=>0,:error=>0, :fatal=>0}
   end
@@ -293,8 +292,7 @@ class RobotRunner
   end
 
   def get_version_stats(druid,ingest_detail)
-    repository = Stanford::StorageRepository.new
-    storage_object = repository.storage_object(druid)
+    storage_object = StorageServices.find_storage_object(druid)
     version = storage_object.find_object_version
     write_item_tree(version)
     ingest_detail.version = version.version_id
@@ -309,11 +307,12 @@ class RobotRunner
   end
 
   def write_item_tree(version)
-    version_path = version.version_pathname.relative_path_from(Pathname(@repository_home))
-    tree = `cd #{@repository_home}; tree -s #{version_path}`
+    object_parent_path = version.storage_object.object_pathname.parent
+    version_path = version.version_pathname.relative_path_from(object_parent_path)
+    tree = `cd #{object_parent_path}; tree -s #{version_path}`
     treefile = "#{AppHome}/log/#{@workflow}/current/status/latest-item.txt"
     Pathname(treefile).open('w')do |f|
-      f.write "Latest Addition to #{@repository_home}\n"
+      f.write "Latest Addition to repositor\n"
       f.write "#{'='*50}\n"
       f.write(tree)
     end

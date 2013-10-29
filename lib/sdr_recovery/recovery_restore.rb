@@ -32,8 +32,7 @@ module Sdr
     # @return [void] transfer recovered object files to repository storage.
     def recovery_restore(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter recovery_restore")
-      repository = Stanford::StorageRepository.new
-      storage_object = repository.storage_object(druid,create=true)
+      storage_object = StorageServices.storage_object(druid,create=true)
       recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(druid.sub('druid:',''))
       storage_object.restore_object(recovery_path)
       result = storage_object.verify_object_storage
@@ -59,9 +58,8 @@ module Sdr
     end
 
     def verification_files(druid)
-      repository = Stanford::StorageRepository.new
       files = []
-      files << repository.storage_object_pathname(druid).to_s
+      files << StorageServices.object_path(druid).to_s
       files
     end
 

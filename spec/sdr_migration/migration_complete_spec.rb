@@ -23,7 +23,12 @@ describe Sdr::MigrationComplete do
   specify "MigrationComplete#process_item" do
     work_item = mock("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @rs.should_receive(:complete_deposit).with(@druid)
+    mock_so = mock(StorageObject)
+    mock_path = mock(Pathname)
+    StorageServices.should_receive(:find_storage_object).with(@druid,true).and_return(mock_so)
+    mock_so.should_receive(:object_pathname).and_return(mock_path)
+    mock_path.should_receive(:mkpath)
+    @rs.should_receive(:complete_deposit).with(@druid,mock_so)
     @rs.process_item(work_item)
   end
 
