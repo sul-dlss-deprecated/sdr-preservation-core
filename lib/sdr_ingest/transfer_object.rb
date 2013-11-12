@@ -63,7 +63,8 @@ module Sdr
       return true
     rescue Exception => e
       if (tries -= 1) > 0
-          retry
+        GC.start
+        retry
       else
         raise LyberCore::Exceptions::ItemError.new(druid, "Failed cleanup deposit (3 attempts)", e)
       end

@@ -22,7 +22,27 @@ module Sdr
         raise LyberCore::Exceptions::ItemError.new(druid, "Failed validation",e)
       end
       #update_provenance(druid)
+      bag_pathname = storage_object.deposit_bag_pathname
       cleanup_deposit_files(druid, bag_pathname)
+    end
+
+    # @param druid [String] The object identifier
+    # @param bag_pathname [Object] The temp location of the bag containing the object version being deposited
+    # @return [Boolean] Cleanup the temp deposit files, raising an error if cleanup failes after 3 attempts
+    def cleanup_deposit_files(druid, bag_pathname)
+      # retry up to 3 times
+      sleep_time = [0,2,6]
+      attempts ||= 0
+      bag_pathname.rmtree
+      return true
+    rescue Exception => e
+      if (attempts += 1) < sleep_time.size
+        GC.start
+        sleep sleep_time[attempts].to_i
+        retry
+      else
+        raise LyberCore::Exceptions::ItemError.new(druid, "Failed cleanup deposit (#{attempts} attempts)", e)
+      end
     end
 
     def verification_queries(druid)

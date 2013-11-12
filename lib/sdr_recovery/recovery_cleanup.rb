@@ -28,12 +28,30 @@ module Sdr
     end
 
     # @param druid [String] The object identifier
-    # @return [void] complete ingest of the item,  cleanup temp deposit data.
+    # @return [Boolean] complete ingest of the item,  cleanup temp deposit data.
     def recovery_cleanup(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter recovery_cleanup")
       recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(druid.sub('druid:',''))
-      recovery_path.rmtree if recovery_path.exist?
+      cleanup_recovery_files(druid, recovery_path) if recovery_path.exist?
     end
+
+    # @param druid [String] The object identifier
+    # @param recovery_path [Pathname] The temp location of the folder containing the object files being restored
+    # @return [Boolean] Cleanup the temp recovery files, raising an error if cleanup failes after 3 attempts
+    def cleanup_recovery_files(druid, recovery_path)
+      # retry up to 3 times
+      tries ||= 3
+      recovery_path.rmtree
+      return true
+    rescue Exception => e
+      if (tries -= 1) > 0
+        GC.start
+        retry
+      else
+        raise LyberCore::Exceptions::ItemError.new(druid, "Failed rmtree #{recovery_path} (3 attempts)", e)
+      end
+    end
+
 
     def verification_queries(druid)
       queries = []
