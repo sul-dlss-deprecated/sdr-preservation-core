@@ -20,7 +20,7 @@ describe Sdr::MigrationStart do
   end
 
   specify "MigrationStart#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @robot.should_receive(:create_migration_workflow).with(@druid)
     @robot.process_item(work_item)

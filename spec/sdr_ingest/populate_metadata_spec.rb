@@ -27,14 +27,14 @@ describe Sdr::PopulateMetadata do
   end
 
   specify "PopulateMetadata#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @pm.should_receive(:populate_metadata).with(@druid,@fixtures.join('packages','jc837rq9922'))
     @pm.process_item(work_item)
   end
 
   specify "PopulateMetadata#populate_metadata" do
-    sedora_object = mock(SedoraObject)
+    sedora_object = double(SedoraObject)
     Sdr::SedoraObject.stub(:find).with(@druid).and_return(sedora_object)
     @pm.should_receive(:set_datastream_content).exactly(4).times
     sedora_object.should_receive(:save)
@@ -42,14 +42,14 @@ describe Sdr::PopulateMetadata do
   end
 
   specify "PopulateMetadata#set_datastream_content" do
-    sedora_object = mock(SedoraObject)
+    sedora_object = double(SedoraObject)
     Pathname.any_instance.stub(:file?).and_return(true)
     Pathname.any_instance.stub(:read).and_return('<identityMetadata objectId="druid:jc837rq9922">')
     dsid = 'identityMetadata'
-    identity_metatdata = mock(dsid)
+    identity_metatdata = double(dsid)
     sedora_object.should_receive(:datastreams).and_return({'identityMetadata'=>identity_metatdata})
     identity_metatdata.should_receive(:content=).with(/<identityMetadata objectId="druid:jc837rq9922">/)
-    sedora_object.should_not_receive(:pid).and_return(@druid)
+    sedora_object.should_not_receive(:pid)
     @pm.set_datastream_content(sedora_object, @bag_pathname, dsid)
 
     #def set_datastream_content(sedora_object, bag_pathname, dsid)
@@ -64,6 +64,7 @@ describe Sdr::PopulateMetadata do
 
   specify "PopulateMetadata#set_datastream_content with fakeweb" do
 #    http://fedoraAdmin:fedoraAdmin@localhost:8983/fedora/objects/druid%3Ajc837rq9922?format=xml
+    Rubydora::Repository.any_instance.stub(:version => 3.6)
     FakeWeb.clean_registry
     FakeWeb.allow_net_connect = true
     #FakeWeb.allow_net_connect = "#{@druid_url}?format=xml"
@@ -71,7 +72,7 @@ describe Sdr::PopulateMetadata do
     #FakeWeb.allow_net_connect = "#{@druid_url}/datastreams/sdrIngestWF?format=xml"
     #FakeWeb.allow_net_connect = "#{@druid_url}/datastreams/workflows?format=xml"
     FakeWeb.register_uri(:get, "#{@sedora}/describe?xml=true", :status => ["200", "OK"])
-    FakeWeb.register_uri(:get, "#{@druid_url}?format=xml", :status => ["200", "OK"])
+    FakeWeb.register_uri(:get, "#{@druid_url}?format=xml", :status => ["200", "OK"], :body => '<objectProfile />')
     FakeWeb.register_uri(:get, "#{@druid_url}/datastreams?format=xml", :status => ["200", "OK"])
     FakeWeb.register_uri(:get, "#{@druid_url}/datastreams/workflows?format=xml", :status => ["200", "OK"])
     FakeWeb.register_uri(:get, "#{@druid_url}/datastreams/sdrIngestWF?format=xml", :status => ["200", "OK"])

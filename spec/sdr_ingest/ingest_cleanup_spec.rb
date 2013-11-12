@@ -43,7 +43,7 @@ describe Sdr::IngestCleanup do
   end
 
   specify "IngestCleanup#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @ic.should_receive(:ingest_cleanup).with(@druid,@fixtures.join('packages','jc837rq9922'))
     @ic.process_item(work_item)
@@ -58,12 +58,12 @@ describe Sdr::IngestCleanup do
   end
 
   specify "IngestCleanup#update_provenance" do
-    workflow_datastream = mock("sdrIngestWF")
+    workflow_datastream = double("sdrIngestWF")
     # workflow_datastream.stub(:content).and_return(@sdr_workflow)
     Dor::WorkflowService.stub(:get_workflow_xml).with('sdr',@druid, 'sdrIngestWF').and_return(@sdr_workflow)
-    provenance_datastream = mock("provenanceMetadata")
+    provenance_datastream = double("provenanceMetadata")
     provenance_datastream.stub(:content).and_return(@dor_provenance)
-    sedora_object = mock(SedoraObject)
+    sedora_object = double(SedoraObject)
     sedora_object.stub(:sdrIngestWF).and_return(workflow_datastream)
     sedora_object.stub(:provenanceMetadata).and_return(provenance_datastream)
     Sdr::SedoraObject.stub(:find).with(@druid).and_return(sedora_object)

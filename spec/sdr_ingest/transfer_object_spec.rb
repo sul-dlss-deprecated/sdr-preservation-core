@@ -20,7 +20,7 @@ describe Sdr::TransferObject do
   end
 
   specify "TransferObject#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @to.should_receive(:transfer_object).with(@druid,@fixtures.join('packages','jc837rq9922'))
     @to.process_item(work_item)

@@ -9,17 +9,20 @@
 # The fix is to uninstall v 0.9.0 and use v 0.8.7
 # v 0.9.0 was installed in the global gemset on my system -- Richard
 
+# Load config for current environment.
+$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
+
 require 'rake'
 require 'rake/testtask'
 require 'rspec/core/rake_task'
 
-#require 'jettywrapper'
+require 'jettywrapper'
 
 # Import external rake tasks
 Dir.glob('lib/tasks/*.rake').each { |r| import r }
 
 task :default  => :spec
-task :hudson  => [:test_with_jetty, :yard]
+task :hudson  => [:test_with_jetty]
 
 
 desc "Set up environment variables. Unless otherwise specified ROBOT_ENVIRONMENT defaults to local"
@@ -52,15 +55,12 @@ end
 
 
 desc "Run RSpec Examples wrapped in a test instance of jetty"
-task :test_with_jetty do
+task :test_with_jetty => ['jetty:clean'] do
   if (ENV['RAILS_ENV'] == "test")
     jetty_params = { 
-      :jetty_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty'), 
       :quiet => false, 
-      :jetty_port => 8983, 
-      :solr_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty/solr'),
-      :fedora_home => File.expand_path(File.dirname(__FILE__) + '/hydra-jetty/fedora/default'),
-      :startup_wait => 30
+      :jetty_port => 8983,
+      :startup_wait => 45
       }
     error = Jettywrapper.wrap(jetty_params) do  
       Rake::Task["spec"].invoke

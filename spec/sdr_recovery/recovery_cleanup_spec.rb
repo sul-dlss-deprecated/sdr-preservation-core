@@ -21,7 +21,7 @@ describe Sdr::RecoveryCleanup do
   end
 
   specify "RecoveryCleanup#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @rc.should_receive(:recovery_cleanup).with(@druid)
     @rc.process_item(work_item)

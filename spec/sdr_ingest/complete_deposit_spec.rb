@@ -20,7 +20,7 @@ describe Sdr::CompleteDeposit do
   end
 
   specify "CompleteDeposit#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     mock_so = mock(StorageObject)
     mock_path = mock(Pathname)
@@ -32,10 +32,10 @@ describe Sdr::CompleteDeposit do
   end
 
   specify "CompleteDeposit#complete_deposit" do
-    storage_object = mock(StorageObject)
-    new_version = mock(StorageObjectVersion)
+    storage_object = double(StorageObject)
+    new_version = double(StorageObjectVersion)
     storage_object.should_receive(:ingest_bag).and_return(new_version)
-    result = mock(VerificationResult)
+    result = double(VerificationResult)
     result.stub(:verified).and_return(true)
     new_version.should_receive(:verify_version_storage).and_return(result)
     @cd.complete_deposit(@druid,storage_object)

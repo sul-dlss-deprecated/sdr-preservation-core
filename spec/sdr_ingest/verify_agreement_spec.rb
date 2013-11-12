@@ -23,7 +23,7 @@ describe Sdr::VerifyAgreement do
   end
 
   specify "VerifyAgreement#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @va.should_receive(:verify_agreement).with(@druid)
     @va.process_item(work_item)
@@ -124,9 +124,9 @@ describe Sdr::VerifyAgreement do
   end
 
   specify "VerifyAgreement#get_metadata" do
-    sedora_object = mock(SedoraObject)
+    sedora_object = double(SedoraObject)
     SedoraObject.stub(:find).with(@druid).and_return(sedora_object)
-    datastream = mock('relationshipMetadata')
+    datastream = double('relationshipMetadata')
     sedora_object.stub(:datastreams).and_return({'relationshipMetadata'=>datastream})
     datastream.stub(:new?).and_return(false)
     datastream.stub(:content).and_return("<relationshipMetadata>...")
@@ -136,8 +136,8 @@ describe Sdr::VerifyAgreement do
     @va.get_metadata(@druid,'relationshipMetadata').should == nil
 
 
-    #bag_pathname = mock("bag_pathname")
-    #relationship_metadata_pathaname = mock("relationship_metadata_pathaname")
+    #bag_pathname = double("bag_pathname")
+    #relationship_metadata_pathaname = double("relationship_metadata_pathaname")
     #SdrDeposit.stub(:bag_pathname).with(@druid).and_return(bag_pathname)
     #bag_pathname.stub(:join).with('data/metadata/relationshipMetadata.xml').
     #    and_return(relationship_metadata_pathaname)

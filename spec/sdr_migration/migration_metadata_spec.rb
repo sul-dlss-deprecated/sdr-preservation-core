@@ -21,7 +21,7 @@ describe Sdr::MigrationMetadata do
   end
 
   specify "MigrationMetadata#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @rs.should_receive(:populate_metadata).with(@druid,@fixtures.join('packages','jc837rq9922'))
     @rs.process_item(work_item)

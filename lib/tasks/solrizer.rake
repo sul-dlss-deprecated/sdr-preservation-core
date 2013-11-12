@@ -8,7 +8,7 @@ namespace :solrizer do
   require 'rubygems'
   require 'solrizer'
   require 'active-fedora'
-  require 'sdr2_model.rb'
+  require 'sdr2_model'
   require 'nokogiri'
   require 'open-uri'
   

@@ -26,7 +26,7 @@ describe Sdr::RegisterSdr do
   end
 
   specify "RegisterSdr#process_item" do
-    work_item = mock("WorkItem")
+    work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
     @rs.should_receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
         and_return("completed")
@@ -74,7 +74,7 @@ describe Sdr::RegisterSdr do
   end
 
   specify "RegisterSdr#register_item with mocks" do
-    sedora_object = mock(SedoraObject)
+    sedora_object = double(SedoraObject)
     SedoraObject.stub(:exists?).with(@druid).and_return(true)
     SedoraObject.should_receive(:find).with(@druid).and_return(sedora_object)
     sedora_object.should_receive(:set_workflow_datastream_location)
