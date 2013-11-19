@@ -18,6 +18,6 @@ gem "yard"
 gem "equivalent-xml"
 gem "lyberteam-capistrano-devel", ">=1.0.0"
 gem "sys-filesystem"
-gem "mongo"
+#gem "mongo"
 #gem "bson_ext"
 

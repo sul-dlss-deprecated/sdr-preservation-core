@@ -53,6 +53,7 @@ class RobotRunner
 
   def run_pipeline
     subject = "#{@workflow} (#{@environment}) - starting pipeline"
+    @status_process.delete_pid_file(all=true)
     @status_process.write_process_log(subject)
     email_run_status(subject)
     status = process_queue

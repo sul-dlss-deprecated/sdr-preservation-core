@@ -3,7 +3,7 @@
 require 'environment'
 require 'sys/filesystem'
 
-StorageArea = Struct.new(:filesystem, :gb, :used, :free, :pct)
+StorageArea = Struct.new(:filesystem, :gb_total, :gb_used, :pct_used, :gb_free, :pct_free)
 
 class StatusStorage < Status
 
@@ -21,10 +21,11 @@ class StatusStorage < Status
     storage_filesystems.each do |stat|
       area = StorageArea.new
       area.filesystem = stat.path
-      area.gb = (stat.blocks.to_f*stat.block_size.to_f)/gigabye_size
-      area.free = (stat.blocks_available.to_f*stat.block_size.to_f)/gigabye_size
-      area.used = area.gb - area.free
-      area.pct = sprintf "%2d%",(stat.blocks_available.to_f/stat.blocks.to_f)*100
+      area.gb_total = (stat.blocks.to_f*stat.block_size.to_f)/gigabye_size
+      area.gb_free = (stat.blocks_available.to_f*stat.block_size.to_f)/gigabye_size
+      area.gb_used = area.gb_total - area.gb_free
+      area.pct_free = sprintf "%2d%",(area.gb_free/area.gb_total)*100
+      area.pct_used = sprintf "%2d%",(area.gb_used/area.gb_total)*100
       areas << area
     end
     areas
@@ -53,7 +54,7 @@ class StatusStorage < Status
         "Storage Areas",
         StorageArea.members,
         areas.map{|area| area.values},
-        [-18, 7, 7, 7, 3]
+        [-18, 8, 7, 8, 7, 8]
     )
     warnings = report_warnings(areas,threshold)
     s << "#{'-'*70}\n#{warnings}\n" unless warnings.empty?
@@ -64,7 +65,7 @@ class StatusStorage < Status
     threshold ||= 100
     warnings = []
     areas.each do |area|
-      if area.free < threshold
+      if area.gb_free < threshold
         warnings << "Free disk space is below #{threshold} GB for #{area.path}\n"
       end
     end
@@ -75,7 +76,7 @@ class StatusStorage < Status
     areas = storage_areas
     case args.shift.to_s.upcase
       when 'TERABYTES'
-        puts "terabytes = #{areas.inject(0){|result,area| result + area.used/1024}}"
+        puts "terabytes = #{areas.inject(0){|result,area| result + area.gb_used/1024}}"
       else
         puts report_context + report_storage_status(areas,args.shift)
     end

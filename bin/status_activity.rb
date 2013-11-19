@@ -27,19 +27,25 @@ class StatusActivity < Status
 
   def self.options
     puts <<-EOF
-
     list options:
-
       completed  [n] = report recent ingest details (default is 10)
       errors     [n] = report error details
       realtime   [n] = report activity, looping every n seconds (default is 10)
+      pipeline   [n] = report recent pipeline starts and stops
+
+    set options:
+      druid   {id}          = set the object focus'
+      version {n}           = set the version focus'
+      group   {group name}  = set the default file group'
 
     view options:
-
-      log       [id] = find and display log file content using "cat" command
-      file    [path] = find and display file content using "cat" command
-      tree [id|path] = display folder structure of storage area
-
+      druid   {id}          = set the object focus and list the object versions'
+      version {n}           = set the version focus and list the object version folders'
+      group   {group name}  = set the default file group and list its files'
+      deposit               = display folder structure of deposit bag
+      log                   = find and display log file content
+      file    {name|path}   = find and display file content
+      tree    {path}        = display file tree below specified directory
     EOF
   end
 
@@ -48,6 +54,8 @@ class StatusActivity < Status
     @workflow = workflow
     @current_dir = AppHome.join('log',@workflow,'current')
     @history_file = @current_dir.join("status/ingest-history.txt")
+    @latest_ingest = @current_dir.join("status/latest-item.txt")
+    @process_log = @current_dir.join("status/process.log")
     @druid_queue = DruidQueue.new(@workflow)
     @status_process = StatusProcess.new(@workflow)
   end
@@ -145,11 +153,14 @@ class StatusActivity < Status
     s
   end
 
-  def exec(args)
-    command = args.shift.to_s.upcase
-    case command
+  def exec_history(subcmd, args)
+    case subcmd
       when /^COMP/
-        puts report_ingest_history(n=(args.shift || 10).to_i)
+        if args.shift.to_s.upcase == 'TAIL'
+          system("tail -f #{@history_file}")
+        else
+          puts report_ingest_history(n=(args.shift || 10).to_i)
+        end
       when /^ERR/
         errors = error_history
         puts report_context + report_error_history(errors, n=(args.shift || 10).to_i)
@@ -176,45 +187,127 @@ class StatusActivity < Status
             # loop again if specified number of seconds have elapsed
           end
         end
+      when /^PIPE/
+        system("cat #{@process_log} | grep -v queued | tail #{(args.shift || 10).to_i}")
+    end
+
+  end
+
+  def exec(args)
+    cmd = args.shift.to_s.upcase
+    subcmd = args.shift.to_s.upcase
+    case subcmd
+      when /^COMP/,/^ERR/,'REALTIME',/^PIPE/
+        exec_history(subcmd, args)
+      when 'DRUID','ID'
+        druid = args.shift.to_s.downcase
+        if druid != ''
+          @storage_object = StorageServices.find_storage_object(druid, include_deposit=true)
+          @storage_version = @storage_object.current_version
+          @filegroup = @storage_version.file_category_pathname('metadata')
+          @storage_deposit = @storage_object.deposit_bag_pathname
+        end
+        if @storage_object
+          case cmd
+            when 'SET'
+              puts @filegroup.to_s
+            else # list,view
+              system "tree -dDL 1 --noreport #{@storage_object.object_pathname}"
+              puts "\n#{@storage_deposit}" if @storage_deposit.exist?
+          end
+        else
+          puts "You need to specify an object first, using 'set druid'"
+        end
+      when 'VERSION'
+        version = args.shift.to_s
+        if version != ''
+          @storage_version = @storage_object.find_object_version(version.to_i)
+          @filegroup = @storage_version.file_category_pathname('metadata')
+        end
+        if @storage_version
+          case cmd
+            when 'SET'
+              puts @filegroup.to_s
+            else # list,view
+              system "tree -s --noreport #{@storage_version.version_pathname}"
+          end
+        else
+          puts "You need to specify an object first, using 'set druid'"
+        end
+      when 'GROUP','FILEGROUP','FILETYPE'
+        if @storage_version
+          group = args.shift.to_s.downcase
+          @filegroup = @storage_version.file_category_pathname(group) unless group == ''
+          case cmd
+            when 'SET'
+              puts @filegroup.to_s
+            else # list,view
+              system "tree -s --noreport #{@filegroup} | more"
+          end
+        else
+          puts "You need to specify an object first, using 'set druid'"
+        end
+      when 'DEPOSIT'
+        system "tree -s --noreport #{@storage_deposit} | more"
+      when 'LATEST'
+        file_pager(@latest_ingest)
       when 'LOG'
-        objid = args.shift.to_s.split(/:/)[-1]
-        if objid == 'nil'
-          system "tail -n +1 #{@current_dir.join('active').to_s}/*"
-          return
-        elsif objid =~ /^([a-z]{2})(\d{3})([a-z]{2})(\d{4})$/
-          %w{active error status completed}.each do |logdir|
-            logfile = @current_dir.join(logdir, objid)
-            if logfile.exist?
-              system "cat #{logfile.to_s}"
-              return
-            end
+        objid = @storage_object.digital_object_id.split(/:/)[-1]
+        %w{active error status completed}.each do |logdir|
+          logfile = @current_dir.join(logdir, objid)
+          if logfile.exist?
+            file_pager(logfile)
+            return
           end
         end
         puts "Log file was not found for object: #{objid}"
       when 'FILE'
         filename = args.shift.to_s
-        pathname = Pathname(filename)
-        if pathname.file?
-          system "cat #{pathname.to_s}"
-          return
+        fullpath = Pathname(filename)
+        storagepath = @filegroup.join(filename)
+        if fullpath.file?
+          file_pager(fullpath)
+        elsif storagepath.file?
+          file_pager(storagepath)
+        else
+          puts "File was not found : #{filename}"
         end
-        puts "File was not found : #{filename}"
       when 'TREE'
         dirname = args.shift.to_s
-        if dirname =~ /^([a-z]{2})(\d{3})([a-z]{2})(\d{4})$/
-          storage_path = StorageServices.object_path(dirname)
-          system "tree -idf --noreport #{storage_path}"
-          return
+        pathname = Pathname(dirname)
+        if pathname.directory?
+          system "tree -s #{dirname}"
         else
-          pathname = Pathname(dirname)
-          if pathname.directory?
-            system "tree -s #{dirname}"
-            return
-          end
+          puts "Directory was not found : #{dirname}"
         end
-        puts "Directory was not found : #{dirname}"
       else
         StatusActivity.options
+    end
+  end
+
+  def file_pager(pathname)
+    if pathname.file?
+      if `file -b #{pathname}`.include?('text')
+        puts "#{pathname}"
+        puts
+        chunks = pathname.readlines.each_slice(20).to_a
+        if chunks.size == 1
+          puts chunks[0]
+        else
+          puts "*** Displaying 20-line chunks. Press return for next chunk, enter any text to exit ***"
+          puts
+          chunks.each do |chunk|
+            puts chunk
+            STDOUT.flush
+            input = STDIN.gets.strip.split(/\s+/)
+            return unless input.empty?
+          end
+        end
+      else
+        puts `file #{pathname}`
+      end
+    else
+      puts "Not a file: #{pathname}"
     end
   end
 

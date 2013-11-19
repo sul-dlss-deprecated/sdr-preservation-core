@@ -43,7 +43,6 @@ GEM
       nokogiri (>= 1.4.0)
     bagit (0.2.0)
       validatable (~> 1.6)
-    bson (1.8.6)
     builder (3.0.4)
     capistrano (2.13.4)
       highline
@@ -154,8 +153,6 @@ GEM
       json
       nokogiri
       systemu
-    mongo (1.8.6)
-      bson (~> 1.8.6)
     multi_json (1.3.6)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
@@ -268,7 +265,6 @@ DEPENDENCIES
   lyber-core
   lyberteam-capistrano-devel (>= 1.0.0)
   moab-versioning (= 1.2.10)
-  mongo
   nokogiri
   rake (>= 0.8.7)
   rcov

@@ -169,7 +169,7 @@ class StatusWorkflow  < Status
 
   def report_status_detail(detail)
     s = report_table(
-        "#{@workflow} Step Status",
+        "#{@workflow} - New Version Activity Detail",
         StepCounts.members,
         detail.map{|step| step.values},
         [-17, 8, 8, 11]
@@ -179,7 +179,7 @@ class StatusWorkflow  < Status
 
   def report_status_summary(summary)
     s = report_table(
-        "Workflow Database + Archive",
+        "New Version Activity + Archived Objects",
         WorkflowSummary.members,
         [summary.values],
         [-15, 7, 5, 6, 9]
@@ -196,7 +196,7 @@ class StatusWorkflow  < Status
         summary = workflow_status_summary
         puts report_context + report_status_summary(summary)
       when 'WAITING'
-        puts "waiting = #{workflow_waiting}\n"
+        puts "new object versions waiting = #{workflow_waiting}\n"
       when 'ARCHIVED'
         puts "archived = #{request_archive_count}\n"
       else

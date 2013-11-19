@@ -105,9 +105,13 @@ class StatusProcess < Status
     @pid_dir.join(pid.to_s).open('w'){|f| f.puts "#{pid}|#{druid}|#{step}"}
   end
 
-  def delete_pid_file
-    pid_file = @pid_dir.join($$.to_s)
-    pid_file.delete if  pid_file.exist?
+  def delete_pid_file(all=false)
+    if all
+      @pid_dir.children.each{|pid_file| pid_file.delete }
+    else
+      pid_file = @pid_dir.join($$.to_s)
+      pid_file.delete if  pid_file.exist?
+    end
   end
 
   def write_process_log(message)

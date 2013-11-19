@@ -54,11 +54,14 @@ class Menu
       @menu << 'menu                                = Display this menu'
       @menu << 'storage                             = Report storage filesystem status'
       @menu << 'workflow {detail|summary|waiting}   = Report workflow database status'
-      @menu << 'queue   {add item(s)|size|head n}   = Add to queue or report queue status '
+      @menu << 'queue    {add item(s)|size|head n}  = Add to queue or report queue status '
       @menu << 'process  {config|start|stop|list}   = Configure, run, or report status of robot pipelines'
       @menu << 'list     {comp..|err..|realtime}[n] = Report current or recent robot activity '
-      @menu << 'view     {log|file|tree} [id|path]  = view contents of file or storage structure '
-      @menu << 'monitor   {report [n]|queue}        = Report overall status or queue new workflow db items'
+      @menu << 'set      {druid|version|group} {id} = Set the object/version/filegroup focus and/or list the object versions'
+      @menu << 'view     {druid|version|group} {id} = Set the object/version/filegroup focus and list the child folders/files'
+      @menu << 'view     {log|pipeline}             = view object\'s logfile  or recent pipeline history'
+      @menu << 'view     file/tree {name|path}      = view specified file or directory structure'
+      @menu << 'monitor  {report [n]|queue}         = Report overall status or queue new workflow db items'
       @menu << 'quit                                = Exit'
     end
     title = "Menu for #{@workflow}:"
@@ -69,44 +72,42 @@ class Menu
     end
   end
 
-  def workflow(args)
-    @status_workflow.exec(args)
-  end
-
-  def queue(args)
-    @druid_queue.exec(args)
-  end
-
-  def process(args)
-    @status_process.exec(args)
-  end
-
-  def list  (args)
-    @status_activity.exec(args)
-  end
-
-  def storage(args)
-    @status_storage.exec(args)
-  end
-
-  def monitor(args)
-    @status_monitor.exec(args)
-  end
-
-  def view(args)
-    @status_activity.exec(args)
+  def call(args)
+    cmd = args.first.to_s
+    case cmd
+      when 'list','set','view'
+        @status_activity.exec(args)
+      else
+        args.shift
+        case cmd
+          when 'storage'
+            @status_storage.exec(args)
+          when 'workflow'
+            @status_workflow.exec(args)
+          when 'queue'
+            @druid_queue.exec(args)
+          when 'process'
+            @status_process.exec(args)
+          when 'monitor'
+            @status_monitor.exec(args)
+        end
+    end
+  rescue Exception => e
+    puts e.message
+    puts e.backtrace
   end
 
   def exec(args)
     menu
     while true
-      cmd = args.shift.to_s
+      cmd = args.first.to_s
       if ['exit','quit'].include?(cmd)
         return
       elsif ['help','?'].include?(cmd)
         menu
       elsif @menu.collect{|item| item.split(/ /).first}.include?(cmd)
-        send(cmd.to_sym, args)
+        puts
+        call(args)
       elsif not (cmd.nil? or cmd.empty?)
         puts "Command not recognised: #{cmd} #{args.join(' ')}"
         menu
