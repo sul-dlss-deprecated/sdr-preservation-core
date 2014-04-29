@@ -21,6 +21,7 @@ module Sdr
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
       original_bag_pathname = locate_old_bag(druid)
       rsync_object(original_bag_pathname, deposit_bag_pathname)
+      remediate_version_metadata(druid, deposit_bag_pathname)
       generate_inventory_manifests(druid, deposit_bag_pathname)
     end
 
@@ -77,6 +78,19 @@ module Sdr
       LyberCore::Log.debug("#{source_pathname} transferred to #{target_pathname}")
     rescue Exception => e
       raise LyberCore::Exceptions::ItemError.new(druid, "Error transferring object", e)
+    end
+
+    # @param druid [String] The object identifier
+    # @param bag_pathname [Pathname] The location of the BagIt bag being ingested
+    # @return [void] Add a v1 versionMetadata datastream unless it already exists
+    def remediate_version_metadata(druid, bag_pathname)
+      vm_pathname = bag_pathname.join('data/metadata',"versionMetadata.xml")
+      unless vm_pathname.exist?
+        template_pathname = Pathname("#{ROBOT_ROOT}/config/versionMetadata-template.xml")
+        vm_pathname.open('w') do |vm|
+          vm << template_pathname.read.sub(/druid/,druid)
+        end
+      end
     end
 
     def generate_inventory_manifests(druid, deposit_bag_pathname)
