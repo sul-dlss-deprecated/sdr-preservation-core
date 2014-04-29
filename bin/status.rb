@@ -6,6 +6,16 @@ class Status
     context
   end
 
+  def environment_suffix
+    case ENV["ROBOT_ENVIRONMENT"].upcase
+      when 'PRODUCTION'
+        '-prod'
+      when 'TEST'
+        '-test'
+      when 'DEVELOPMENT'
+        '-dev'
+    end
+  end
 
   def sprintf_directive(value,column)
     case value

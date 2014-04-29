@@ -34,18 +34,20 @@ class StatusActivity < Status
       pipeline   [n] = report recent pipeline starts and stops
 
     set options:
-      druid   {id}          = set the object focus'
-      version {n}           = set the version focus'
-      group   {group name}  = set the default file group'
+      druid   {id}         = set the object focus
+      version {n}          = set the version focus
+      group   {group name} = set the default file group'
 
     view options:
-      druid   {id}          = set the object focus and list the object versions'
-      version {n}           = set the version focus and list the object version folders'
-      group   {group name}  = set the default file group and list its files'
-      deposit               = display folder structure of deposit bag
-      log                   = find and display log file content
-      file    {name|path}   = find and display file content
-      tree    {path}        = display file tree below specified directory
+      druid   {id}           = set the object focus and list the object versions
+      version {n}            = set the version focus and list the object version folders
+      group   {group name}   = set the default file group and list its files
+      deposit                = display folder structure of deposit bag
+      log                    = find and display log file content
+      file    {name|path}    = find and display file content
+      folder  {path}         = display file tree below specified directory (alias is 'tree')
+      dor {export|workspace} = display file tree for object on the DOR server
+      urls                   = generate URLs for Argo, Dor Fedora, and Workflow server views
     EOF
   end
 
@@ -202,27 +204,38 @@ class StatusActivity < Status
       when 'DRUID','ID'
         druid = args.shift.to_s.downcase
         if druid != ''
+          druid = "druid:#{druid}" unless druid.start_with?('druid')
           @storage_object = StorageServices.find_storage_object(druid, include_deposit=true)
           @storage_version = @storage_object.current_version
           @filegroup = @storage_version.file_category_pathname('metadata')
           @storage_deposit = @storage_object.deposit_bag_pathname
         end
         if @storage_object
-          case cmd
-            when 'SET'
-              puts @filegroup.to_s
-            else # list,view
-              system "tree -dDL 1 --noreport #{@storage_object.object_pathname}"
-              puts "\n#{@storage_deposit}" if @storage_deposit.exist?
+          object_home = @storage_object.object_pathname
+          if object_home.exist?
+            case cmd
+              when 'SET'
+                puts "Storage: #{@filegroup.to_s}"
+              else # list,view
+                system "tree -dDL 1 --noreport #{object_home}"
+            end
+          else
+            puts "Storage Not Found: #{object_home}"
           end
+          puts "\nDeposit: #{@storage_deposit}" if @storage_deposit.exist?
         else
           puts "You need to specify an object first, using 'set druid'"
         end
       when 'VERSION'
         version = args.shift.to_s
         if version != ''
-          @storage_version = @storage_object.find_object_version(version.to_i)
-          @filegroup = @storage_version.file_category_pathname('metadata')
+          begin
+            @storage_version = @storage_object.find_object_version(version.to_i)
+            @filegroup = @storage_version.file_category_pathname('metadata')
+          rescue Exception => e
+            puts e.message
+            return
+          end
         end
         if @storage_version
           case cmd
@@ -272,13 +285,40 @@ class StatusActivity < Status
         else
           puts "File was not found : #{filename}"
         end
-      when 'TREE'
+      when 'TREE','FOLDER'
         dirname = args.shift.to_s
         pathname = Pathname(dirname)
         if pathname.directory?
           system "tree -s #{dirname}"
         else
           puts "Directory was not found : #{dirname}"
+        end
+      when 'DOR'
+        if @storage_object
+          dor_url = Sdr::Config.ingest_transfer.account
+          druid_tool = DruidTools::Druid.new(@storage_object.digital_object_id,'/dor/workspace')
+          area = args.shift.to_s.upcase
+          case area
+            when 'EXPORT'
+              puts "DOR Host: lyberservices#{environment_suffix}"
+              system "ssh #{dor_url} 'tree -s --noreport /dor/export/#{druid_tool.id}'"
+            when 'WORKSPACE'
+              puts "DOR Host: lyberservices#{environment_suffix}"
+              system "ssh #{dor_url} 'tree -s --noreport #{druid_tool.path}'"
+            else
+              puts "Command not recognized: VIEW DOR #{area}"
+          end
+        else
+          puts "You need to specify an object first, using 'set druid'"
+        end
+      when /^URL/
+        if @storage_object
+          druid = @storage_object.digital_object_id
+          puts "https://argo#{environment_suffix}.stanford.edu/catalog/#{druid}"
+          puts "https://sul-dor#{environment_suffix}.stanford.edu/fedora/objects/#{druid}/datastreams/versionMetadata/content"
+          puts "https://sul-lyberservices#{environment_suffix}.stanford.edu/workflow/dor/objects/#{druid}/workflows"
+        else
+          puts "You need to specify an object first, using 'set druid'"
         end
       else
         StatusActivity.options

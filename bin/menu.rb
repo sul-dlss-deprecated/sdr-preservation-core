@@ -59,7 +59,7 @@ class Menu
       @menu << 'list     {comp..|err..|realtime}[n] = Report current or recent robot activity '
       @menu << 'set      {druid|version|group} {id} = Set the object/version/filegroup focus and/or list the object versions'
       @menu << 'view     {druid|version|group} {id} = Set the object/version/filegroup focus and list the child folders/files'
-      @menu << 'view     {log|pipeline}             = view object\'s logfile  or recent pipeline history'
+      @menu << 'view     {log|pipeline|urls|dor}    = view object\'s logfile, recent pipeline history, URLs, or DOR files'
       @menu << 'view     file/tree {name|path}      = view specified file or directory structure'
       @menu << 'monitor  {report [n]|queue}         = Report overall status or queue new workflow db items'
       @menu << 'quit                                = Exit'
