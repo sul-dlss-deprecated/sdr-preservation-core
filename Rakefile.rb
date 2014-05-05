@@ -16,8 +16,6 @@ require 'rake'
 require 'rake/testtask'
 require 'rspec/core/rake_task'
 
-require 'jettywrapper'
-
 # Import external rake tasks
 Dir.glob('lib/tasks/*.rake').each { |r| import r }
 
@@ -30,7 +28,6 @@ task :environment do
    environment = ENV['ROBOT_ENVIRONMENT'] || "development"
    RAILS_ENV = environment
    require File.expand_path(File.dirname(__FILE__) + "/config/environments/#{environment}")  
-   ActiveFedora::SolrService.register( SOLR_URL )
 end
 
 desc "Run RSpec"
@@ -51,23 +48,5 @@ RSpec::Core::RakeTask.new(:spec_rcov) do |t|
   t.pattern = 'spec/sdr*/*.rb'
   t.rspec_opts = [ "-f documentation"]
   t.rcov_opts = ['--exclude /gems/,/Library/,/usr/,spec,lib/tasks']
-end
-
-
-desc "Run RSpec Examples wrapped in a test instance of jetty"
-task :test_with_jetty => ['jetty:clean'] do
-  if (ENV['RAILS_ENV'] == "test")
-    jetty_params = { 
-      :quiet => false, 
-      :jetty_port => 8983,
-      :startup_wait => 45
-      }
-    error = Jettywrapper.wrap(jetty_params) do  
-      Rake::Task["spec"].invoke
-    end
-    raise "test failures: #{error}" if error
-  else
-    system("rake hudson RAILS_ENV=test")
-  end
 end
 

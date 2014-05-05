@@ -2,9 +2,7 @@ source "http://rubygems.org"
 source "http://sul-gems.stanford.edu"
 
 gem "moab-versioning", "= 1.2.10" #, :path => '/Users/rnanders/Code/Ruby/moab-versioning' #
-gem "active-fedora"
 gem "fakeweb"
-gem "jettywrapper"
 gem "nokogiri"
 gem "rake", ">=0.8.7"
 gem "rest-client"
@@ -18,6 +16,4 @@ gem "yard"
 gem "equivalent-xml"
 gem "lyberteam-capistrano-devel", ">=1.0.0"
 gem "sys-filesystem"
-#gem "mongo"
-#gem "bson_ext"
 
