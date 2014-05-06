@@ -6,7 +6,7 @@ describe Sdr::MigrationTransfer do
   before(:all) do
     @object_id = "jq937jp0017"
     @druid = "druid:#{@object_id}"
-    @deposit_bag_pathname = @fixtures.join('packages/v0001')
+    @deposit_bag_pathname = @fixtures.join("deposit/#{@object_id}")
   end
 
   before(:each) do
@@ -24,7 +24,7 @@ describe Sdr::MigrationTransfer do
   specify "MigrationTransfer#process_item" do
     work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @mt.should_receive(:transfer_object).with(@druid,@fixtures.join('packages','jq937jp0017'))
+    @mt.should_receive(:transfer_object).with(@druid,@fixtures.join('deposit','jq937jp0017'))
     @mt.process_item(work_item)
   end
   

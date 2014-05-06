@@ -6,7 +6,15 @@ describe SdrRobot do
   context "SdrRobot adds convenience methods for retrying service requests" do
 
     before :all do
-     end
+      @druid = "druid:jc837rq9922"
+      @deposit_pathname = @fixtures.join('deposit','jc837rq9922')
+    end
+
+    specify "VerifyAgreement#find_deposit_pathname" do
+      robot = SdrRobot.new("sdrIngestWF","sdr_robot")
+      robot.find_deposit_pathname(@druid).should == @deposit_pathname
+      lambda{robot.find_deposit_pathname("druid:aa111bb2222")}.should raise_exception(/pathname does not exist or is not a directory/)
+    end
 
     specify "SdrRobot.transmit" do
       robot = SdrRobot.new("sdrIngestWF","sdr_robot")

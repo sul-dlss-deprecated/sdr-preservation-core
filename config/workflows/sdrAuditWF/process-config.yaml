@@ -1,4 +1,11 @@
+audit-start:
+  batch_limit: 1000
+  error_limit: 5
+  classname: "Sdr::AuditStart"
+  classpath: "sdr_audit/audit_start.rb"
+
 audit-verify:
+  prerequisite: audit-start
   batch_limit: 200
   error_limit: 5
   classname: "Sdr::AuditVerify"

@@ -23,15 +23,8 @@ validate-bag:
   classname: "Sdr::ValidateBag"
   classpath: "sdr_ingest/validate_bag"
 
-populate-metadata:
-  prerequisite: validate-bag
-  batch_limit: 200
-  error_limit: 5
-  classname: "Sdr::PopulateMetadata"
-  classpath: "sdr_ingest/populate_metadata"
-
 verify-agreement:
-  prerequisite: populate-metadata  
+  prerequisite: validate-bag
   batch_limit: 200
   error_limit: 5
   classname: "Sdr::VerifyAgreement"

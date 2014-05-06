@@ -31,42 +31,13 @@ module Sdr
         raise LyberCore::Exceptions::ItemError.new(
                   druid, "accessionWF:sdr-ingest-transfer status is #{accession_status}")
       end
-      register_item(druid)
-      # temporary measure until sdr-ingest-transfer creates this row in workflow table
+      # Create a step (table row) in the current workflow instance for ingest-cleanup robot
       update_workflow_status('sdr',druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting') if @workflow_name == 'sdrIngestWF'
     end
 
-    # @param druid [String] The object identifier
-    # @return [SedoraObject]
-    # - Creates a *Sedora* object unless it already exists
-    # - Adds the +sdrIngestWF+ datastream to the Sedora object unless it already exists
-    def register_item(druid)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter register_item")
-      if SedoraObject.exists?(druid)
-        sedora_object = SedoraObject.find(druid)
-      else
-        sedora_object = SedoraObject.new(:pid=>druid)
-        sedora_object.save
-      end
-      sedora_object.set_workflow_datastream_location
-      sedora_object
-    rescue Exception => e
-      raise LyberCore::Exceptions::FatalError.new("Sedora Object cannot be found or created", e)
-    end
 
     def verification_queries(druid)
-      user_password = "#{Sdr::Config.sedora.user}:#{Sdr::Config.sedora.password}"
-      fedora_url = Sdr::Config.sedora.url.sub('//',"//#{user_password}@")
       queries = []
-      queries << [
-          "#{fedora_url}/objects/#{druid}?format=xml", 200,
-          /<objectProfile/ ]
-      queries << [
-          "#{fedora_url}/objects/#{druid}/datastreams?format=xml",
-           200, /<objectDatastreams/ ]
-      queries << [
-          "#{fedora_url}/objects/#{druid}/datastreams/workflows?format=xml",
-          200, /<dsLabel>Workflows<\/dsLabel>/ ]
       queries
     end
 

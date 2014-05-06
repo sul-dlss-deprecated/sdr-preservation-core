@@ -1,7 +1,5 @@
 <workflow id="sdrMigrationWF">
      <process name="migration-start" status="completed" />
-     <process name="migration-register" status="waiting" />
      <process name="migration-transfer" status="waiting" />
-     <process name="migration-metadata" status="waiting"/>
      <process name="migration-complete" lifecycle="migrated" status="waiting" />
 </workflow>

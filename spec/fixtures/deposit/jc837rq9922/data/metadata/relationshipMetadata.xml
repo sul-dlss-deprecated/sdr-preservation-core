@@ -1,5 +1,5 @@
 <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#" xmlns:hydra="http://projecthydra.org/ns/relations#">
-  <rdf:Description rdf:about="info:fedora/druid:ab123cd4567">
+  <rdf:Description rdf:about="info:fedora/druid:jc837rq9922">
     <hydra:isGovernedBy rdf:resource="info:fedora/druid:wk434ht4838"></hydra:isGovernedBy>
   </rdf:Description>
 </rdf:RDF>

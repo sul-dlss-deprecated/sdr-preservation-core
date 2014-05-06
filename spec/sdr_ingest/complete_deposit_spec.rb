@@ -5,7 +5,6 @@ describe Sdr::CompleteDeposit do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
-    @bag_pathname = @fixtures.join('import','jc837rq9922')
   end
 
   before(:each) do

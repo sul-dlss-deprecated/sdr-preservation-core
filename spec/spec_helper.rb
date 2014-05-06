@@ -9,8 +9,7 @@ include Sdr
 
 def fixture_setup
   @fixtures = Pathname.new(File.dirname(__FILE__)).join('fixtures')
-  @temp = Pathname.new(File.dirname(__FILE__)).join('temp')
-  @temp.mkpath
+  @temp = Pathname(Dir.mktmpdir)
   @temp = @temp.realpath
 end
 

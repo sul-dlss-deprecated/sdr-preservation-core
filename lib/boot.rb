@@ -41,16 +41,8 @@ end
 # end
 
 # Sdr::Config contains the constants that are required within this project
-# to get the sedora password:
-#   ssh sdr2service@{sedora-???}
-#   cat /var/local/fedora/install/install.properties | grep admin.pass
 module Sdr
   Config = Confstruct::Configuration.new do
-    sedora do
-      url  'http://sedora-xxx.stanford.edu/fedora'
-      user  'fedoraAdmin'
-      password "see above"
-    end
     ingest_transfer do
       account "lyberadmin@sul-lyberservices-dev.stanford.edu"
       export_dir "/dor/export/"
@@ -98,15 +90,7 @@ environment = case ENV["ROBOT_ENVIRONMENT"]
 end
 require File.join(ROBOT_ROOT,"config/environments/#{environment}")
 
-ENABLE_SOLR_UPDATES = false
-require 'rake'
-require 'active-fedora'
-require 'sdr/sedora_configurator'
-ActiveFedora.configurator = Sdr::SedoraConfigurator.new
-ActiveFedora.init
-
 require 'sdr/sdr_robot'
-require 'sdr/sedora_object'
 
 module Dor
   module WorkflowService

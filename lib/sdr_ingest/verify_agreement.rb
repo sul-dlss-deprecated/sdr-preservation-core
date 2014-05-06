@@ -7,7 +7,7 @@ module Sdr
   class VerifyAgreement < SdrRobot
 
     # A cache of APO/agreement object identifiers that have already been verified to exist in Sedora
-    attr_reader :valid_identifiers
+    attr_accessor :valid_apo_ids
 
     # define class instance variables and getter method so that we can inherit from this class
     @workflow_name = 'sdrIngestWF'
@@ -20,11 +20,12 @@ module Sdr
     # set workflow name, step name, log location, log severity level
     def initialize(opts = {})
       super(self.class.workflow_name, self.class.workflow_step, opts)
-      @valid_identifiers = Array.new()
+      @valid_apo_ids = Array.new()
     end
-  
+
+    # Process an object from the queue through this robot
     # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
-    # @return [void] process an object from the queue through this robot
+    # @return [void]
     #   Overrides LyberCore::Robots::Robot.process_item method.
     #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
@@ -32,91 +33,90 @@ module Sdr
       verify_agreement(work_item.druid)
     end
 
-    # @param druid [String] The object identifier
-    # @return [Boolean] Find the APO or Agreement identifier in the object metadata,
+    # Find the APO identifier in the relationshipMetadata,
     #   and verify that the identifer belongs to a previously ingested object
+    # @param druid [String] The object identifier
+    # @return [Boolean] true if APO was found, raise exception if verification fails
     def verify_agreement(druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter verify_agreement")
       LyberCore::Log.debug("Druid being processed is #{druid}")
-      if apo_id = find_apo_id(druid) and verify_identifier(apo_id)
-        LyberCore::Log.debug("APO id #{apo_id} was verified")
-        true
-      elsif agreement_id = find_agreement_id(druid) and verify_identifier(agreement_id)
-        LyberCore::Log.debug("Agreement id #{agreement_id} was verified")
-        true
+      deposit_pathname = find_deposit_pathname(druid)
+      if relationship_md_pathname = find_relationship_metadata(deposit_pathname)
+        if apo_id = find_apo_id(druid,relationship_md_pathname)
+          if verify_apo_id(druid,apo_id)
+            LyberCore::Log.debug("APO id #{apo_id} was verified")
+            true
+          else
+            raise LyberCore::Exceptions::ItemError.new(druid, "APO object #{apo_id} was not found in repository")
+          end
+        else
+          raise LyberCore::Exceptions::ItemError.new(druid, "APO ID not found in relationshipMetadata")
+        end
       else
-        raise LyberCore::Exceptions::ItemError.new(druid,
-           "Neither APO ID (#{apo_id.to_s}) or Agreement ID (#{agreement_id.to_s}) could be verified")
+        version = find_deposit_version(druid, deposit_pathname)
+        if version > 1
+          LyberCore::Log.debug("APO verification skipped for version > 1")
+          true
+        else
+          raise LyberCore::Exceptions::ItemError.new(druid, "relationshipMetadata.xml not found in deposited metadata files")
+        end
       end
     end
 
-    # @param druid [String] The object identifier
-    # @return [String] The 'isGovernedBy' APO identifier found in the relationshipMetadata
-    def find_apo_id(druid)
+    def find_relationship_metadata(deposit_pathname)
+      relationship_md_pathname = deposit_pathname.join('data','metadata','relationshipMetadata.xml')
+      relationship_md_pathname.file? ? relationship_md_pathname : nil
+    end
+
+    # Find the location of the file containing the relationshipMetadata
+    # @param [String] druid The object identifier
+    # @param [Pathname] deposit_pathname The location of the deposited object version
+    # @return [Pathname] The location of the relationshipMetadata.xml file, or raise exception
+    def find_deposit_version(druid, deposit_pathname)
+      vmfile = deposit_pathname.join('data','metadata','versionMetadata.xml')
+      doc = Nokogiri::XML(vmfile.read)
+      nodeset = doc.xpath("/versionMetadata/version")
+      version_id = nodeset.last['versionId']
+      raise "version_id is nil" if version_id.nil? 
+      version_id.to_i
+    rescue Exception => e
+      raise LyberCore::Exceptions::ItemError.new(druid, "Unable to find deposit version", e)
+    end
+
+    # Extract the APO id from the relationship metadata
+    # @param [String] druid The object identifier
+    # @param relationship_md_pathname [Pathname] The location of the relationshipMetadata.xml file
+    # @return [String] The 'isGovernedBy' APO identifier found in the relationshipMetadata,
+    #   or raise exception
+    def find_apo_id(druid,relationship_md_pathname)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter find_apo_id")
-      if (relationship_metadata = get_metadata(druid,'relationshipMetadata'))
-        doc = Nokogiri::XML(relationship_metadata)
-        nodeset = doc.xpath("//hydra:isGovernedBy",'hydra'=>'http://projecthydra.org/ns/relations#')
-        return nil if nodeset.empty?
-        apo_id = nodeset.first.attribute_with_ns('resource','http://www.w3.org/1999/02/22-rdf-syntax-ns#')
-        apo_id.text.split('/')[-1]
-      else
-        nil
-      end
+      relationship_md = Nokogiri::XML(relationship_md_pathname.read)
+      nodeset = relationship_md.xpath("//hydra:isGovernedBy",'hydra'=>'http://projecthydra.org/ns/relations#')
+      apo_id = nodeset.first.attribute_with_ns('resource','http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+      apo_id.text.split('/')[-1] if apo_id
     rescue Exception => e
-      raise LyberCore::Exceptions::FatalError.new("Unable to find APO id for #{druid}", e)
+      raise LyberCore::Exceptions::ItemError.new(druid, "Unable to find APO id in relationshipMetadata", e)
     end
 
-    # @param druid [String] The object identifier
-    # @return [String] The agreement identifier found in the identityMetadata datastream
-    def find_agreement_id(druid)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter find_agreement_id")
-      if (identity_metadata = get_metadata(druid,'identityMetadata'))
-        doc = Nokogiri::XML(identity_metadata)
-        nodeset= doc.xpath("//agreementId/text()")
-        return nil if nodeset.empty?
-        nodeset.first.text
-      else
-        nil
-      end
-    rescue Exception => e
-      raise LyberCore::Exceptions::FatalError.new("Unable to find agreement id for #{druid}", e)
-    end
-
-    # @param druid [String] The object identifier
-    # @param dsid [String] The datastream identifier, which is also the basename of the XML data file
-    # @return [String] The contents of the specified datastream, else nil if not found
-    def get_metadata(druid, dsid)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter get_metadata")
-      sedora_object = Sdr::SedoraObject.find(druid)
-      datastream = sedora_object.datastreams[dsid]
-      if datastream.new?
-        nil
-      else
-        datastream.content
-      end
-      #pathname = SdrDeposit.bag_pathname(druid).join("data/metadata/#{dsid}.xml")
-      #if pathname.exist?
-      #  pathname.read
-      #else
-      #  nil
-      #end
-    end
-
-    # @param identifier [String] The APO or agreement identifier
-    # @return [Boolean] Return true if the identifier is a sedora pid
-    def verify_identifier(identifier)
+    # Confirm that the APO identifier for the object corresponds to an already ingested object
+    # @param [String] druid The object identifier
+    # @param apo_druid [String] The APO identifier
+    # @return [Boolean] Return true if the object for the apo_druid is found in storage, or raise exception
+    def verify_apo_id(druid,apo_druid)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter verify_identifier")
-      if @valid_identifiers.include?(identifier)
-        true
-      elsif SedoraObject.exists?(identifier)
-        @valid_identifiers << identifier
+      if @valid_apo_ids.include?(apo_druid)
         true
       else
-        false
+        apo_object = StorageServices.find_storage_object(apo_druid)
+        if apo_object.object_pathname.directory?
+          @valid_apo_ids << apo_druid
+          true
+        else
+          raise LyberCore::Exceptions::ItemError.new(druid,"APO object #{apo_druid} not found")
+        end
       end
     rescue Exception => e
-      raise LyberCore::Exceptions::FatalError.new("unable to verify identifier", e)
+      raise LyberCore::Exceptions::ItemError.new(druid, "Unable to verify APO object #{apo_druid}", e)
     end
 
     def verification_queries(druid)
@@ -128,7 +128,6 @@ module Sdr
       files = []
       files
     end
-
 
   end
 

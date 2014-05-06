@@ -3,7 +3,20 @@ require 'boot'
 
 module Sdr
 
+  # Contains the shared methods used by all robots that inherit from this object
   class SdrRobot < LyberCore::Robots::Robot
+
+    # Find the location of the deposited object version
+    # @param [String] druid The object identifier
+    # @return [Pathname] The location of the deposited object version, or raise exception
+    def find_deposit_pathname(druid)
+      storage_object = StorageServices.find_storage_object(druid,include_deposit=true)
+      deposit_pathname = storage_object.deposit_bag_pathname
+      return deposit_pathname if deposit_pathname.directory?
+      raise "pathname does not exist or is not a directory"
+    rescue Exception => e
+      raise LyberCore::Exceptions::ItemError.new(druid, "Unable to determine deposit pathname", e)
+    end
 
     # @param opts [Hash] options (:tries and :interval)
     # @param request [Object] the block of code to execute

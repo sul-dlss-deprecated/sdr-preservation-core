@@ -5,7 +5,9 @@ describe Sdr::VerifyAgreement do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
-
+    @deposit_pathname = @fixtures.join('deposit','jc837rq9922')
+    @relationship_md_pathname = @deposit_pathname.join(@druid)
+    @apo_id = 'aa111bb2222'
   end
 
   before(:each) do
@@ -29,151 +31,95 @@ describe Sdr::VerifyAgreement do
     @va.process_item(work_item)
   end
 
-  specify "VerifyAgreement#verify_agreement true true na na" do
-    @va.should_receive(:find_apo_id).with(@druid).and_return('valid_apo_id')
-    @va.should_receive(:verify_identifier).with('valid_apo_id').and_return(true)
-    @va.should_not_receive(:find_agreement_id)
-    @va.verify_agreement(@druid).should == true
+  describe "VerifyAgreement#verify_agreement" do
+
+    specify "apo_id retrieved from relationship metadata and verified" do
+      @va.should_receive(:find_deposit_pathname).with(@druid).and_return(@deposit_pathname)
+      @va.should_receive(:find_relationship_metadata).with(@deposit_pathname).and_return(@relationship_md_pathname)
+      @va.should_receive(:find_apo_id).with(@druid, @relationship_md_pathname).and_return(@apo_id)
+      @va.should_receive(:verify_apo_id).with(@druid, @apo_id).and_return(true)
+      @va.should_not_receive(:find_deposit_version)
+      @va.verify_agreement(@druid).should == true
+    end
+
+    specify "apo_id retrieved from relationship metadata but the APO object does not exist in storage" do
+      @va.should_receive(:find_deposit_pathname).with(@druid).and_return(@deposit_pathname)
+      @va.should_receive(:find_relationship_metadata).with(@deposit_pathname).and_return(@relationship_md_pathname)
+      @va.should_receive(:find_apo_id).with(@druid, @relationship_md_pathname).and_return(@apo_id)
+      @va.should_receive(:verify_apo_id).with(@druid, @apo_id).and_return(false)
+      @va.should_not_receive(:find_deposit_version)
+      lambda { @va.verify_agreement(@druid) }.should raise_exception(/APO object aa111bb2222 was not found in repository/)
+    end
+
+    specify "apo_id could not be retrieved from an existing relationship metadata file" do
+      @va.should_receive(:find_deposit_pathname).with(@druid).and_return(@deposit_pathname)
+      @va.should_receive(:find_relationship_metadata).with(@deposit_pathname).and_return(@relationship_md_pathname)
+      @va.should_receive(:find_apo_id).with(@druid, @relationship_md_pathname).and_return(nil)
+      @va.should_not_receive(:verify_apo_id)
+      @va.should_not_receive(:find_deposit_version)
+      lambda { @va.verify_agreement(@druid) }.should raise_exception(/APO ID not found in relationshipMetadata/)
+    end
+
+    specify "relationship metadata not found in deposit area, but that's OK because version > 1" do
+      # relationship metadata not found in deposit area, but that's OK because version > 1
+      @va.should_receive(:find_deposit_pathname).with(@druid).and_return(@deposit_pathname)
+      @va.should_receive(:find_relationship_metadata).with(@deposit_pathname).and_return(nil)
+      @va.should_not_receive(:find_apo_id)
+      @va.should_not_receive(:verify_apo_id)
+      @va.should_receive(:find_deposit_version).with(@druid, @deposit_pathname).and_return(2)
+      @va.verify_agreement(@druid).should == true
+    end
+
+    specify "relationship metadata not found in deposit area, raise error because version = 1" do
+      # relationship metadata not found in deposit area, but that's OK because version > 1
+      @va.should_receive(:find_deposit_pathname).with(@druid).and_return(@deposit_pathname)
+      @va.should_receive(:find_relationship_metadata).with(@deposit_pathname).and_return(nil)
+      @va.should_not_receive(:find_apo_id)
+      @va.should_not_receive(:verify_apo_id)
+      @va.should_receive(:find_deposit_version).with(@druid, @deposit_pathname).and_return(1)
+      lambda { @va.verify_agreement(@druid) }.should raise_exception(/relationshipMetadata.xml not found in deposited metadata files/)
+    end
+
   end
 
-  specify "VerifyAgreement#verify_agreement true false true true" do
-    @va.should_receive(:find_apo_id).with(@druid).and_return('invalid_apo_id')
-    @va.should_receive(:verify_identifier).with('invalid_apo_id').and_return(false)
-    @va.should_receive(:find_agreement_id).with(@druid).and_return('valid_agreement_id')
-    @va.should_receive(:verify_identifier).with('valid_agreement_id').and_return(true)
-    @va.verify_agreement(@druid).should == true
+  specify "VerifyAgreement#find_relationship_metadata" do
+    deposit_pathname = @deposit_pathname
+    reln_md_pathname = deposit_pathname.join('data','metadata','relationshipMetadata.xml')
+    @va.find_relationship_metadata(deposit_pathname).should == reln_md_pathname
+    deposit_pathname = @deposit_pathname.parent.join('aa111bb2222')
+    @va.find_relationship_metadata(deposit_pathname).should == nil
   end
 
-  specify "VerifyAgreement#verify_agreement false na true true" do
-    @va.should_receive(:find_apo_id).with(@druid).and_return(nil)
-    @va.should_receive(:find_agreement_id).with(@druid).and_return('valid_agreement_id')
-    @va.should_receive(:verify_identifier).with('valid_agreement_id').and_return(true)
-    @va.verify_agreement(@druid).should == true
-  end
-
-  specify "VerifyAgreement#verify_agreement false na true false" do
-    @va.should_receive(:find_apo_id).with(@druid).and_return(nil)
-    @va.should_receive(:find_agreement_id).with(@druid).and_return('invalid_agreement_id')
-    @va.should_receive(:verify_identifier).with('invalid_agreement_id').and_return(false)
-    lambda{@va.verify_agreement(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
-  end
-
-  specify "VerifyAgreement#verify_agreement false na false na" do
-    @va.should_receive(:find_apo_id).with(@druid).and_return(nil)
-    @va.should_receive(:find_agreement_id).with(@druid).and_return(nil)
-    lambda{@va.verify_agreement(@druid)}.should raise_exception(LyberCore::Exceptions::ItemError)
+  specify "VerifyAgreement#find_deposit_version" do
+    deposit_pathname = @deposit_pathname
+    version = @va.find_deposit_version(@druid, deposit_pathname)
+    version.should == 2
+    deposit_pathname = @deposit_pathname.parent.join('aa111bb2222')
+    lambda{@va.find_deposit_version(@druid, deposit_pathname)}.should raise_exception(/Unable to find deposit version/)
   end
 
   specify "VerifyAgreement#find_apo_id" do
-    @va.stub(:get_metadata).with(@druid,'relationshipMetadata').and_return(<<-EOF
-      <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#" xmlns:hydra="http://projecthydra.org/ns/relations#">
-        <rdf:Description rdf:about="info:fedora/druid:ab123cd4567">
-          <hydra:isGovernedBy rdf:resource="info:fedora/druid:wk434ht4838"></hydra:isGovernedBy>
-        </rdf:Description>
-      </rdf:RDF>
-    EOF
-    )
-    @va.find_apo_id(@druid).should == "druid:wk434ht4838"
-
-    @va.stub(:get_metadata).with(@druid,'relationshipMetadata').and_return(nil)
-    @va.find_apo_id(@druid).should == nil
-
-    @va.stub(:get_metadata).with(@druid,'relationshipMetadata').and_return(<<-EOF
-      <rdf:RDF xmlns:fedora-model="info:fedora/fedora-system:def/model#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rel="info:fedora/fedora-system:def/relations-external#" xmlns:hydra="http://projecthydra.org/ns/relations#">
-      </rdf:RDF>
-    EOF
-    )
-    @va.find_apo_id(@druid).should == nil
-
+    relationship_md_pathname = @va.find_relationship_metadata(@deposit_pathname)
+    @va.find_apo_id(@druid,relationship_md_pathname).should == "druid:wk434ht4838"
+    relationship_md_pathname = @va.find_relationship_metadata(@deposit_pathname.parent)
+    lambda{@va.find_apo_id(@druid,relationship_md_pathname)}.should raise_exception(/Unable to find APO id in relationshipMetadata/)
   end
 
-  specify "VerifyAgreement#find_agreement_id" do
-    @va.should_receive(:get_metadata).with(@druid,'identityMetadata').and_return(<<-EOF
-      <identityMetadata>
-        <objectId>druid:bp119bq5041</objectId>
-        <objectType>item</objectType>
-        <objectLabel>google download barcode 36105033436945</objectLabel>
-        <objectCreator>DOR</objectCreator>
-        <citationTitle>Why go to college?: An address</citationTitle>
-        <citationCreator>Palmer, Alice Freeman , 1855-1902</citationCreator>
-        <sourceId source="google">STANFORD_36105033436945</sourceId>
-        <otherId name="shelfseq">376.6 .P173</otherId>
-        <otherId name="catkey">2223292</otherId>
-        <otherId name="barcode">36105033436945</otherId>
-        <otherId name="callseq">2</otherId>
-        <otherId name="uuid">66ec8966-a04b-4155-aea4-f7443923ae72</otherId>
-        <agreementId>druid:zn292gq7284</agreementId>
-        <tag>Google Book : Phase 1</tag>
-        <tag>Google Book : Scan source STANFORD</tag>
-        <tag>Google Book : US pre-1923</tag>
-      </identityMetadata>
-    EOF
-    )
-    @va.find_agreement_id(@druid).should == "druid:zn292gq7284"
+  specify "VerifyAgreement#verify_apo_id" do
+    apo_druid = "druid:zn292gq7284"
+    @va.valid_apo_ids << apo_druid
+    @va.verify_apo_id(@druid,apo_druid).should == true
 
-    @va.should_receive(:get_metadata).with(@druid,'identityMetadata').and_return(nil)
-    @va.find_agreement_id(@druid).should == nil
+    apo_druid = "druid:jq937jp0017"
+    @va.valid_apo_ids.include?(apo_druid).should == false
+    @va.verify_apo_id(@druid,apo_druid).should == true
+    @va.valid_apo_ids.include?(apo_druid).should == true
 
-    @va.should_receive(:get_metadata).with(@druid,'identityMetadata').and_return(<<-EOF
-      <identityMetadata>
-      </identityMetadata>
-    EOF
-    )
-    @va.find_agreement_id(@druid).should == nil
+    apo_druid = "druid:bad"
+    lambda{@va.verify_apo_id(@druid,apo_druid)}.should raise_exception(/Unable to verify APO object/)
 
-  end
-
-  specify "VerifyAgreement#get_metadata" do
-    sedora_object = double(SedoraObject)
-    SedoraObject.stub(:find).with(@druid).and_return(sedora_object)
-    datastream = double('relationshipMetadata')
-    sedora_object.stub(:datastreams).and_return({'relationshipMetadata'=>datastream})
-    datastream.stub(:new?).and_return(false)
-    datastream.stub(:content).and_return("<relationshipMetadata>...")
-    @va.get_metadata(@druid,'relationshipMetadata').should == "<relationshipMetadata>..."
-
-    datastream.stub(:new?).and_return(true)
-    @va.get_metadata(@druid,'relationshipMetadata').should == nil
-
-
-    #bag_pathname = double("bag_pathname")
-    #relationship_metadata_pathaname = double("relationship_metadata_pathaname")
-    #SdrDeposit.stub(:bag_pathname).with(@druid).and_return(bag_pathname)
-    #bag_pathname.stub(:join).with('data/metadata/relationshipMetadata.xml').
-    #    and_return(relationship_metadata_pathaname)
-    #relationship_metadata_pathaname.stub(:read).and_return("<relationshipMetadata>...")
-    #relationship_metadata_pathaname.stub(:exist?).and_return(true)
-    #@va.get_metadata(@druid,'relationshipMetadata').should == "<relationshipMetadata>..."
-    #relationship_metadata_pathaname.stub(:exist?).and_return(false)
-    #@va.get_metadata(@druid,'relationshipMetadata').should == nil
-  end
-
-  specify "VerifyAgreement#verify_identifier" do
-    @va.valid_identifiers << "druid:zn292gq7284"
-    @va.verify_identifier("druid:zn292gq7284").should == true
-
-    SedoraObject.stub(:exists?).with("druid:wk434ht4838").and_return(true)
-    @va.valid_identifiers.include?("druid:wk434ht4838").should == false
-    @va.verify_identifier("druid:wk434ht4838").should == true
-    @va.valid_identifiers.include?("druid:wk434ht4838").should == true
-
-    SedoraObject.stub(:exists?).with("druid:bad").and_return(false)
-    @va.verify_identifier("druid:bad").should == false
-
-    #def verify_identifier(identifier)
-    #  LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter verify_identifier")
-    #  if @valid_identifiers.include?(identifier)
-    #    true
-    #  elsif SedoraObject.exists?(agreement_id)
-    #    @valid_identifiers << agreement_id
-    #    true
-    #  else
-    #    false
-    #  end
-    #rescue Exception => e
-    #  raise LyberCore::Exceptions::FatalError.new("unable to verify identifier", e)
-    #end
-
+    @va.valid_apo_ids = nil
+    lambda{@va.verify_apo_id(@druid,apo_druid)}.should raise_exception(/undefined method/)
   end
 
 end

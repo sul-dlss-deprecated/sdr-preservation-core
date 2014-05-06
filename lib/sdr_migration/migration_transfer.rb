@@ -141,10 +141,10 @@ module Sdr
     end
 
     def verification_files(druid)
-      storage_object = StorageServices.find_storage_object(druid,include_deposit=true)
+      deposit_bag_pathname = find_deposit_pathname(druid)
       files = []
-        files << storage_object.deposit_bag_pathname.to_s
-        files << storage_object.deposit_bag_pathname.join("bag-info.txt").to_s
+        files << deposit_bag_pathname.to_s
+        files << deposit_bag_pathname.join("bag-info.txt").to_s
       files
     end
 

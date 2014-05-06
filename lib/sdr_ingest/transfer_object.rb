@@ -25,8 +25,7 @@ module Sdr
     #   See LyberCore::Robots::Robot#process_queue
     def process_item(work_item)
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      storage_object = StorageServices.find_storage_object(work_item.druid,include_deposit=true)
-      bag_pathname = storage_object.deposit_bag_pathname
+      bag_pathname = find_deposit_pathname(work_item.druid)
       transfer_object(work_item.druid,bag_pathname)
     end
 
@@ -82,7 +81,7 @@ module Sdr
     end
 
     # @see http://en.wikipedia.org/wiki/User:Chdev/tarpipe
-    # ssh ${user}@${remotehost} "tar -cf - ${srcdir}" | tar -C ${destdir} -xf -
+    # ssh user@remotehost "tar -cf - srcdir | tar -C destdir -xf -
     def tarpipe_command(druid, deposit_home)
       'ssh ' + Sdr::Config.ingest_transfer.account +
       ' "tar -C ' + Sdr::Config.ingest_transfer.export_dir  +
@@ -97,9 +96,9 @@ module Sdr
     end
 
     def verification_files(druid)
-      storage_object = StorageServices.find_storage_object(druid,include_deposit=true)
+      deposit_bag_pathname = find_deposit_pathname(druid)
       files = []
-        files << storage_object.deposit_bag_pathname.to_s
+        files << deposit_bag_pathname.to_s
       files
     end
 

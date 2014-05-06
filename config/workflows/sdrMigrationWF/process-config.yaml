@@ -4,29 +4,15 @@ migration-start:
   classname: "Sdr::MigrationStart"
   classpath: "sdr_migration/migration_start.rb"
 
-migration-register:
-  prerequisite: migration-start
-  batch_limit: 1000
-  error_limit: 5
-  classname: "Sdr::MigrationRegister"
-  classpath: "sdr_migration/migration_register.rb"
-
 migration-transfer:
-  prerequisite: migration-register
+  prerequisite: migration-start
   batch_limit: 200
   error_limit: 5
   classname: "Sdr::MigrationTransfer"
   classpath: "sdr_migration/migration_transfer.rb"
 
-migration-metadata:
-  prerequisite: migration-validate
-  batch_limit: 200
-  error_limit: 5
-  classname: "Sdr::MigrationMetadata"
-  classpath: "sdr_migration/migration_metadata.rb"
-
 migration-complete:
-  prerequisite: migration-metadata
+  prerequisite: migration-transfer
   batch_limit: 200
   error_limit: 5  
   classname: "Sdr::MigrationComplete"

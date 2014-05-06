@@ -21,7 +21,6 @@ module Sdr
         LyberCore::Log.info result.to_json(verbose=false)
         raise LyberCore::Exceptions::ItemError.new(druid, "Failed validation",e)
       end
-      #update_provenance(druid)
       bag_pathname = storage_object.deposit_bag_pathname
       cleanup_deposit_files(druid, bag_pathname)
     end

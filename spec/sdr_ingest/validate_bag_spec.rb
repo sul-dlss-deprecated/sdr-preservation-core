@@ -5,7 +5,7 @@ describe Sdr::ValidateBag do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
-    @bag_pathname = @fixtures.join('import','jc837rq9922')
+    @bag_pathname = @fixtures.join('deposit','aa111bb2222')
   end
 
   before(:each) do
@@ -22,7 +22,7 @@ describe Sdr::ValidateBag do
   specify "ValidateBag#process_item" do
     work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @vb.should_receive(:validate_bag).with(@druid,@fixtures.join('packages','jc837rq9922'), 0)
+    @vb.should_receive(:validate_bag).with(@druid,@fixtures.join('deposit','jc837rq9922'), 0)
     @vb.process_item(work_item)
   end
 
@@ -36,7 +36,7 @@ describe Sdr::ValidateBag do
   specify "ValidateBag#validate_bag_structure" do
     @bag_pathname.stub(:to_s).and_return('bagdir')
     @bag_pathname.stub(:exist?).and_return(false)
-    lambda{@vb.verify_bag_structure(@bag_pathname)}.should raise_exception(/jc837rq9922 not found at bagdir/)
+    lambda{@vb.verify_bag_structure(@bag_pathname)}.should raise_exception(/aa111bb2222 not found at bagdir/)
     @bag_pathname.stub(:exist?).and_return(true)
 
     data_dir = double('datadir')
@@ -69,16 +69,16 @@ describe Sdr::ValidateBag do
 
   specify "ValidateBag#validate_bag_data" do
     druid = 'druid:jq937jp0017'
-    good_bag = @fixtures.join('packages/v0001')
+    good_bag = @fixtures.join('deposit/jq937jp0017')
     @vb.validate_bag_data(good_bag ).should == true
-    bag_missing_file = @fixtures.join('packages/bag_missing_file')
+    bag_missing_file = @fixtures.join('deposit/bag_missing_file')
     lambda{@vb.validate_bag_data(bag_missing_file )}.should raise_exception(Errno::ENOENT)
-    bag_bad_fixity = @fixtures.join('packages/bag_bad_fixity')
+    bag_bad_fixity = @fixtures.join('deposit/bag_bad_fixity')
     lambda{@vb.validate_bag_data(bag_bad_fixity )}.should raise_exception(/Bag data validation error/)
   end
 
   specify "ValidateBag#verify_version_number" do
-    bag_pathname = @fixtures.join('packages/v0001')
+    bag_pathname = @fixtures.join('deposit/jq937jp0017')
     @vb.verify_version_number(bag_pathname,0).should == true
     lambda{@vb.verify_version_number( bag_pathname,1)}.should raise_exception(/Version mismatch/)
   end
@@ -90,13 +90,13 @@ describe Sdr::ValidateBag do
   end
 
   specify "ValidateBag#vmfile_version_id" do
-    bag_pathname = @fixtures.join('packages/v0001')
+    bag_pathname = @fixtures.join('deposit/jq937jp0017')
     vmfile = bag_pathname .join("data/metadata/versionMetadata.xml")
     @vb.vmfile_version_id(vmfile).should == 1
   end
 
   specify "ValidateBag#inventory_version_id" do
-    bag_pathname = @fixtures.join('packages/v0001')
+    bag_pathname = @fixtures.join('deposit/jq937jp0017')
     inventory_file = bag_pathname .join("versionAdditions.xml")
     @vb.inventory_version_id(inventory_file).should == 1
   end

@@ -5,7 +5,7 @@ describe Sdr::TransferObject do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
-    @bag_pathname = @fixtures.join('import','jc837rq9922')
+    @bag_pathname = @fixtures.join('deposit','aa111bb2222')
   end
 
   before(:each) do
@@ -22,14 +22,14 @@ describe Sdr::TransferObject do
   specify "TransferObject#process_item" do
     work_item = double("WorkItem")
     work_item.stub(:druid).and_return(@druid)
-    @to.should_receive(:transfer_object).with(@druid,@fixtures.join('packages','jc837rq9922'))
+    @to.should_receive(:transfer_object).with(@druid,@fixtures.join('deposit','jc837rq9922'))
     @to.process_item(work_item)
   end
 
 
   specify "TransferObject#tarpipe_command" do
-    cmd = @to.tarpipe_command(@druid, "#{ROBOT_ROOT}/spec/fixtures/import")
-    cmd.should ==  "ssh lyberadmin@sul-lyberservices-dev.stanford.edu \"tar -C /dor/export/ --dereference -cf - jc837rq9922 \" | tar -C #{ROBOT_ROOT}/spec/fixtures/import -xf -"
+    cmd = @to.tarpipe_command(@druid, "#{ROBOT_ROOT}/spec/fixtures/deposit")
+    cmd.should ==  "ssh lyberadmin@sul-lyberservices-dev.stanford.edu \"tar -C /dor/export/ --dereference -cf - jc837rq9922 \" | tar -C #{ROBOT_ROOT}/spec/fixtures/deposit -xf -"
   end
 
   specify "TransferObject#verify_version_metadata" do
