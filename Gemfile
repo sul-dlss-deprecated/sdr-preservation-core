@@ -15,5 +15,6 @@ gem "rcov", :platform => :ruby_18
 gem "yard"
 gem "equivalent-xml"
 gem "lyberteam-capistrano-devel", ">=1.0.0"
+gem "capistrano", '= 2.13.5'
 gem "sys-filesystem"
 
