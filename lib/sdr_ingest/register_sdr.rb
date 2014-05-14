@@ -26,7 +26,7 @@ module Sdr
         raise Sdr::ItemError.new(druid, "accessionWF:sdr-ingest-transfer status is #{accession_status}")
       end
       # Create a step (table row) in the current workflow instance for ingest-cleanup robot
-      update_workflow_status('sdr',druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting') if @workflow_name == 'sdrIngestWF'
+      update_workflow_status('sdr',druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting', 0) if @workflow_name == 'sdrIngestWF'
     end
 
     def verification_queries(druid)

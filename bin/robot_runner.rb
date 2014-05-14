@@ -151,8 +151,7 @@ class RobotRunner
       #t0=Time.now
       @status_process.write_process_status($$, druid.split(':')[-1], robot.name)
       #@breakdown.write_process_status += (Time.now - t0)
-      status = run_robot(robot, druid, logfile)
-      status = analyze_logfile(logfile) if status == 'error'
+      status = run_robot(robot, druid)
       return status if status =='error' or status == 'fatal'
     end
     write_ingest_detail(druid)
@@ -169,47 +168,34 @@ class RobotRunner
     @robots
   end
 
-  def run_robot(robot, druid, logfile)
+  def run_robot(robot, druid)
     begin
-      #t0=Time.now
       LyberCore::Log.info "=" * 60
-      robot_opts = {:logfile => logfile.to_s, :loglevel => @loglevel, :argv => ['-d', druid]}
       require robot.classpath
-      #    robot_object = eval(robot.classname).new(robot_opts)
-      # http://www.ruby-forum.com/topic/182803
       robot_class = robot.classname.split('::').reduce(Object){|cls, c| cls.const_get(c) }
-      robot_object = robot_class.new(robot_opts)
-      #@breakdown.create_robot += (Time.now - t0)
-      #t0=Time.now
+      robot_object = robot_class.new
+      LyberCore::Log.info "Running #{robot.name}"
       begin
         robot_status = robot_object.get_workflow_status('sdr', druid, @workflow, robot.name)
       rescue
         robot_status = ['Sdr::MigrationStart','Sdr::RecoveryStart','Sdr::AuditVerify'].include?(robot.classname) ? 'waiting' : 'unknown'
       end
-      #@breakdown.check_status += (Time.now - t0)
-      #t0=Time.now
       case robot_status
         when 'completed'
           LyberCore::Log.info "#{druid} #{robot.name} status = previously completed"
         when 'waiting','error'
-          # Here's where we run the robot
-          robot_object.start
-          #@breakdown.run_robot += (Time.now - t0)
-          #t0=Time.now
-          robot_status = Dor::WorkflowService.get_workflow_status(
-              'sdr', druid, @workflow, robot.name)
-          LyberCore::Log.info "#{druid} #{robot.name} status = #{robot_status}"
-          #@breakdown.check_status += (Time.now - t0)
-          return 'error'if robot_status != "completed"
-          if @verify
+          # run the robot
+          robot_status = robot_object.process_item(druid)
+          if @verify and robot_status == "completed"
             return 'error' unless verify_results(robot_object, druid)
           end
+          return robot_status
         else
           LyberCore::Log.error "#{druid} #{robot.name} unexpected status = #{robot_status}"
           return 'error'
       end
     rescue Exception
-      LyberCore::Log.error "#{$!.inspect}\n#{$@}"
+      LyberCore::Log.fatal "#{$!.inspect}\n#{$@}"
       return 'fatal'
     end
     return robot_status
@@ -242,19 +228,6 @@ class RobotRunner
       end
     end
     return true
-  end
-
-  def analyze_logfile(logfile)
-    log=Pathname(logfile).read
-    if log.include?('FATAL')
-      return 'fatal'
-    elsif log.include?('ItemError')
-      return 'error'
-    elsif log.include?('ERROR')
-      return 'fatal'
-    else
-      return 'completed'
-    end
   end
 
   def move_logfile(logfile, status)

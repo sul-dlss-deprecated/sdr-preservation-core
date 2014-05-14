@@ -22,20 +22,24 @@ describe SdrRobot do
     end
 
     specify "SdrRobot#update_workflow_status success" do
-      params = ['dor', 'druid', 'accessionWF', 'sdr-ingest-received', 'completed']
+      input = ['dor', 'druid', 'accessionWF', 'sdr-ingest-received', 'completed', 5]
+      params = input[0..4]
+      params << {:elapsed=>5, :note=>Socket.gethostname}
       expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params).twice.and_raise(TimeoutError)
       expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params)
       opts = {:interval => 3}
       params << opts
-      expect(@robot.update_workflow_status(*params)).to eq(nil)
+      expect(@robot.update_workflow_status(*input)).to eq(nil)
     end
 
     specify "SdrRobot#update_workflow_status failure" do
-      params = ['dor', 'druid', 'accessionWF', 'sdr-ingest-received', 'completed']
+      input = ['dor', 'druid', 'accessionWF', 'sdr-ingest-received', 'completed',5]
+      params = input[0..4]
+      params << {:elapsed=>5, :note=>Socket.gethostname}
       expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params).exactly(3).times.and_raise(TimeoutError)
       opts = {:interval => 3}
       params << opts
-      expect{@robot.update_workflow_status(*params)}.to raise_exception(Sdr::FatalError)
+      expect{@robot.update_workflow_status(*input)}.to raise_exception(Sdr::FatalError)
     end
 
   end

@@ -22,7 +22,7 @@ describe Sdr::RegisterSdr do
   specify "RegisterSdr#perform" do
     expect(@rs).to receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
         and_return("completed")
-    expect(Dor::WorkflowService).to receive(:update_workflow_status).with('sdr', @druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting')
+    expect(Dor::WorkflowService).to receive(:update_workflow_status)
     @rs.perform(@druid)
     expect(@rs).to receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
         and_return("error")

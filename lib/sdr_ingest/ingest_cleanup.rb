@@ -29,7 +29,7 @@ module Sdr
     # @return [void] complete ingest of the item, update provenance, cleanup deposit data.
     def ingest_cleanup(druid,bag_pathname )
       cleanup_deposit_files(druid, bag_pathname) if bag_pathname.exist?
-      update_workflow_status('dor', druid, 'accessionWF', 'sdr-ingest-received', 'completed')
+      update_workflow_status('dor', druid, 'accessionWF', 'sdr-ingest-received', 'completed', 1)
     end
 
     # @param druid [String] The object identifier
