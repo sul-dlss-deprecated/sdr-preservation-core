@@ -14,55 +14,54 @@ describe Sdr::MigrationTransfer do
   end
 
   specify "MigrationTransfer#initialize" do
-    @mt.should be_instance_of MigrationTransfer
-    @mt.class.superclass.should == TransferObject
-    @mt.should be_kind_of LyberCore::Robots::Robot
-    @mt.workflow_name.should == 'sdrMigrationWF'
-    @mt.workflow_step.should == 'migration-transfer'
+    expect(@mt).to be_an_instance_of(MigrationTransfer)
+    expect(@mt.class.superclass).to eq(TransferObject)
+    expect(@mt).to be_a_kind_of(LyberCore::Robot)
+    expect(@mt.workflow_name).to eq('sdrMigrationWF')
+    expect(@mt.workflow_step).to eq('migration-transfer')
   end
 
-  specify "MigrationTransfer#process_item" do
-    work_item = double("WorkItem")
-    work_item.stub(:druid).and_return(@druid)
-    @mt.should_receive(:transfer_object).with(@druid,@fixtures.join('deposit','jq937jp0017'))
-    @mt.process_item(work_item)
+  specify "MigrationTransfer#perform" do
+    expect(@mt).to receive(:transfer_object).with(@druid,@fixtures.join('deposit','jq937jp0017'))
+    @mt.perform(@druid)
   end
   
   specify "MigrationTransfer#generate_inventory_manifests" do
     version_inventory = Moab::FileInventory.new(:type=>"version",:digital_object_id=>@druid, :version_id=>1)
     version_additions = Moab::FileInventory.new(:type=>"additons",:digital_object_id=>@druid, :version_id=>1)
-    @mt.should_receive(:get_version_inventory).with(@druid, @deposit_bag_pathname).and_return(version_inventory)
-    version_inventory.should_receive(:write_xml_file).with(@deposit_bag_pathname)
-    @mt.should_receive(:get_version_additions).with(@druid, version_inventory).and_return(version_additions)
-    version_additions.should_receive(:write_xml_file).with(@deposit_bag_pathname)
+    expect(@mt).to receive(:get_version_inventory).with(@druid, @deposit_bag_pathname).and_return(version_inventory)
+    expect(version_inventory).to receive(:write_xml_file).with(@deposit_bag_pathname)
+    expect(@mt).to receive(:get_version_additions).with(@druid, version_inventory).and_return(version_additions)
+    expect(version_additions).to receive(:write_xml_file).with(@deposit_bag_pathname)
     @mt.generate_inventory_manifests(@druid, @deposit_bag_pathname)
   end
 
   specify "MigrationTransfer#get_version_inventory" do
-    @mt.should_receive(:write_content_metadata).with(an_instance_of(String),an_instance_of(Pathname))
+    expect(@mt).to receive(:write_content_metadata).with(an_instance_of(String),an_instance_of(Pathname))
     version_inventory = @mt.get_version_inventory(@druid, @deposit_bag_pathname)
-    version_inventory.should be_instance_of Moab::FileInventory
-    version_inventory.group('content').files.size.should == 6
-    version_inventory.group('metadata').files.size.should == 5
-    version_inventory.group('content').files[0].signature.to_xml.should be_equivalent_to( <<-EOF
-      <fileSignature size="41981" md5="915c0305bf50c55143f1506295dc122c"
-           sha1="60448956fbe069979fce6a6e55dba4ce1f915178"
-           sha256="4943c6ffdea7e33b74fd7918de900de60e9073148302b0ad1bf5df0e6cec032a"/>
-      EOF
-    )
+    expect(version_inventory).to be_an_instance_of(Moab::FileInventory)
+    expect(version_inventory.group('content').files.size).to eq(6)
+    expect(version_inventory.group('metadata').files.size).to eq(5)
+    actual = version_inventory.group('content').files[0].signature.to_xml
+    expected = <<-EOF
+          <fileSignature size="41981" md5="915c0305bf50c55143f1506295dc122c"
+               sha1="60448956fbe069979fce6a6e55dba4ce1f915178"
+               sha256="4943c6ffdea7e33b74fd7918de900de60e9073148302b0ad1bf5df0e6cec032a"/>
+          EOF
+    expect(EquivalentXml.equivalent?(actual,expected)).to eq(true)
   end
 
   specify "MigrationTransfer#get_data_group" do
     data_group = @mt.get_data_group(@deposit_bag_pathname, 'content')
-    data_group.group_id.should == 'content'
-    data_group.files.size.should == 6
+    expect(data_group.group_id).to eq('content')
+    expect(data_group.files.size).to eq(6)
   end
 
   specify "MigrationTransfer#upgrade_content_metadata" do
     content_group = @mt.get_data_group(@deposit_bag_pathname, 'content')
-    @mt.should_receive(:write_content_metadata).with(an_instance_of(String),an_instance_of(Pathname))
+    expect(@mt).to receive(:write_content_metadata).with(an_instance_of(String),an_instance_of(Pathname))
     content_metadata = @mt.upgrade_content_metadata(@deposit_bag_pathname, content_group)
-    content_metadata.should be_equivalent_to( <<-EOF
+    expected = <<-EOF
       <contentMetadata type="sample" objectId="druid:jq937jp0017">
         <resource type="version" sequence="1" id="version-1">
           <file datetime="2012-03-26T08:15:11-06:00" size="40873" id="title.jpg" shelve="yes" publish="yes" preserve="yes">
@@ -98,22 +97,22 @@ describe Sdr::MigrationTransfer do
         </resource>
       </contentMetadata>
     EOF
-  )
+    expect(EquivalentXml.equivalent?(content_metadata,expected)).to eq(true)
   end
 
   specify "MigrationTransfer#get_version_additions" do
-    @mt.should_receive(:write_content_metadata).with(an_instance_of(String),an_instance_of(Pathname))
+    expect(@mt).to receive(:write_content_metadata).with(an_instance_of(String),an_instance_of(Pathname))
     version_inventory = @mt.get_version_inventory(@druid, @deposit_bag_pathname)
     version_additions = @mt.get_version_additions(@druid, version_inventory)
-    version_additions.group('content').files.size.should == 6
-    version_additions.group('metadata').files.size.should == 5
-    version_additions.group('content').files[0].signature.to_xml.should be_equivalent_to( <<-EOF
+    expect(version_additions.group('content').files.size).to eq(6)
+    expect(version_additions.group('metadata').files.size).to eq(5)
+    actual = version_additions.group('content').files[0].signature.to_xml
+    expected = <<-EOF
       <fileSignature size="41981" md5="915c0305bf50c55143f1506295dc122c"
            sha1="60448956fbe069979fce6a6e55dba4ce1f915178"
            sha256="4943c6ffdea7e33b74fd7918de900de60e9073148302b0ad1bf5df0e6cec032a"/>
       EOF
-    )
-
+    expect(EquivalentXml.equivalent?(actual,expected)).to eq(true)
   end
 
 end

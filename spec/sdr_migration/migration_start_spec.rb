@@ -13,22 +13,20 @@ describe Sdr::MigrationStart do
   end
 
   specify "MigrationStart#initialize" do
-    @robot.should be_instance_of MigrationStart
-    @robot.should be_kind_of LyberCore::Robots::Robot
-    @robot.workflow_name.should == 'sdrMigrationWF'
-    @robot.workflow_step.should == 'migration-start'
+    expect(@robot).to be_an_instance_of(MigrationStart)
+    expect(@robot).to be_a_kind_of(LyberCore::Robot)
+    expect(@robot.workflow_name).to eq('sdrMigrationWF')
+    expect(@robot.workflow_step).to eq('migration-start')
   end
 
-  specify "MigrationStart#process_item" do
-    work_item = double("WorkItem")
-    work_item.stub(:druid).and_return(@druid)
-    @robot.should_receive(:create_migration_workflow).with(@druid)
-    @robot.process_item(work_item)
+  specify "MigrationStart#perform" do
+    expect(@robot).to receive(:create_migration_workflow).with(@druid)
+    @robot.perform(@druid)
   end
 
   specify "MigrationStart#read_sdr_migration_workflow_xml" do
     wf_xml = @robot.read_sdr_migration_workflow_xml()
-    wf_xml.should =~ /<workflow id=\"sdrMigrationWF\">/
+    expect(wf_xml).to match(/<workflow id=\"sdrMigrationWF\">/)
   end
 
 end

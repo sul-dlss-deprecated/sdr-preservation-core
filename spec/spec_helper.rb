@@ -1,10 +1,13 @@
 ENV['RSPEC'] = "true"
 
-require 'rspec'
+require 'awesome_print'
 require 'equivalent-xml'
 require 'fakeweb'
-require 'sdr'
+require 'rspec'
+require 'simplecov'
+SimpleCov.start
 
+require 'sdr'
 include Sdr
 
 def fixture_setup

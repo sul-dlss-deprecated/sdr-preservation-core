@@ -8,7 +8,9 @@ $LOAD_PATH.unshift(specdir) unless $LOAD_PATH.include?(specdir)
 require 'rubygems'
 require 'bundler/setup'
 require 'confstruct'
-# @see https://github.com/mbklein/confstruct
+require 'pathname'
+require 'nokogiri'
+#require 'logger'
 
 # The Dor::Config object is created in dor-services-gem/lib/dor/config.rb
 # and initialized with the data in dor-services-gem/config/config_defaults.yml
@@ -55,27 +57,11 @@ module Sdr
   end
 end
 
-require 'rubygems'
-require 'English'
-require 'pathname'
-require 'nokogiri'
-#require 'logger'
 
 require 'druid-tools'
 require 'dor/services/workflow_service'
+require 'lyber_core/robot'
 require 'lyber_core/log'
-require 'lyber_core/robots/robot'
-require 'lyber_core/robots/service_controller'
-require 'lyber_core/robots/workflow'
-require 'lyber_core/robots/workspace'
-require 'lyber_core/robots/work_queue'
-require 'lyber_core/robots/work_item'
-require 'lyber_core/utils'
-require 'lyber_core/exceptions/empty_queue'
-require 'lyber_core/exceptions/fatal_error'
-require 'lyber_core/exceptions/service_error'
-require 'lyber_core/exceptions/item_error'
-
 require 'moab_stanford'
 include Stanford
 

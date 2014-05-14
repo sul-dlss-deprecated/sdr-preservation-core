@@ -19,7 +19,7 @@ module Sdr
       result = new_version.verify_version_storage
       if result.verified == false
         LyberCore::Log.info result.to_json(verbose=false)
-        raise LyberCore::Exceptions::ItemError.new(druid, "Failed validation",e)
+        raise Sdr::ItemError.new(druid, "Failed validation",e)
       end
       bag_pathname = storage_object.deposit_bag_pathname
       cleanup_deposit_files(druid, bag_pathname)
@@ -40,7 +40,7 @@ module Sdr
         sleep sleep_time[attempts].to_i
         retry
       else
-        raise LyberCore::Exceptions::ItemError.new(druid, "Failed cleanup deposit (#{attempts} attempts)", e)
+        raise Sdr::ItemError.new(druid, "Failed cleanup deposit (#{attempts} attempts)", e)
       end
     end
 

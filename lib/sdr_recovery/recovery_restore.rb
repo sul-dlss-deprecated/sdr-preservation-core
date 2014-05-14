@@ -19,13 +19,12 @@ module Sdr
       super(self.class.workflow_name, self.class.workflow_step, opts)
     end
 
-    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @param druid [String] The item to be processed
     # @return [void] process an object from the queue through this robot
-    #   Overrides LyberCore::Robots::Robot.process_item method.
-    #   See LyberCore::Robots::Robot#process_queue
-    def process_item(work_item)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      recovery_restore(work_item.druid)
+    #   See LyberCore::Robot#work
+    def perform(druid)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
+      recovery_restore(druid)
     end
 
     # @param druid [String] The object identifier
@@ -38,10 +37,10 @@ module Sdr
       result = storage_object.verify_object_storage
       if result.verified == false
         LyberCore::Log.info result.to_json(verbose=false)
-        raise LyberCore::Exceptions::ItemError.new(druid, "Failed validation",e)
+        raise Sdr::ItemError.new(druid, "Failed validation",e)
       end
     rescue Exception => e
-      raise LyberCore::Exceptions::ItemError.new(druid, "Failed restore",e)
+      raise Sdr::ItemError.new(druid, "Failed restore",e)
     end
 
     def verification_queries(druid)

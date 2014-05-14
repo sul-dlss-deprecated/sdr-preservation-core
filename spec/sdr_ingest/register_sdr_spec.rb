@@ -13,22 +13,20 @@ describe Sdr::RegisterSdr do
   end
 
   specify "RegisterSdr#initialize" do
-    @rs.should be_instance_of RegisterSdr
-    @rs.should be_kind_of LyberCore::Robots::Robot
-    @rs.workflow_name.should == 'sdrIngestWF'
-    @rs.workflow_step.should == 'register-sdr'
+    expect(@rs).to be_an_instance_of(RegisterSdr)
+    expect(@rs).to be_a_kind_of(LyberCore::Robot)
+    expect(@rs.workflow_name).to eq('sdrIngestWF')
+    expect(@rs.workflow_step).to eq('register-sdr')
   end
 
-  specify "RegisterSdr#process_item" do
-    work_item = double("WorkItem")
-    work_item.stub(:druid).and_return(@druid)
-    @rs.should_receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
+  specify "RegisterSdr#perform" do
+    expect(@rs).to receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
         and_return("completed")
-    Dor::WorkflowService.should_receive(:update_workflow_status).with('sdr', @druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting')
-    @rs.process_item(work_item)
-    @rs.should_receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
+    expect(Dor::WorkflowService).to receive(:update_workflow_status).with('sdr', @druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting')
+    @rs.perform(@druid)
+    expect(@rs).to receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
         and_return("error")
-    lambda{@rs.process_item(work_item)}.should raise_exception(/druid:jc837rq9922 - accessionWF:sdr-ingest-transfer status is error/)
+    expect{@rs.perform(@druid)}.to raise_exception(/druid:jc837rq9922 - accessionWF:sdr-ingest-transfer status is error/)
 
   end
 

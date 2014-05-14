@@ -13,22 +13,20 @@ describe Sdr::RecoveryStart do
   end
 
   specify "RecoveryStart#initialize" do
-    @robot.should be_instance_of RecoveryStart
-    @robot.should be_kind_of LyberCore::Robots::Robot
-    @robot.workflow_name.should == 'sdrRecoveryWF'
-    @robot.workflow_step.should == 'recovery-start'
+    expect(@robot).to be_an_instance_of(RecoveryStart)
+    expect(@robot).to be_a_kind_of(LyberCore::Robot)
+    expect(@robot.workflow_name).to eq('sdrRecoveryWF')
+    expect(@robot.workflow_step).to eq('recovery-start')
   end
 
-  specify "RecoveryStart#process_item" do
-    work_item = double("WorkItem")
-    work_item.stub(:druid).and_return(@druid)
-    @robot.should_receive(:create_recovery_workflow).with(@druid)
-    @robot.process_item(work_item)
+  specify "RecoveryStart#perform" do
+    expect(@robot).to receive(:create_recovery_workflow).with(@druid)
+    @robot.perform(@druid)
   end
 
   specify "RecoveryStart#read_sdr_recovery_workflow_xml" do
     wf_xml = @robot.read_sdr_recovery_workflow_xml()
-    wf_xml.should =~ /<workflow id=\"sdrRecoveryWF\">/
+    expect(wf_xml).to match(/<workflow id=\"sdrRecoveryWF\">/)
   end
 
 end

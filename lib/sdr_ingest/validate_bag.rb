@@ -19,16 +19,15 @@ module Sdr
       super(self.class.workflow_name, self.class.workflow_step, opts)
     end
 
-    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @param druid [String] The item to be processed
     # @return [void] process an object from the queue through this robot
-    #   Overrides LyberCore::Robots::Robot.process_item method.
-    #   See LyberCore::Robots::Robot#process_queue
-    def process_item(work_item)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      storage_object = StorageServices.find_storage_object(work_item.druid,include_deposit=true)
+    #   See LyberCore::Robot#work
+    def perform(druid)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
+      storage_object = StorageServices.find_storage_object(druid,include_deposit=true)
       bag_pathname = storage_object.deposit_bag_pathname
       current_version_id  = storage_object.current_version_id
-      validate_bag(work_item.druid,bag_pathname, current_version_id)
+      validate_bag(druid,bag_pathname, current_version_id)
     end
 
     # @param druid [String] The object identifier
@@ -42,7 +41,7 @@ module Sdr
       validate_bag_data(bag_pathname)
       true
     rescue Exception => e
-      raise LyberCore::Exceptions::ItemError.new(druid, "Bag validation failure", e)
+      raise Sdr::ItemError.new(druid, "Bag validation failure", e)
     end
 
     # @param [Pathname] bag_pathname the location of the bag to be verified

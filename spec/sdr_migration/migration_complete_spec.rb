@@ -13,23 +13,21 @@ describe Sdr::MigrationComplete do
   end
 
   specify "MigrationComplete#initialize" do
-    @rs.should be_instance_of MigrationComplete
-    @rs.class.superclass.should == CompleteDeposit
-    @rs.should be_kind_of LyberCore::Robots::Robot
-    @rs.workflow_name.should == 'sdrMigrationWF'
-    @rs.workflow_step.should == 'migration-complete'
+    expect(@rs).to be_an_instance_of(MigrationComplete)
+    expect(@rs.class.superclass).to eq(CompleteDeposit)
+    expect(@rs).to be_a_kind_of(LyberCore::Robot)
+    expect(@rs.workflow_name).to eq('sdrMigrationWF')
+    expect(@rs.workflow_step).to eq('migration-complete')
   end
 
-  specify "MigrationComplete#process_item" do
-    work_item = double("WorkItem")
-    work_item.stub(:druid).and_return(@druid)
-    mock_so = mock(StorageObject)
-    mock_path = mock(Pathname)
-    StorageServices.should_receive(:find_storage_object).with(@druid,true).and_return(mock_so)
-    mock_so.should_receive(:object_pathname).and_return(mock_path)
-    mock_path.should_receive(:mkpath)
-    @rs.should_receive(:complete_deposit).with(@druid,mock_so)
-    @rs.process_item(work_item)
+  specify "MigrationComplete#perform" do
+    mock_so = double(StorageObject)
+    mock_path = double(Pathname)
+    expect(StorageServices).to receive(:find_storage_object).with(@druid,true).and_return(mock_so)
+    expect(mock_so).to receive(:object_pathname).and_return(mock_path)
+    expect(mock_path).to receive(:mkpath)
+    expect(@rs).to receive(:complete_deposit).with(@druid,mock_so)
+    @rs.perform(@druid)
   end
 
 end

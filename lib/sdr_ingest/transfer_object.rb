@@ -19,14 +19,13 @@ module Sdr
       super(self.class.workflow_name, self.class.workflow_step, opts)
     end
 
-    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @param druid [String] The item to be processed
     # @return [void] process an object from the queue through this robot
-    #   Overrides LyberCore::Robots::Robot.process_item method.
-    #   See LyberCore::Robots::Robot#process_queue
-    def process_item(work_item)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      bag_pathname = find_deposit_pathname(work_item.druid)
-      transfer_object(work_item.druid,bag_pathname)
+    #   See LyberCore::Robot#work
+    def perform(druid)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
+      bag_pathname = find_deposit_pathname(druid)
+      transfer_object(druid,bag_pathname)
     end
 
     # @param druid [String] The object identifier
@@ -47,9 +46,9 @@ module Sdr
       LyberCore::Log.debug("deposit bag_pathname is : #{bag_pathname}")
       cleanup_deposit_files(druid, bag_pathname) if bag_pathname.exist?
       raise "versionMetadata.xml not found in export" unless verify_version_metadata(druid)
-      LyberCore::Utils::FileUtilities.execute(tarpipe_command(druid,deposit_home))
+      shell_execute(tarpipe_command(druid,deposit_home))
       rescue Exception => e
-        raise LyberCore::Exceptions::ItemError.new(druid, "Error transferring object", e)
+        raise Sdr::ItemError.new(druid, "Error transferring object", e)
     end
 
     # @param druid [String] The object identifier
@@ -65,7 +64,7 @@ module Sdr
         GC.start
         retry
       else
-        raise LyberCore::Exceptions::ItemError.new(druid, "Failed cleanup deposit (3 attempts)", e)
+        raise Sdr::ItemError.new(druid, "Failed cleanup deposit (3 attempts)", e)
       end
     end
 
@@ -77,7 +76,7 @@ module Sdr
       exists_cmd = "if ssh " + Sdr::Config.ingest_transfer.account +
         " test -e " + vmpath + ";" +
         " then echo exists; else echo notfound; fi"
-      (LyberCore::Utils::FileUtilities.execute(exists_cmd).chomp == 'exists')
+      (shell_execute(exists_cmd).chomp == 'exists')
     end
 
     # @see http://en.wikipedia.org/wiki/User:Chdev/tarpipe

@@ -34,7 +34,7 @@ module Sdr
       return tree_based_pathname if tree_based_pathname && tree_based_pathname.exist?
       date_based_pathname = date_based_location(druid, old_storage_area)
       return date_based_pathname if date_based_pathname.exist?
-      raise LyberCore::Exceptions::ItemError.new(druid, "No bag found for druid #{druid}")
+      raise Sdr::ItemError.new(druid, "No bag found for druid #{druid}")
     end
 
     # @param druid [String] The object identifier
@@ -63,7 +63,7 @@ module Sdr
       end
       object_path = @toc_hash[druid]
       return old_storage_area.join(object_path) if object_path
-      raise LyberCore::Exceptions::ItemError.new(druid, "No line found in deposit-complete.toc for druid #{druid}")
+      raise Sdr::ItemError.new(druid, "No line found in deposit-complete.toc for druid #{druid}")
     end
 
     # @param source_pathname [Pathname] The object's original ingest location
@@ -74,10 +74,10 @@ module Sdr
       # and http://www.rsync.net/resources/howto/mac_images.html
       # trailing slash on the source path means "copy the contents of the source dir to the target dir"
       rsync_command = "rsync -qac --inplace #{source_pathname}/ #{target_pathname}/"
-      LyberCore::Utils::FileUtilities.execute(rsync_command)
+      shell_execute(rsync_command)
       LyberCore::Log.debug("#{source_pathname} transferred to #{target_pathname}")
     rescue Exception => e
-      raise LyberCore::Exceptions::ItemError.new(druid, "Error transferring object", e)
+      raise Sdr::ItemError.new(druid, "Error transferring object", e)
     end
 
     # @param druid [String] The object identifier

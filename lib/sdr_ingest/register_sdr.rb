@@ -19,22 +19,19 @@ module Sdr
       super(self.class.workflow_name, self.class.workflow_step, opts)
     end
 
-    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @param druid [String] The item to be processed
     # @return [void] process an object from the queue through this robot
-    #   Overrides LyberCore::Robots::Robot.process_item method.
-    #   See LyberCore::Robots::Robot#process_queue
-    def process_item(work_item)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      druid=work_item.druid
+    #   See LyberCore::Robot#work
+    def perform(druid)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
+      druid=druid
       accession_status = get_workflow_status('dor', druid, 'accessionWF', 'sdr-ingest-transfer')
       unless accession_status == 'completed'
-        raise LyberCore::Exceptions::ItemError.new(
-                  druid, "accessionWF:sdr-ingest-transfer status is #{accession_status}")
+        raise Sdr::ItemError.new(druid, "accessionWF:sdr-ingest-transfer status is #{accession_status}")
       end
       # Create a step (table row) in the current workflow instance for ingest-cleanup robot
       update_workflow_status('sdr',druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting') if @workflow_name == 'sdrIngestWF'
     end
-
 
     def verification_queries(druid)
       queries = []
@@ -45,7 +42,6 @@ module Sdr
       files = []
       files
     end
-
 
   end
 

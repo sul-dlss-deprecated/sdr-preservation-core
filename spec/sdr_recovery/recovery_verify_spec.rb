@@ -13,24 +13,22 @@ describe Sdr::RecoveryVerify do
   end
 
   specify "RecoveryVerify#initialize" do
-    @rv.should be_instance_of RecoveryVerify
-    @rv.should be_kind_of LyberCore::Robots::Robot
-    @rv.workflow_name.should == 'sdrRecoveryWF'
-    @rv.workflow_step.should == 'recovery-verify'
+    expect(@rv).to be_an_instance_of(RecoveryVerify)
+    expect(@rv).to be_a_kind_of(LyberCore::Robot)
+    expect(@rv.workflow_name).to eq('sdrRecoveryWF')
+    expect(@rv.workflow_step).to eq('recovery-verify')
   end
 
-  specify "RecoveryVerify#process_item" do
-    work_item = double("WorkItem")
-    work_item.stub(:druid).and_return(@druid)
-    @rv.should_receive(:recovery_verify).with(@druid)
-    @rv.process_item(work_item)
+  specify "RecoveryVerify#perform" do
+    expect(@rv).to receive(:recovery_verify).with(@druid)
+    @rv.perform(@druid)
   end
   
   specify "RecoveryVerify#recovery_verify" do
     source_path = @fixtures.join('repository',@object_id)
     recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(@druid.sub('druid:',''))
     FileUtils.cp_r(source_path.to_s,recovery_path.to_s)
-    @rv.recovery_verify(@druid).should == true
+    expect(@rv.recovery_verify(@druid)).to eq(true)
     recovery_path.rmtree if recovery_path.exist?
   end
 

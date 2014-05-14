@@ -12,31 +12,29 @@ describe Sdr::CompleteDeposit do
   end
 
   specify "CompleteDeposit#initialize" do
-    @cd.should be_instance_of CompleteDeposit
-    @cd.should be_kind_of LyberCore::Robots::Robot
-    @cd.workflow_name.should == 'sdrIngestWF'
-    @cd.workflow_step.should == 'complete-deposit'
+    expect(@cd).to be_an_instance_of(CompleteDeposit)
+    expect(@cd).to be_a_kind_of(LyberCore::Robot)
+    expect(@cd.workflow_name).to eq('sdrIngestWF')
+    expect(@cd.workflow_step).to eq('complete-deposit')
   end
 
-  specify "CompleteDeposit#process_item" do
-    work_item = double("WorkItem")
-    work_item.stub(:druid).and_return(@druid)
-    mock_so = mock(StorageObject)
-    mock_path = mock(Pathname)
-    StorageServices.should_receive(:find_storage_object).with(@druid,true).and_return(mock_so)
-    mock_so.should_receive(:object_pathname).and_return(mock_path)
-    mock_path.should_receive(:mkpath)
-    @cd.should_receive(:complete_deposit).with(@druid,mock_so)
-    @cd.process_item(work_item)
+  specify "CompleteDeposit#perform" do
+    mock_so = double(StorageObject)
+    mock_path = double(Pathname)
+    expect(StorageServices).to receive(:find_storage_object).with(@druid,true).and_return(mock_so)
+    expect(mock_so).to receive(:object_pathname).and_return(mock_path)
+    expect(mock_path).to receive(:mkpath)
+    expect(@cd).to receive(:complete_deposit).with(@druid,mock_so)
+    @cd.perform(@druid)
   end
 
   specify "CompleteDeposit#complete_deposit" do
     storage_object = double(StorageObject)
     new_version = double(StorageObjectVersion)
-    storage_object.should_receive(:ingest_bag).and_return(new_version)
+    expect(storage_object).to receive(:ingest_bag).and_return(new_version)
     result = double(VerificationResult)
     result.stub(:verified).and_return(true)
-    new_version.should_receive(:verify_version_storage).and_return(result)
+    expect(new_version).to receive(:verify_version_storage).and_return(result)
     @cd.complete_deposit(@druid,storage_object)
   end
 

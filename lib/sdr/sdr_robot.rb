@@ -1,10 +1,27 @@
 require File.join(File.dirname(__FILE__), '../libdir')
 require 'boot'
+require 'sdr/chained_error'
+require 'sdr/item_error'
+require 'sdr/fatal_error'
 
 module Sdr
 
   # Contains the shared methods used by all robots that inherit from this object
-  class SdrRobot < LyberCore::Robots::Robot
+  class SdrRobot
+    include LyberCore::Robot
+
+    def initialize(workflow_name, step_name, opts = {})
+      super('sdr', workflow_name, step_name, opts)
+    end
+
+    def workflow_name
+      @workflow_name
+    end
+
+    def step_name
+      @step_name
+    end
+    alias_method :workflow_step, :step_name
 
     # Find the location of the deposited object version
     # @param [String] druid The object identifier
@@ -15,7 +32,25 @@ module Sdr
       return deposit_pathname if deposit_pathname.directory?
       raise "pathname does not exist or is not a directory"
     rescue Exception => e
-      raise LyberCore::Exceptions::ItemError.new(druid, "Unable to determine deposit pathname", e)
+      raise Sdr::ItemError.new(druid, "Unable to determine deposit pathname", e)
+    end
+
+    # Executes a system command in a subprocess.
+    # The method will return stdout from the command if execution was successful.
+    # The method will raise an exception if if execution fails.
+    # The exception's message will contain the explaination of the failure.
+    # @param [String] command the command to be executed
+    # @return [String] stdout from the command if execution was successful
+    def shell_execute(command)
+      status, stdout, stderr = systemu(command)
+      if (status.exitstatus != 0)
+        raise stderr
+      end
+      return stdout
+    rescue
+      msg = "Command failed to execute: [#{command}] caused by <STDERR = #{stderr.split($/).join('; ')}>"
+      msg << " STDOUT = #{stdout.split($/).join('; ')}" if (stdout && (stdout.length > 0))
+      raise msg
     end
 
     # @param opts [Hash] options (:tries and :interval)
@@ -30,8 +65,16 @@ module Sdr
         sleep interval
         retry
       else
-        raise LyberCore::Exceptions::FatalError.new("Failed to transmit request", e)
+        raise Sdr::FatalError.new("Failed to transmit request", e)
       end
+    end
+
+    def test_success
+      return "success"
+    end
+
+    def test_failure
+      raise "failure"
     end
 
     def create_workflow_rows(repo, druid, workflow_name, wf_xml, opts = {:create_ds => true})
@@ -50,14 +93,14 @@ module Sdr
       transmit(opts) {Dor::WorkflowService.update_workflow_status(repo, druid, workflow, process, status)}
     end
 
-    # @param work_item [LyberCore::Robots::WorkItem] The object being processed
+    # @param druid [String] The object being processed
     # @return [Boolean] process the object, then set success or error status
     def process_work_item(work_item)
       begin
         #call overridden method
-        process_item(work_item)
+        perform(work_item)
         transmit() {work_item.set_success}
-      rescue LyberCore::Exceptions::FatalError => fatal_error
+      rescue Sdr::FatalError => fatal_error
         raise fatal_error
       rescue Exception => e
         transmit() {work_item.set_error(e)}

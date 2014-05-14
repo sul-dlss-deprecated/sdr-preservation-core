@@ -1,20 +1,29 @@
-source "http://rubygems.org"
-source "http://sul-gems.stanford.edu"
+# If the Ruby version being use does not match, Bundler will raise an exception
+ruby '2.1.0'
 
-gem "moab-versioning", "= 1.2.10" #, :path => '/Users/rnanders/Code/Ruby/moab-versioning' #
-gem "fakeweb"
-gem "nokogiri"
-gem "rake", ">=0.8.7"
-gem "rest-client"
-gem "confstruct"
-gem "dor-services"
-gem "lyber-core"
-gem "druid-tools"
-gem "rspec", "> 2"
-gem "rcov", :platform => :ruby_18
-gem "yard"
-gem "equivalent-xml"
-gem "lyberteam-capistrano-devel", ">=1.0.0"
-gem "capistrano", '= 2.13.5'
-gem "sys-filesystem"
+source 'http://rubygems.org'
+source 'http://sul-gems.stanford.edu'
+
+gem 'confstruct'
+gem 'dor-workflow-service', '~> 1.6', '>= 1.6.3'
+gem 'druid-tools'
+gem 'json_pure'
+gem 'lyber-core',  '~> 3.2', '>= 3.2.2'
+gem 'moab-versioning', '~> 1.3' #, :path => '/Users/rnanders/Code/Ruby/moab-versioning' #
+gem 'nokogiri'
+gem 'rake'
+gem 'rest-client'
+gem 'sys-filesystem'
+
+group :development do
+	gem 'awesome_print'
+  gem 'capistrano-bundler', '~> 1.1'
+	gem 'equivalent-xml'
+	gem 'fakeweb'
+  gem 'lyberteam-capistrano-devel', '3.0.0.pre1'
+	gem 'rspec', '~> 2.14'
+	gem 'simplecov', '~> 0.7.1'
+	gem 'yard'
+end
+
 

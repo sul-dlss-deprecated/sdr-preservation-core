@@ -24,13 +24,12 @@ module Sdr
     end
 
     # Process an object from the queue through this robot
-    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @param druid [String] The item to be processed
     # @return [void]
-    #   Overrides LyberCore::Robots::Robot.process_item method.
-    #   See LyberCore::Robots::Robot#process_queue
-    def process_item(work_item)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      verify_agreement(work_item.druid)
+    #   See LyberCore::Robot#work
+    def perform(druid)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
+      verify_agreement(druid)
     end
 
     # Find the APO identifier in the relationshipMetadata,
@@ -47,10 +46,10 @@ module Sdr
             LyberCore::Log.debug("APO id #{apo_id} was verified")
             true
           else
-            raise LyberCore::Exceptions::ItemError.new(druid, "APO object #{apo_id} was not found in repository")
+            raise Sdr::ItemError.new(druid, "APO object #{apo_id} was not found in repository")
           end
         else
-          raise LyberCore::Exceptions::ItemError.new(druid, "APO ID not found in relationshipMetadata")
+          raise Sdr::ItemError.new(druid, "APO ID not found in relationshipMetadata")
         end
       else
         version = find_deposit_version(druid, deposit_pathname)
@@ -58,7 +57,7 @@ module Sdr
           LyberCore::Log.debug("APO verification skipped for version > 1")
           true
         else
-          raise LyberCore::Exceptions::ItemError.new(druid, "relationshipMetadata.xml not found in deposited metadata files")
+          raise Sdr::ItemError.new(druid, "relationshipMetadata.xml not found in deposited metadata files")
         end
       end
     end
@@ -80,7 +79,7 @@ module Sdr
       raise "version_id is nil" if version_id.nil? 
       version_id.to_i
     rescue Exception => e
-      raise LyberCore::Exceptions::ItemError.new(druid, "Unable to find deposit version", e)
+      raise Sdr::ItemError.new(druid, "Unable to find deposit version", e)
     end
 
     # Extract the APO id from the relationship metadata
@@ -95,7 +94,7 @@ module Sdr
       apo_id = nodeset.first.attribute_with_ns('resource','http://www.w3.org/1999/02/22-rdf-syntax-ns#')
       apo_id.text.split('/')[-1] if apo_id
     rescue Exception => e
-      raise LyberCore::Exceptions::ItemError.new(druid, "Unable to find APO id in relationshipMetadata", e)
+      raise Sdr::ItemError.new(druid, "Unable to find APO id in relationshipMetadata", e)
     end
 
     # Confirm that the APO identifier for the object corresponds to an already ingested object
@@ -112,11 +111,11 @@ module Sdr
           @valid_apo_ids << apo_druid
           true
         else
-          raise LyberCore::Exceptions::ItemError.new(druid,"APO object #{apo_druid} not found")
+          raise Sdr::ItemError.new(druid,"APO object #{apo_druid} not found")
         end
       end
     rescue Exception => e
-      raise LyberCore::Exceptions::ItemError.new(druid, "Unable to verify APO object #{apo_druid}", e)
+      raise Sdr::ItemError.new(druid, "Unable to verify APO object #{apo_druid}", e)
     end
 
     def verification_queries(druid)

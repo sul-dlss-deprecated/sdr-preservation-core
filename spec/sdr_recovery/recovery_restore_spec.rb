@@ -13,28 +13,26 @@ describe Sdr::RecoveryRestore do
   end
 
   specify "RecoveryComplete#initialize" do
-    @rr.should be_instance_of RecoveryRestore
-    @rr.class.superclass.should == Sdr::SdrRobot
-    @rr.should be_kind_of LyberCore::Robots::Robot
-    @rr.workflow_name.should == 'sdrRecoveryWF'
-    @rr.workflow_step.should == 'recovery-restore'
+    expect(@rr).to be_an_instance_of(RecoveryRestore)
+    expect(@rr.class.superclass).to eq(Sdr::SdrRobot)
+    expect(@rr).to be_a_kind_of(LyberCore::Robot)
+    expect(@rr.workflow_name).to eq('sdrRecoveryWF')
+    expect(@rr.workflow_step).to eq('recovery-restore')
   end
 
-  specify "RecoveryComplete#process_item" do
-    work_item = double("WorkItem")
-    work_item.stub(:druid).and_return(@druid)
-    @rr.should_receive(:recovery_restore).with(@druid)
-    @rr.process_item(work_item)
+  specify "RecoveryComplete#perform" do
+    expect(@rr).to receive(:recovery_restore).with(@druid)
+    @rr.perform(@druid)
   end
 
   specify "RecoveryComplete#recovery_restore" do
     storage_object = double(Moab::StorageObject)
     recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(@druid.sub('druid:',''))
-    StorageServices.should_receive(:storage_object).with(@druid,true).and_return(storage_object)
-    storage_object.should_receive(:restore_object).with(recovery_path)
+    expect(StorageServices).to receive(:storage_object).with(@druid,true).and_return(storage_object)
+    expect(storage_object).to receive(:restore_object).with(recovery_path)
     verification_result = double(VerificationResult)
     verification_result.stub(:verified).and_return(true)
-    storage_object.should_receive(:verify_object_storage).and_return(verification_result)
+    expect(storage_object).to receive(:verify_object_storage).and_return(verification_result)
     @rr.recovery_restore(@druid)
   end
 

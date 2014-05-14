@@ -19,14 +19,13 @@ module Sdr
       super(self.class.workflow_name, self.class.workflow_step, opts)
     end
 
-    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @param druid [String] The item to be processed
     # @return [void] process an object from the queue through this robot
-    #   Overrides LyberCore::Robots::Robot.process_item method.
-    #   See LyberCore::Robots::Robot#process_queue
-    def process_item(work_item)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      bag_pathname = find_deposit_pathname(work_item.druid)
-      ingest_cleanup(work_item.druid,bag_pathname )
+    #   See LyberCore::Robot#work
+    def perform(druid)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
+      bag_pathname = find_deposit_pathname(druid)
+      ingest_cleanup(druid,bag_pathname )
     end
 
     # @param druid [String] The object identifier
@@ -52,7 +51,7 @@ module Sdr
         sleep sleep_time[attempts].to_i
         retry
       else
-        raise LyberCore::Exceptions::ItemError.new(druid, "Failed cleanup deposit (#{attempts} attempts)", e)
+        raise Sdr::ItemError.new(druid, "Failed cleanup deposit (#{attempts} attempts)", e)
       end
     end
 

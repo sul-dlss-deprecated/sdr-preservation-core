@@ -19,15 +19,14 @@ module Sdr
       super(self.class.workflow_name, self.class.workflow_step, opts)
     end
 
-    # @param work_item [LyberCore::Robots::WorkItem] The item to be processed
+    # @param druid [String] The item to be processed
     # @return [void] process an object from the queue through this robot
-    #   Overrides LyberCore::Robots::Robot.process_item method.
-    #   See LyberCore::Robots::Robot#process_queue
-    def process_item(work_item)
-      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter process_item")
-      storage_object = StorageServices.find_storage_object(work_item.druid,include_deposit=true)
+    #   See LyberCore::Robot#work
+    def perform(druid)
+      LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
+      storage_object = StorageServices.find_storage_object(druid,include_deposit=true)
       storage_object.object_pathname.mkpath
-      complete_deposit(work_item.druid,storage_object)
+      complete_deposit(druid,storage_object)
     end
 
     # @param druid [String] The object identifier
@@ -38,7 +37,7 @@ module Sdr
       result = new_version.verify_version_storage
       if result.verified == false
         LyberCore::Log.info result.to_json(verbose=false)
-        raise LyberCore::Exceptions::ItemError.new(druid, "Failed verification")
+        raise Sdr::ItemError.new(druid, "Failed verification")
       end
     end
 
