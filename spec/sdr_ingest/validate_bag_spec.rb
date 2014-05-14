@@ -15,8 +15,8 @@ describe Sdr::ValidateBag do
   specify "ValidateBag#initialize" do
     expect(@vb).to be_an_instance_of(ValidateBag)
     expect(@vb).to be_a_kind_of(LyberCore::Robot)
-    expect(@vb.workflow_name).to eq('sdrIngestWF')
-    expect(@vb.workflow_step).to eq('validate-bag')
+    expect(@vb.class.workflow_name).to eq('sdrIngestWF')
+    expect(@vb.class.step_name).to eq('validate-bag')
   end
 
   specify "ValidateBag#perform" do

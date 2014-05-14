@@ -16,8 +16,8 @@ describe Sdr::RecoveryRestore do
     expect(@rr).to be_an_instance_of(RecoveryRestore)
     expect(@rr.class.superclass).to eq(Sdr::SdrRobot)
     expect(@rr).to be_a_kind_of(LyberCore::Robot)
-    expect(@rr.workflow_name).to eq('sdrRecoveryWF')
-    expect(@rr.workflow_step).to eq('recovery-restore')
+    expect(@rr.class.workflow_name).to eq('sdrRecoveryWF')
+    expect(@rr.class.step_name).to eq('recovery-restore')
   end
 
   specify "RecoveryComplete#perform" do

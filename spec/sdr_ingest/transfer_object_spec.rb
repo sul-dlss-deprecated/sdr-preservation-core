@@ -15,8 +15,8 @@ describe Sdr::TransferObject do
   specify "TransferObject#initialize" do
     expect(@to).to be_an_instance_of(TransferObject)
     expect(@to).to be_a_kind_of(LyberCore::Robot)
-    expect(@to.workflow_name).to eq('sdrIngestWF')
-    expect(@to.workflow_step).to eq('transfer-object')
+    expect(@to.class.workflow_name).to eq('sdrIngestWF')
+    expect(@to.class.step_name).to eq('transfer-object')
   end
 
   specify "TransferObject#perform" do

@@ -16,8 +16,8 @@ describe Sdr::MigrationComplete do
     expect(@rs).to be_an_instance_of(MigrationComplete)
     expect(@rs.class.superclass).to eq(CompleteDeposit)
     expect(@rs).to be_a_kind_of(LyberCore::Robot)
-    expect(@rs.workflow_name).to eq('sdrMigrationWF')
-    expect(@rs.workflow_step).to eq('migration-complete')
+    expect(@rs.class.workflow_name).to eq('sdrMigrationWF')
+    expect(@rs.class.step_name).to eq('migration-complete')
   end
 
   specify "MigrationComplete#perform" do

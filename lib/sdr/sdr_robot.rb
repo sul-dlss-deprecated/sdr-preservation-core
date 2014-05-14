@@ -10,18 +10,17 @@ module Sdr
   class SdrRobot
     include LyberCore::Robot
 
+    # accessors for class instance variables
+    # methods are inherited by subclasses, but @workflow_name and @step_name are not global values
+    # @see http://martinfowler.com/bliki/ClassInstanceVariable.html
+    class << self
+      attr_accessor :workflow_name
+      attr_accessor :step_name
+    end
+
     def initialize(workflow_name, step_name, opts = {})
       super('sdr', workflow_name, step_name, opts)
     end
-
-    def workflow_name
-      @workflow_name
-    end
-
-    def step_name
-      @step_name
-    end
-    alias_method :workflow_step, :step_name
 
     # Find the location of the deposited object version
     # @param [String] druid The object identifier

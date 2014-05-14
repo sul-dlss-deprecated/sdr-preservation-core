@@ -15,8 +15,8 @@ describe Sdr::RecoveryVerify do
   specify "RecoveryVerify#initialize" do
     expect(@rv).to be_an_instance_of(RecoveryVerify)
     expect(@rv).to be_a_kind_of(LyberCore::Robot)
-    expect(@rv.workflow_name).to eq('sdrRecoveryWF')
-    expect(@rv.workflow_step).to eq('recovery-verify')
+    expect(@rv.class.workflow_name).to eq('sdrRecoveryWF')
+    expect(@rv.class.step_name).to eq('recovery-verify')
   end
 
   specify "RecoveryVerify#perform" do

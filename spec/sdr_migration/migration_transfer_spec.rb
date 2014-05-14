@@ -17,8 +17,8 @@ describe Sdr::MigrationTransfer do
     expect(@mt).to be_an_instance_of(MigrationTransfer)
     expect(@mt.class.superclass).to eq(TransferObject)
     expect(@mt).to be_a_kind_of(LyberCore::Robot)
-    expect(@mt.workflow_name).to eq('sdrMigrationWF')
-    expect(@mt.workflow_step).to eq('migration-transfer')
+    expect(@mt.class.workflow_name).to eq('sdrMigrationWF')
+    expect(@mt.class.step_name).to eq('migration-transfer')
   end
 
   specify "MigrationTransfer#perform" do

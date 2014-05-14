@@ -5,16 +5,14 @@ module Sdr
 
   # Robot for initializing the workflow of each migrated object
   class MigrationStart < SdrRobot
+
+    # class instance variables (accessors defined in SdrRobot parent class)
     @workflow_name = 'sdrMigrationWF'
-    @workflow_step = 'migration-start'
-    class << self
-      attr_accessor :workflow_name
-      attr_accessor :workflow_step
-    end
+    @step_name = 'migration-start'
 
     # set workflow name, step name, log location, log severity level
     def initialize(opts = {})
-      super(self.class.workflow_name, self.class.workflow_step, opts)
+      super(self.class.workflow_name, self.class.step_name, opts)
     end
 
     # @param druid [String] The item to be processed

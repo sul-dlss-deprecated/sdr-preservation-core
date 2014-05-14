@@ -17,8 +17,8 @@ describe Sdr::VerifyAgreement do
   specify "VerifyAgreement#initialize" do
     expect(@va).to be_an_instance_of(VerifyAgreement)
     expect(@va).to be_a_kind_of(LyberCore::Robot)
-    expect(@va.workflow_name).to eq('sdrIngestWF')
-    expect(@va.workflow_step).to eq('verify-agreement')
+    expect(@va.class.workflow_name).to eq('sdrIngestWF')
+    expect(@va.class.step_name).to eq('verify-agreement')
   end
 
   specify "VerifyAgreement#perform" do

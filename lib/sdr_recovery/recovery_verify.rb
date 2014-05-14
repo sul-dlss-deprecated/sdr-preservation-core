@@ -6,17 +6,13 @@ module Sdr
   # Robot for validating recovered object versions
   class RecoveryVerify < SdrRobot
 
-    # define class instance variables and getter method so that we can inherit from this class
+    # class instance variables (accessors defined in SdrRobot parent class)
     @workflow_name = 'sdrRecoveryWF'
-    @workflow_step = 'recovery-verify'
-    class << self
-      attr_accessor :workflow_name
-      attr_accessor :workflow_step
-    end
+    @step_name = 'recovery-verify'
 
     # @return [RecoveryVerify] set workflow name, step name, log location, log severity level
     def initialize(opts = {})
-      super(self.class.workflow_name, self.class.workflow_step, opts)
+      super(self.class.workflow_name, self.class.step_name, opts)
     end
 
     # @param druid [String] The item to be processed

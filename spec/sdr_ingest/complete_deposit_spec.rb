@@ -14,8 +14,8 @@ describe Sdr::CompleteDeposit do
   specify "CompleteDeposit#initialize" do
     expect(@cd).to be_an_instance_of(CompleteDeposit)
     expect(@cd).to be_a_kind_of(LyberCore::Robot)
-    expect(@cd.workflow_name).to eq('sdrIngestWF')
-    expect(@cd.workflow_step).to eq('complete-deposit')
+    expect(@cd.class.workflow_name).to eq('sdrIngestWF')
+    expect(@cd.class.step_name).to eq('complete-deposit')
   end
 
   specify "CompleteDeposit#perform" do

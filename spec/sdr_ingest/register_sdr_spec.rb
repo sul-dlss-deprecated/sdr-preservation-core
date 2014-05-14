@@ -15,8 +15,8 @@ describe Sdr::RegisterSdr do
   specify "RegisterSdr#initialize" do
     expect(@rs).to be_an_instance_of(RegisterSdr)
     expect(@rs).to be_a_kind_of(LyberCore::Robot)
-    expect(@rs.workflow_name).to eq('sdrIngestWF')
-    expect(@rs.workflow_step).to eq('register-sdr')
+    expect(@rs.class.workflow_name).to eq('sdrIngestWF')
+    expect(@rs.class.step_name).to eq('register-sdr')
   end
 
   specify "RegisterSdr#perform" do

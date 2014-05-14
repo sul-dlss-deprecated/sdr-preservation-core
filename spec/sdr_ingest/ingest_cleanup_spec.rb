@@ -14,8 +14,8 @@ describe Sdr::IngestCleanup do
   specify "IngestCleanup#initialize" do
     expect(@ic).to be_an_instance_of(IngestCleanup)
     expect(@ic).to be_a_kind_of(LyberCore::Robot)
-    expect(@ic.workflow_name).to eq('sdrIngestWF')
-    expect(@ic.workflow_step).to eq('ingest-cleanup')
+    expect(@ic.class.workflow_name).to eq('sdrIngestWF')
+    expect(@ic.class.step_name).to eq('ingest-cleanup')
   end
 
   specify "IngestCleanup#perform" do

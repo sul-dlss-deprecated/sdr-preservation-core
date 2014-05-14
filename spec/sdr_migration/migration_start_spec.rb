@@ -15,8 +15,8 @@ describe Sdr::MigrationStart do
   specify "MigrationStart#initialize" do
     expect(@robot).to be_an_instance_of(MigrationStart)
     expect(@robot).to be_a_kind_of(LyberCore::Robot)
-    expect(@robot.workflow_name).to eq('sdrMigrationWF')
-    expect(@robot.workflow_step).to eq('migration-start')
+    expect(@robot.class.workflow_name).to eq('sdrMigrationWF')
+    expect(@robot.class.step_name).to eq('migration-start')
   end
 
   specify "MigrationStart#perform" do

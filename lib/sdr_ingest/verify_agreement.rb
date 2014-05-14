@@ -9,17 +9,13 @@ module Sdr
     # A cache of APO/agreement object identifiers that have already been verified to exist in Sedora
     attr_accessor :valid_apo_ids
 
-    # define class instance variables and getter method so that we can inherit from this class
+    # class instance variables (accessors defined in SdrRobot parent class)
     @workflow_name = 'sdrIngestWF'
-    @workflow_step = 'verify-agreement'
-    class << self
-      attr_accessor :workflow_name
-      attr_accessor :workflow_step
-    end
+    @step_name = 'verify-agreement'
 
     # set workflow name, step name, log location, log severity level
     def initialize(opts = {})
-      super(self.class.workflow_name, self.class.workflow_step, opts)
+      super(self.class.workflow_name, self.class.step_name, opts)
       @valid_apo_ids = Array.new()
     end
 

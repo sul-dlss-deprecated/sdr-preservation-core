@@ -7,16 +7,13 @@ module Sdr
   # A robot for copying the recovered object versions to online storage
   class RecoveryRestore < SdrRobot
 
+    # class instance variables (accessors defined in SdrRobot parent class)
     @workflow_name = 'sdrRecoveryWF'
-    @workflow_step = 'recovery-restore'
-    class << self
-      attr_accessor :workflow_name
-      attr_accessor :workflow_step
-    end
+    @step_name = 'recovery-restore'
 
     # @return [RecoveryRestore] set workflow name, step name, log location, log severity level
     def initialize(opts = {})
-      super(self.class.workflow_name, self.class.workflow_step, opts)
+      super(self.class.workflow_name, self.class.step_name, opts)
     end
 
     # @param druid [String] The item to be processed

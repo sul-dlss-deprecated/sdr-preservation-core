@@ -8,8 +8,9 @@ module Sdr
   # Most methods inherit from complete-deposit robot's class
   class MigrationComplete < CompleteDeposit
 
+    # class instance variables (accessors defined in SdrRobot parent class)
     @workflow_name = 'sdrMigrationWF'
-    @workflow_step = 'migration-complete'
+    @step_name = 'migration-complete'
 
     # @param druid [String] The object identifier
     # @param storage_object [StorageObject] The representation of a digitial object's storage directory

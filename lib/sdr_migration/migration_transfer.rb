@@ -10,9 +10,9 @@ module Sdr
   # bagit checksum manifests will be used to check fixity in migration-complete setp
   class MigrationTransfer < TransferObject
 
+    # class instance variables (accessors defined in SdrRobot parent class)
     @workflow_name = 'sdrMigrationWF'
-    @workflow_step = 'migration-transfer'
-
+    @step_name = 'migration-transfer'
 
     # @param druid [String] The object identifier
     # @param deposit_bag_pathname [Pathname] The location of the BagIt bag being ingested

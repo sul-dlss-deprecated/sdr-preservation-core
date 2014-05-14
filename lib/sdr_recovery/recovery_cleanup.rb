@@ -6,16 +6,13 @@ module Sdr
   # A robot for file cleanup after the object recovery 
   class RecoveryCleanup < SdrRobot
 
+    # class instance variables (accessors defined in SdrRobot parent class)
     @workflow_name = 'sdrRecoveryWF'
-    @workflow_step = 'recovery-cleanup'
-    class << self
-      attr_accessor :workflow_name
-      attr_accessor :workflow_step
-    end
+    @step_name = 'recovery-cleanup'
 
     # @return [RecoveryCleanup] set workflow name, step name, log location, log severity level
     def initialize(opts = {})
-      super(self.class.workflow_name, self.class.workflow_step, opts)
+      super(self.class.workflow_name, self.class.step_name, opts)
     end
 
     # @param druid [String] The item to be processed

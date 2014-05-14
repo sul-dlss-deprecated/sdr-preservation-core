@@ -15,8 +15,8 @@ describe Sdr::RecoveryStart do
   specify "RecoveryStart#initialize" do
     expect(@robot).to be_an_instance_of(RecoveryStart)
     expect(@robot).to be_a_kind_of(LyberCore::Robot)
-    expect(@robot.workflow_name).to eq('sdrRecoveryWF')
-    expect(@robot.workflow_step).to eq('recovery-start')
+    expect(@robot.class.workflow_name).to eq('sdrRecoveryWF')
+    expect(@robot.class.step_name).to eq('recovery-start')
   end
 
   specify "RecoveryStart#perform" do

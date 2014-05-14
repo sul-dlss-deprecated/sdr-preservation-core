@@ -16,8 +16,8 @@ describe Sdr::RecoveryCleanup do
     expect(@rc).to be_an_instance_of(RecoveryCleanup)
     expect(@rc.class.superclass).to eq(Sdr::SdrRobot)
     expect(@rc).to be_a_kind_of(LyberCore::Robot)
-    expect(@rc.workflow_name).to eq('sdrRecoveryWF')
-    expect(@rc.workflow_step).to eq('recovery-cleanup')
+    expect(@rc.class.workflow_name).to eq('sdrRecoveryWF')
+    expect(@rc.class.step_name).to eq('recovery-cleanup')
   end
 
   specify "RecoveryCleanup#perform" do
