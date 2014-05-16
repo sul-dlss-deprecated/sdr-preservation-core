@@ -7,7 +7,9 @@
 .rvmrc
 .yardoc
 *~
-config/environments/passwords.rb
+config/certs
+config/deploy
+config/environments
 coverage
 coverage.data
 doc
