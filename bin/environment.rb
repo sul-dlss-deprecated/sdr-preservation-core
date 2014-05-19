@@ -23,7 +23,9 @@ ENV['ROBOT_ENVIRONMENT'] = (
     when "sdr-services"
       'production'
     when "sdr-services-test"
-      'test'
+      'staging'
+    when "sul-sdr-services-dev"
+      'integration'
     else
       'development'
   end

@@ -21,12 +21,12 @@ module Dor
        workspace nil
      end
      workflow do
-       url 'https://lyberservices-xxx.stanford.edu/workflow'
+       url 'https://workflow-server.stanford.edu/workflow'
      end
      ssl do
        cert_file '/var/sdr2service/sdr2/config/certs/ls-xxx.crt'
        key_file '/var/sdr2service/sdr2/config/certs/ls-xxx.key'
-       key_pass 'lsxxx'
+       key_pass 'yyy'
      end
    end
 end
@@ -46,7 +46,7 @@ end
 module Sdr
   Config = Confstruct::Configuration.new do
     ingest_transfer do
-      account "lyberadmin@sul-lyberservices-dev.stanford.edu"
+      account "userid@dor-host.stanford.edu"
       export_dir "/dor/export/"
     end
     logdir File.join(ROBOT_ROOT, 'log')
@@ -66,14 +66,7 @@ require 'moab_stanford'
 include Stanford
 
 # Load the environment file based on Environment.  Default to local
-environment = case ENV["ROBOT_ENVIRONMENT"]
-  when 'test'
-    "sdr-services-test.rb"
-  when 'prod', 'production'
-    "sdr-services.rb"
-  else
-    "development"
-end
+environment = ENV['ROBOT_ENVIRONMENT'] || ENV["RAILS_ENV"] ||= 'development'
 require File.join(ROBOT_ROOT,"config/environments/#{environment}")
 
 require 'sdr/sdr_robot'

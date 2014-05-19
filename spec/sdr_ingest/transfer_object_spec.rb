@@ -27,11 +27,11 @@ describe Sdr::TransferObject do
 
   specify "TransferObject#tarpipe_command" do
     cmd = @to.tarpipe_command(@druid, "#{ROBOT_ROOT}/spec/fixtures/deposit")
-    expect(cmd).to eq( "ssh lyberadmin@sul-lyberservices-dev.stanford.edu \"tar -C /dor/export/ --dereference -cf - jc837rq9922 \" | tar -C #{ROBOT_ROOT}/spec/fixtures/deposit -xf -")
+    expect(cmd).to eq( "ssh userid@dor-host.stanford.edu \"tar -C /dor/export/ --dereference -cf - jc837rq9922 \" | tar -C #{ROBOT_ROOT}/spec/fixtures/deposit -xf -")
   end
 
   specify "TransferObject#verify_version_metadata" do
-    vmcmd = 'if ssh lyberadmin@sul-lyberservices-dev.stanford.edu test -e /dor/export/jc837rq9922/data/metadata/versionMetadata.xml; then echo exists; else echo notfound; fi'
+    vmcmd = 'if ssh userid@dor-host.stanford.edu test -e /dor/export/jc837rq9922/data/metadata/versionMetadata.xml; then echo exists; else echo notfound; fi'
     expect(@to).to receive(:shell_execute).with(vmcmd).and_return("exists")
     expect(@to.verify_version_metadata(@druid)).to eq(true)
     expect(@to).to receive(:shell_execute).with(vmcmd).and_return("not")

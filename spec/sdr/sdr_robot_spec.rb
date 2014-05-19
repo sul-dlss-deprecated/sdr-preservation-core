@@ -18,7 +18,7 @@ describe SdrRobot do
 
     specify "SdrRobot#transmit" do
       expect(@robot.transmit { @robot.test_success }).to eq "success"
-      expect{@robot.transmit { @robot.test_failure }}.to raise_exception(/failure/)
+      expect{@robot.transmit({interval: 3}) { @robot.test_failure }}.to raise_exception(/failure/)
     end
 
     specify "SdrRobot#update_workflow_status success" do
@@ -27,9 +27,9 @@ describe SdrRobot do
       params << {:elapsed=>5, :note=>Socket.gethostname}
       expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params).twice.and_raise(TimeoutError)
       expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params)
-      opts = {:interval => 3}
+      opts = {interval: 1}
       params << opts
-      expect(@robot.update_workflow_status(*input)).to eq(nil)
+      expect(@robot.update_workflow_status(*input, opts)).to eq(nil)
     end
 
     specify "SdrRobot#update_workflow_status failure" do
@@ -37,9 +37,9 @@ describe SdrRobot do
       params = input[0..4]
       params << {:elapsed=>5, :note=>Socket.gethostname}
       expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params).exactly(3).times.and_raise(TimeoutError)
-      opts = {:interval => 3}
+      opts = {interval: 1}
       params << opts
-      expect{@robot.update_workflow_status(*input)}.to raise_exception(Sdr::FatalError)
+      expect{@robot.update_workflow_status(*input, opts)}.to raise_exception(Sdr::FatalError)
     end
 
   end

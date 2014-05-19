@@ -8,8 +8,10 @@
 .yardoc
 *~
 config/certs
-config/deploy
-config/environments
+config/deploy/*
+!config/deploy/development.rb
+config/environments/*
+!config/environments/development.rb
 coverage
 coverage.data
 doc
