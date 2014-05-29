@@ -3,10 +3,10 @@
 # run-pipelines.sh
 
 # cron:
-#       /var/sdr2service/sdr2/current/bin/run-pipelines.sh {workflow} [robot_runner options]
+#       /var/sdr2service/sdr-preservation-core/current/bin/run-pipelines.sh {workflow} [robot_runner options]
 #
 # command line:
-#               cd ~/sdr2/current/bin
+#               cd ~/sdr-preservation-core/current/bin
 #               echo ./run-pipelines.sh {sdrIngestWF|sdrMigrationWF|sdrRecoveryWF} | at now
 
 # exit the script if simple command fails

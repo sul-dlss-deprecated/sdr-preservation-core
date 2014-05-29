@@ -5,36 +5,52 @@
 * Bess Sadler
 * Richard Anderson
 
-==An overview of the workflow
+== An overview of the workflow
 You can see the steps of the workflow in
     config/workflows/sdrIngestWF/sdrIngestWF.xml
 
 You can see the dependencies and settings for each step in
     config/workflows/sdrIngestWF/process-config.yaml
 
-==Execution
+== Admin Menu
 
-Run robots using the script:
-    ~/sdr2/robots/run-sdr-robots.sh {robot filename}
-    
-This script figures out the path to the robot filename and the ROBOT_ENVIRONMENT
-to be used, unless already specified as an environmental variable.
+alias sdr2='cd ~/sdr-preservation-core/current/bin'
+alias ingest='sdr2 ; ./bundle-exec.sh menu.rb sdrIngestWF; cd $OLDPWD'
+alias ingest-log='log sdrIngestWF'
+function log() { cd ~/sdr-preservation-core/current/log/$1/current; }
 
+== Crontab
 
-==Running tests
-    cd ~/sdr2
-    rake spec
+# At top of every hour, check process state configuration and start new pipeline(s)
+# - if number of running pipelines < MAX,
+# - time of day is within the operational window, and
+# - STATE != STOP
+*/30 * * * *  /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/bundle-exec.sh status_process.rb sdrIngestWF start! cron'
 
-==Project Directory Structure
+# Every 2 minutes, add more object ids from the workflow waiting list into the ingest pipeline directory queue
+# but only if a robot pipeline is running and the queue is empty
+*/2 * * * *  /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/bundle-exec.sh status_monitor.rb sdrIngestWF queue cron'
+
+# Every Sunday morning, generate and email a report containing a summary of the disk space used and number of objects in storage
+0 4 * * 0 /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/weekly-status.sh'
+
+# Every evening send object count and terabytes of storage to sulstats
+30 23 * * * /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/daily-status.sh'
+
+== Running tests
+    cd ~/sdr-preservation-core
+    rspec
+
+== Project Directory Structure
     |
     ---config
     |  |
+    |  ---certs : authentication certificates for workflow service
+    |  ---deploy : host-level Capistrano configuration
     |  ---environments : configuration for dev,test,prod environments
     |  ---workflows : workflow specific configuration - steps, dependencies. One directory per workflow.
     |
     ---lib : ruby classes needed for your local robots
-    |
-    ---robots
     |  |
     |  ---sdrIngest : all of the robots for a particular workflow. One directory per workflow
     |

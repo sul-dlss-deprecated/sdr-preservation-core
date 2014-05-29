@@ -24,8 +24,8 @@ module Dor
        url 'https://workflow-server.stanford.edu/workflow'
      end
      ssl do
-       cert_file '/var/sdr2service/sdr2/config/certs/ls-xxx.crt'
-       key_file '/var/sdr2service/sdr2/config/certs/ls-xxx.key'
+       cert_file '/var/sdr2service/sdr-preservation-core/config/certs/ls-xxx.crt'
+       key_file '/var/sdr2service/sdr-preservation-core/config/certs/ls-xxx.key'
        key_pass 'yyy'
      end
    end

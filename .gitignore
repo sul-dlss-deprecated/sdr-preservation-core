@@ -16,4 +16,4 @@ coverage
 coverage.data
 doc
 pkg
-sdr2.iml
+*.iml
