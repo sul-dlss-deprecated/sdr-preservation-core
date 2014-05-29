@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'environment'
+require_relative 'environment'
 require 'irb'
 IRB.start

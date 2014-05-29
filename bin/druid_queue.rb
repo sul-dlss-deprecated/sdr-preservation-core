@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
-require 'environment'
-require 'directory_queue'
+require_relative 'environment'
+require_relative 'directory_queue'
 require 'druid-tools'
 
 class DruidQueue < DirectoryQueue

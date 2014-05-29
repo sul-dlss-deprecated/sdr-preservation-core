@@ -1,16 +1,10 @@
-ROBOT_ROOT = File.expand_path(File.join(File.dirname(__FILE__),'..'))
-libdir = File.join(ROBOT_ROOT,'lib')
-specdir = File.join(ROBOT_ROOT,'spec')
-$LOAD_PATH.unshift(libdir) unless $LOAD_PATH.include?(libdir)
-$LOAD_PATH.unshift(specdir) unless $LOAD_PATH.include?(specdir)
-#puts $LOAD_PATH
-
+require 'pathname'
 require 'rubygems'
 require 'bundler/setup'
 require 'confstruct'
-require 'pathname'
 require 'nokogiri'
-#require 'logger'
+require_relative 'libdir'
+ROBOT_ROOT = Pathname(__dir__).parent.to_s
 
 # The Dor::Config object is created in dor-services-gem/lib/dor/config.rb
 # and initialized with the data in dor-services-gem/config/config_defaults.yml

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'environment'
+require_relative 'environment'
 require 'sys/filesystem'
 
 StorageArea = Struct.new(:filesystem, :gb_total, :gb_used, :pct_used, :gb_free, :pct_free)

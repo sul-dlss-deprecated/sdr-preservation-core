@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'environment'
+require_relative 'environment'
 require 'boot'
 require 'rest-client'
 require 'nokogiri'

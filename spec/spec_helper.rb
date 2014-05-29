@@ -11,7 +11,7 @@ require 'sdr'
 include Sdr
 
 def fixture_setup
-  @fixtures = Pathname.new(File.dirname(__FILE__)).join('fixtures')
+  @fixtures = Pathname(__dir__).join('fixtures')
   @temp = Pathname(Dir.mktmpdir)
   @temp = @temp.realpath
 end

@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__),'../libdir')
+require_relative '../libdir'
 require 'boot'
 
 module Sdr

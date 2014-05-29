@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'environment'
-require 'status_process'
-require 'druid_queue'
+require_relative 'environment'
+require_relative 'status_process'
+require_relative 'druid_queue'
 require 'pathname'
 require 'time'
 require 'timeout'

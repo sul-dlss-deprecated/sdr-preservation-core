@@ -1,9 +1,7 @@
 # 
 # Rakefile.rb
 # 
-# Load config for current environment.
-$LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'lib'))
-
+require_relative 'lib/libdir'
 require 'rake'
 require 'rake/testtask'
 
@@ -14,7 +12,7 @@ desc "Set up environment variables. Unless otherwise specified ROBOT_ENVIRONMENT
 task :environment do
    environment = ENV['ROBOT_ENVIRONMENT'] || "development"
    RAILS_ENV = environment
-   require File.expand_path(File.dirname(__FILE__) + "/config/environments/#{environment}")  
+   require_relative "config/environments/#{environment}"
 end
 
 

@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
-require 'environment'
-require 'druid_queue'
-require 'status_activity'
-require 'status_process'
-require 'status_workflow'
+require_relative 'environment'
+require_relative 'druid_queue'
+require_relative 'status_activity'
+require_relative 'status_process'
+require_relative 'status_workflow'
 require 'boot'
 require 'socket'
 require 'pathname'

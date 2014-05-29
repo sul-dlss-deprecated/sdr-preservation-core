@@ -6,7 +6,6 @@
 # then invoking the program using "bundle exec"
 
 export BIN=`dirname $0`
-
 cd $BIN
-bundle exec $BIN/"$@" | egrep -v  '(^Loaded datastream|^SOLRIZER|^resetting mappings for Solrizer)'
+bundle exec $BIN/"$@"
 

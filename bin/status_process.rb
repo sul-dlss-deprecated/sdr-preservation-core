@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'environment'
+require_relative 'environment'
 require 'yaml'
 
 class StatusProcess < Status
