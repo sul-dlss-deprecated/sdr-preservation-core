@@ -87,8 +87,16 @@ module Sdr
       LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter find_apo_id")
       relationship_md = Nokogiri::XML(relationship_md_pathname.read)
       nodeset = relationship_md.xpath("//hydra:isGovernedBy",'hydra'=>'http://projecthydra.org/ns/relations#')
-      apo_id = nodeset.first.attribute_with_ns('resource','http://www.w3.org/1999/02/22-rdf-syntax-ns#')
-      apo_id.text.split('/')[-1] if apo_id
+      unless nodeset.empty?
+        apo_id = nodeset.first.attribute_with_ns('resource','http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+        if apo_id
+          return apo_id.text.split('/')[-1]
+        else
+          raise Sdr::ItemError.new(druid, "Unable to find resource attribute in isGovernedBy node of relationshipMetadata")
+        end
+      else
+        raise Sdr::ItemError.new(druid, "Unable to find isGovernedBy node of relationshipMetadata")
+      end
     rescue Exception => e
       raise Sdr::ItemError.new(druid, "Unable to find APO id in relationshipMetadata", e)
     end
