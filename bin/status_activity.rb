@@ -108,7 +108,7 @@ class StatusActivity < Status
     ie = ErrorDetail.new
     ie.datetime = logfile.mtime.strftime('%Y-%m-%d %H:%M')
     ie.druid = logfile.basename.to_s
-    errors = logfile.each_line.grep(/ERROR/) + logfile.each_line.grep(/FATAL/)
+    errors = logfile.each_line.grep(/(ERROR|FATAL)/)
     return nil if errors.empty?
     error_line = errors.last.chomp
     offset = error_line.index(ie.druid) ? error_line.index(ie.druid)+11 : error_line.index("::")+3
