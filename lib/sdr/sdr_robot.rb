@@ -28,8 +28,7 @@ module Sdr
     def find_deposit_pathname(druid)
       storage_object = StorageServices.find_storage_object(druid,include_deposit=true)
       deposit_pathname = storage_object.deposit_bag_pathname
-      return deposit_pathname if deposit_pathname.directory?
-      raise "pathname does not exist or is not a directory"
+      return deposit_pathname
     rescue Exception => e
       raise Sdr::ItemError.new(druid, "Unable to determine deposit pathname", e)
     end
@@ -105,7 +104,7 @@ module Sdr
       transmit(opts) {Dor::WorkflowService.update_workflow_status(repo, druid, workflow_name, step_name, status, :elapsed => elapsed, :note => Socket.gethostname)}
     end
 
-    def update_workflow_error_status(repo, druid, workflow_name, step_name, message)
+    def update_workflow_error_status(repo, druid, workflow_name, step_name, message, opts={})
       transmit(opts) {Dor::WorkflowService.update_workflow_error_status(repo, druid, workflow_name, step_name, message, :error_text => Socket.gethostname)}
     end
 

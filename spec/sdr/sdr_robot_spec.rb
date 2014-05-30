@@ -13,7 +13,6 @@ describe SdrRobot do
 
     specify "SdrRobot#find_deposit_pathname" do
       expect(@robot.find_deposit_pathname(@druid)).to eq( @deposit_pathname)
-      expect{@robot.find_deposit_pathname("druid:aa111bb2222")}.to raise_exception(/pathname does not exist or is not a directory/)
     end
 
     specify "SdrRobot#transmit" do
