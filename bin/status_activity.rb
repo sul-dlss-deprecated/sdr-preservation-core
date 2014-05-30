@@ -144,7 +144,7 @@ class StatusActivity < Status
     body = Array.new
     body << summary.values
     n.times do |i|
-      body << ActivityStatus.members.map{|m| detail[m][i] || "" }
+      body << ActivityStatus.members.map{|m| detail[m.to_s][i] || "" }
     end
     s = report_table(
         "#{@workflow} Current Queue & Activity",

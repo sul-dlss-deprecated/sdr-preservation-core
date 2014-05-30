@@ -19,7 +19,7 @@ class Menu
   end
 
   def initialize(workflow)
-    @environs = ENV['ROBOT_ENVIRONMENT'][0..3].sub('deve','dev')
+    @environs = ENV['ROBOT_ENVIRONMENT']
     @workflow = workflow
     @druid_queue = DruidQueue.new(@workflow)
     @status_activity = StatusActivity.new(@workflow)

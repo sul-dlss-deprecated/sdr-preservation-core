@@ -19,7 +19,7 @@ class Status
 
   def sprintf_directive(value,column)
     case value
-      when String
+      when String,Symbol
         "%#{column}s"
       when Integer
         "%#{column}d"
