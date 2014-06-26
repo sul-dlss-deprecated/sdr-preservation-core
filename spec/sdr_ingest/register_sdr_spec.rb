@@ -1,7 +1,8 @@
 require 'sdr_ingest/register_sdr'
 require 'spec_helper'
+include Robots::SdrRepo::SdrIngest
 
-describe Sdr::RegisterSdr do
+describe RegisterSdr do
 
   before(:all) do
     @object_id = "jc837rq9922"

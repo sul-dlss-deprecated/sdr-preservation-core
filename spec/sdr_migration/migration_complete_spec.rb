@@ -1,7 +1,8 @@
 require 'sdr_migration/migration_complete'
 require 'spec_helper'
+include Robots::SdrRepo::SdrMigration
 
-describe Sdr::MigrationComplete do
+describe MigrationComplete do
 
   before(:all) do
     @object_id = "jc837rq9922"
@@ -14,7 +15,7 @@ describe Sdr::MigrationComplete do
 
   specify "MigrationComplete#initialize" do
     expect(@rs).to be_an_instance_of(MigrationComplete)
-    expect(@rs.class.superclass).to eq(CompleteDeposit)
+    expect(@rs.class.superclass).to eq(Robots::SdrRepo::SdrIngest::CompleteDeposit)
     expect(@rs).to be_a_kind_of(LyberCore::Robot)
     expect(@rs.class.workflow_name).to eq('sdrMigrationWF')
     expect(@rs.class.step_name).to eq('migration-complete')

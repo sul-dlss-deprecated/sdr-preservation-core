@@ -1,7 +1,8 @@
 require 'sdr_ingest/complete_deposit'
 require 'spec_helper'
+include Robots::SdrRepo::SdrIngest
 
-describe Sdr::CompleteDeposit do
+describe CompleteDeposit do
 
   before(:all) do
     @druid = "druid:jc837rq9922"

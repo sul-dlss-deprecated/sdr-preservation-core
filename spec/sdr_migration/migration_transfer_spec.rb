@@ -1,7 +1,8 @@
 require 'sdr_migration/migration_transfer'
 require 'spec_helper'
+include Robots::SdrRepo::SdrMigration
 
-describe Sdr::MigrationTransfer do
+describe MigrationTransfer do
 
   before(:all) do
     @object_id = "jq937jp0017"
@@ -15,7 +16,7 @@ describe Sdr::MigrationTransfer do
 
   specify "MigrationTransfer#initialize" do
     expect(@mt).to be_an_instance_of(MigrationTransfer)
-    expect(@mt.class.superclass).to eq(TransferObject)
+    expect(@mt.class.superclass).to eq(Robots::SdrRepo::SdrIngest::TransferObject)
     expect(@mt).to be_a_kind_of(LyberCore::Robot)
     expect(@mt.class.workflow_name).to eq('sdrMigrationWF')
     expect(@mt.class.step_name).to eq('migration-transfer')

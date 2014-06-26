@@ -1,7 +1,8 @@
 require 'sdr_recovery/recovery_cleanup'
 require 'spec_helper'
+include Robots::SdrRepo::SdrRecovery
 
-describe Sdr::RecoveryCleanup do
+describe RecoveryCleanup do
 
   before(:all) do
     @object_id = "jc837rq9922"
@@ -14,7 +15,7 @@ describe Sdr::RecoveryCleanup do
 
   specify "RecoveryCleanup#initialize" do
     expect(@rc).to be_an_instance_of(RecoveryCleanup)
-    expect(@rc.class.superclass).to eq(Sdr::SdrRobot)
+    expect(@rc.class.superclass).to eq(Robots::SdrRepo::SdrRobot)
     expect(@rc).to be_a_kind_of(LyberCore::Robot)
     expect(@rc.class.workflow_name).to eq('sdrRecoveryWF')
     expect(@rc.class.step_name).to eq('recovery-cleanup')

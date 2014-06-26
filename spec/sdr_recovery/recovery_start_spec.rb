@@ -1,7 +1,8 @@
 require 'sdr_recovery/recovery_start'
 require 'spec_helper'
+include Robots::SdrRepo::SdrRecovery
 
-describe Sdr::RecoveryStart do
+describe RecoveryStart do
 
   before(:all) do
     @object_id = "jc837rq9922"

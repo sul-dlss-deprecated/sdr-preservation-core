@@ -1,26 +1,26 @@
 recovery-start:
   batch_limit: 1000
   error_limit: 5
-  classname: "Sdr::RecoveryStart"
+  classname: "Robots::SdrRepo::SdrRecovery::RecoveryStart"
   classpath: "sdr_recovery/recovery_start.rb"
 
 recovery-verify:
   prerequisite: recovery-start
   batch_limit: 200
   error_limit: 5
-  classname: "Sdr::RecoveryVerify"
+  classname: "Robots::SdrRepo::SdrRecovery::RecoveryVerify"
   classpath: "sdr_recovery/recovery_verify.rb"
 
 recovery-restore:
   prerequisite: recovery-verify
   batch_limit: 200
   error_limit: 5
-  classname: "Sdr::RecoveryRestore"
+  classname: "Robots::SdrRepo::SdrRecovery::RecoveryRestore"
   classpath: "sdr_recovery/recovery_restore.rb"
 
 recovery-cleanup:
   prerequisite: recovery-restore
   batch_limit: 200
   error_limit: 5  
-  classname: "Sdr::RecoveryCleanup"
+  classname: "Robots::SdrRepo::SdrRecovery::RecoveryCleanup"
   classpath: "sdr_recovery/recovery_cleanup.rb"

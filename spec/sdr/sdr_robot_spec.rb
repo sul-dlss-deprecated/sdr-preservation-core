@@ -1,5 +1,6 @@
 require 'sdr/sdr_robot'
 require 'spec_helper'
+include Robots::SdrRepo
 
 describe SdrRobot do
 
@@ -38,7 +39,7 @@ describe SdrRobot do
       expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params).exactly(3).times.and_raise(TimeoutError)
       opts = {interval: 1}
       params << opts
-      expect{@robot.update_workflow_status(*input, opts)}.to raise_exception(Sdr::FatalError)
+      expect{@robot.update_workflow_status(*input, opts)}.to raise_exception(FatalError)
     end
 
   end

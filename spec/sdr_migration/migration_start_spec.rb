@@ -1,7 +1,8 @@
 require 'sdr_migration/migration_start'
 require 'spec_helper'
+include Robots::SdrRepo::SdrMigration
 
-describe Sdr::MigrationStart do
+describe MigrationStart do
 
   before(:all) do
     @object_id = "jc837rq9922"

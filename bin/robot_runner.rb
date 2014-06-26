@@ -178,7 +178,9 @@ class RobotRunner
       begin
         robot_status = robot_object.get_workflow_status('sdr', druid, @workflow, robot.name)
       rescue
-        robot_status = ['Sdr::MigrationStart','Sdr::RecoveryStart','Sdr::AuditVerify'].include?(robot.classname) ? 'waiting' : 'unknown'
+        bootstrap_robots = ['SdrMigration::MigrationStart','SdrRecovery::RecoveryStart','SdrAudit::AuditVerify'].
+          map{|r| "Robots::SdrRepo::#{r}"}
+        robot_status = bootstrap_robots.include?(robot.classname) ? 'waiting' : 'unknown'
       end
       case robot_status
         when 'completed'

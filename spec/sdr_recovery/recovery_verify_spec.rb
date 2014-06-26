@@ -1,7 +1,8 @@
 require 'sdr_recovery/recovery_verify'
 require 'spec_helper'
+include Robots::SdrRepo::SdrRecovery
 
-describe Sdr::RecoveryVerify do
+describe RecoveryVerify do
 
   before(:all) do
     @object_id = "jq937jp0017"

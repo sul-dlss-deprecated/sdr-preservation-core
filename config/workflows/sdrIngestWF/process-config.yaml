@@ -6,40 +6,40 @@ register-sdr:
   prerequisite: start-ingest
   batch_limit: 1000
   error_limit: 5
-  classname: "Sdr::RegisterSdr"
+  classname: "Robots::SdrRepo::SdrIngest::RegisterSdr"
   classpath: "sdr_ingest/register_sdr"
 
 transfer-object:
   prerequisite: register-sdr  
   batch_limit: 200
   error_limit: 5
-  classname: "Sdr::TransferObject"
+  classname: "Robots::SdrRepo::SdrIngest::TransferObject"
   classpath: "sdr_ingest/transfer_object"
 
 validate-bag:
   prerequisite: transfer-object 
   batch_limit: 200
   error_limit: 5
-  classname: "Sdr::ValidateBag"
+  classname: "Robots::SdrRepo::SdrIngest::ValidateBag"
   classpath: "sdr_ingest/validate_bag"
 
 verify-agreement:
   prerequisite: validate-bag
   batch_limit: 200
   error_limit: 5
-  classname: "Sdr::VerifyAgreement"
+  classname: "Robots::SdrRepo::SdrIngest::VerifyAgreement"
   classpath: "sdr_ingest/verify_agreement"
 
 complete-deposit:
   prerequisite: verify-agreement
   batch_limit: 200
   error_limit: 5  
-  classname: "Sdr::CompleteDeposit"
+  classname: "Robots::SdrRepo::SdrIngest::CompleteDeposit"
   classpath: "sdr_ingest/complete_deposit"
 
 ingest-cleanup:
   prerequisite: complete-deposit
   batch_limit: 200
   error_limit: 5
-  classname: "Sdr::IngestCleanup"
+  classname: "Robots::SdrRepo::SdrIngest::IngestCleanup"
   classpath: "sdr_ingest/ingest_cleanup"

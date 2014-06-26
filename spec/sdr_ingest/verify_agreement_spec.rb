@@ -1,7 +1,8 @@
 require 'sdr_ingest/verify_agreement'
 require 'spec_helper'
+include Robots::SdrRepo::SdrIngest
 
-describe Sdr::VerifyAgreement do
+describe VerifyAgreement do
 
   before(:all) do
     @druid = "druid:jc837rq9922"

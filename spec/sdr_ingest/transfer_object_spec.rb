@@ -1,7 +1,8 @@
 require 'sdr_ingest/transfer_object'
 require 'spec_helper'
+include Robots::SdrRepo::SdrIngest
 
-describe Sdr::TransferObject do
+describe TransferObject do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
@@ -50,10 +51,10 @@ describe Sdr::TransferObject do
     expect(@to).to receive(:verify_version_metadata).with(@druid).and_return(true)
     expect(@to).to receive(:tarpipe_command).with(@druid,@bag_pathname.parent).and_return('thecommand')
     @to.stub(:shell_execute).and_raise("cmd failed")
-    expect{@to.transfer_object(@druid,@bag_pathname)}.to raise_exception(Sdr::ItemError)
+    expect{@to.transfer_object(@druid,@bag_pathname)}.to raise_exception(ItemError)
 
     expect(@to).to receive(:verify_version_metadata).with(@druid).and_return(false)
-    expect{@to.transfer_object(@druid,@bag_pathname)}.to raise_exception(Sdr::ItemError)
+    expect{@to.transfer_object(@druid,@bag_pathname)}.to raise_exception(ItemError)
 
    end
 

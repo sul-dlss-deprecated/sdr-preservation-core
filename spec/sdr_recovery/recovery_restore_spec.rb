@@ -1,7 +1,8 @@
 require 'sdr_recovery/recovery_restore'
 require 'spec_helper'
+include Robots::SdrRepo::SdrRecovery
 
-describe Sdr::RecoveryRestore do
+describe RecoveryRestore do
 
   before(:all) do
     @object_id = "jc837rq9922"
@@ -14,7 +15,7 @@ describe Sdr::RecoveryRestore do
 
   specify "RecoveryComplete#initialize" do
     expect(@rr).to be_an_instance_of(RecoveryRestore)
-    expect(@rr.class.superclass).to eq(Sdr::SdrRobot)
+    expect(@rr.class.superclass).to eq(Robots::SdrRepo::SdrRobot)
     expect(@rr).to be_a_kind_of(LyberCore::Robot)
     expect(@rr.class.workflow_name).to eq('sdrRecoveryWF')
     expect(@rr.class.step_name).to eq('recovery-restore')

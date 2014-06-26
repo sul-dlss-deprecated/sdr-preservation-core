@@ -1,7 +1,8 @@
 require 'sdr_ingest/ingest_cleanup'
 require 'spec_helper'
+include Robots::SdrRepo::SdrIngest
 
-describe Sdr::IngestCleanup do
+describe IngestCleanup do
 
   before(:all) do
     @druid = "druid:jc837rq9922"

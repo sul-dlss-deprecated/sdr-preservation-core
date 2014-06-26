@@ -1,19 +1,19 @@
 migration-start:
   batch_limit: 1000
   error_limit: 5
-  classname: "Sdr::MigrationStart"
+  classname: "Robots::SdrRepo::SdrMigration::MigrationStart"
   classpath: "sdr_migration/migration_start.rb"
 
 migration-transfer:
   prerequisite: migration-start
   batch_limit: 200
   error_limit: 5
-  classname: "Sdr::MigrationTransfer"
+  classname: "Robots::SdrRepo::SdrMigration::MigrationTransfer"
   classpath: "sdr_migration/migration_transfer.rb"
 
 migration-complete:
   prerequisite: migration-transfer
   batch_limit: 200
   error_limit: 5  
-  classname: "Sdr::MigrationComplete"
+  classname: "Robots::SdrRepo::SdrMigration::MigrationComplete"
   classpath: "sdr_migration/migration_complete.rb"

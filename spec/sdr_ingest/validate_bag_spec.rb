@@ -1,7 +1,8 @@
 require 'sdr_ingest/validate_bag'
 require 'spec_helper'
+include Robots::SdrRepo::SdrIngest
 
-describe Sdr::ValidateBag do
+describe ValidateBag do
 
   before(:all) do
     @druid = "druid:jc837rq9922"
