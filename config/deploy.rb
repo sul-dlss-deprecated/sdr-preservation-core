@@ -27,7 +27,7 @@ set :log_level, :info
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
-set :linked_dirs, %w(log config/environments config/certs)
+set :linked_dirs, %w(log run config/environments config/certs)
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
@@ -35,5 +35,13 @@ set :linked_dirs, %w(log config/environments config/certs)
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
-
-
+desc 'Restart application'
+task :restart do
+  on roles(:app), in: :sequence, wait: 10 do
+    within release_path do
+      test :bundle, :exec, :controller, :stop
+      test :bundle, :exec, :controller, :quit
+      test :bundle, :exec, :controller, :boot
+    end
+  end
+end
