@@ -36,3 +36,4 @@ Moab::Config.configure do
   path_method :druid
 end
 
+REDIS_URL ||= "localhost:6379/resque:development"

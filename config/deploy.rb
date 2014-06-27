@@ -35,13 +35,22 @@ set :linked_dirs, %w(log run config/environments config/certs)
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
-desc 'Restart application'
-task :restart do
-  on roles(:app), in: :sequence, wait: 10 do
-    within release_path do
-      test :bundle, :exec, :controller, :stop
-      test :bundle, :exec, :controller, :quit
-      test :bundle, :exec, :controller, :boot
+namespace :deploy do
+
+  # the sshkit's test method will return to this script even if the call to stop or quit fails
+  # http://vladigleba.com/blog/2014/04/10/deploying-rails-apps-part-6-writing-capistrano-tasks/
+  desc 'Restart application'
+  task :restart do
+    on roles(:app), in: :sequence, wait: 10 do
+      within release_path do
+        test :bundle, :exec, :controller, :stop
+        test :bundle, :exec, :controller, :quit
+        execute :bundle, :exec, :controller, :boot
+      end
     end
   end
+
+  # Capistrano 3 no longer runs deploy:restart by default.  Therefore the following line is needed:
+  after :publishing, :restart
+
 end
