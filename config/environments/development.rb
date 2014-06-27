@@ -36,4 +36,5 @@ Moab::Config.configure do
   path_method :druid
 end
 
+# Location of the master controller which handles object queues
 REDIS_URL ||= "localhost:6379/resque:development"
