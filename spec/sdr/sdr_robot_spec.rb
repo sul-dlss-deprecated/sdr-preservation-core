@@ -12,10 +12,6 @@ describe SdrRobot do
       @robot = SdrRobot.new( "sdrIngestWF","sdr_robot")
     end
 
-    specify "SdrRobot#find_deposit_pathname" do
-      expect(@robot.find_deposit_pathname(@druid)).to eq( @deposit_pathname)
-    end
-
     specify "SdrRobot#transmit" do
       expect(@robot.transmit { @robot.test_success }).to eq "success"
       expect{@robot.transmit({interval: 3}) { @robot.test_failure }}.to raise_exception(/failure/)

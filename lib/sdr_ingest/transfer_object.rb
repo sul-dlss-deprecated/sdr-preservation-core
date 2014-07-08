@@ -22,12 +22,11 @@ module Robots
         #   See LyberCore::Robot#work
         def perform(druid)
           LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
-          bag_pathname = find_deposit_pathname(druid)
-          transfer_object(druid, bag_pathname)
+          transfer_object(druid)
         end
 
         # @param druid [String] The object identifier
-        # @param bag_pathname [Pathname] The location of the BagIt bag being ingested
+        # @param deposit_pathname [Pathname] The location of the BagIt bag being ingested
         # @return [void] Transfer and untar the object from the DOR export area to the SDR deposit area.
         #   Note: POSIX tar has a limit of 100 chars in a filename
         #     some implementations of gnu TAR work around this by adding a ././@LongLink file containing the full name
@@ -37,16 +36,64 @@ module Robots
         #   Also, beware of incompatabilities between BSD tar and other TAR formats
         #     regarding the handling of vendor extended attributes.
         #     See: http://xorl.wordpress.com/2012/05/15/admin-mistakes-gnu-bsd-tar-and-posix-compatibility/
-        def transfer_object(druid, bag_pathname)
+        def transfer_object(druid)
           LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter transfer_object")
-          deposit_home = bag_pathname.parent
-          deposit_home.mkpath
-          LyberCore::Log.debug("deposit bag_pathname is : #{bag_pathname}")
-          cleanup_deposit_files(druid, bag_pathname) if bag_pathname.exist?
-          raise "versionMetadata.xml not found in export" unless verify_version_metadata(druid)
-          shell_execute(tarpipe_command(druid, deposit_home))
+          verify_accesssion_status(druid)
+          verify_dor_export(druid)
+          verify_version_metadata(druid)
+          deposit_home = get_deposit_home(druid)
+          transfer_cmd = tarpipe_command(druid, deposit_home)
+          Replication::OperatingSystem.execute(transfer_cmd)
         rescue Exception => e
           raise ItemError.new(druid, "Error transferring object", e)
+        end
+
+        # @param druid [String] The object identifier
+        # @return [Boolean] query the workflow service to ensure that accession workflow has appropriate state
+        def verify_accesssion_status(druid)
+          accession_status = get_workflow_status('dor', druid, 'accessionWF', 'sdr-ingest-transfer')
+          if accession_status == 'completed'
+            true
+          else
+            raise ItemError.new(druid, "accessionWF:sdr-ingest-transfer status is #{accession_status}")
+          end
+        end
+
+        # @param druid [String] The object identifier
+        # @return [Boolean] query the workflow service to ensure that accession workflow has appropriate state
+        def verify_dor_export(druid)
+          vmpath = File.join(Sdr::Config.ingest_transfer.export_dir, druid.sub('druid:', ''))
+          verify_dor_path(vmpath)
+        end
+
+        # @param druid [String] The object identifier
+        # @return [Boolean] Test existence of versionMetadata file in export.  Return true if found, false if not
+        def verify_version_metadata(druid)
+          vmpath = File.join(Sdr::Config.ingest_transfer.export_dir,
+                             druid.sub('druid:', ''), "/data/metadata/versionMetadata.xml")
+          verify_dor_path(vmpath)
+        end
+
+        def verify_dor_path(vmpath)
+          exists_cmd = "if ssh " + Sdr::Config.ingest_transfer.account +
+              " test -e " + vmpath + ";" + " then echo exists; else echo notfound; fi"
+          if (Replication::OperatingSystem.execute(exists_cmd).chomp == 'exists')
+            true
+          else
+            raise "#{vmpath} not found"
+          end
+        end
+
+        def get_deposit_home(druid)
+          deposit_pathname = Replication::SdrObject.new(druid).deposit_bag_pathname
+          deposit_home = deposit_pathname.parent
+          LyberCore::Log.debug("deposit bag_pathname is : #{deposit_pathname}")
+          if deposit_pathname.exist?
+            cleanup_deposit_files(druid, deposit_pathname)
+          else
+            deposit_home.mkpath
+          end
+          deposit_home
         end
 
         # @param druid [String] The object identifier
@@ -66,19 +113,10 @@ module Robots
           end
         end
 
-        # @param druid [String] The object identifier
-        # @return [Boolean] Test existence of versionMetadata file in export.  Return true if found, false if not
-        def verify_version_metadata(druid)
-          vmpath = File.join(Sdr::Config.ingest_transfer.export_dir,
-                             druid.sub('druid:', ''), "/data/metadata/versionMetadata.xml")
-          exists_cmd = "if ssh " + Sdr::Config.ingest_transfer.account +
-              " test -e " + vmpath + ";" +
-              " then echo exists; else echo notfound; fi"
-          (shell_execute(exists_cmd).chomp == 'exists')
-        end
-
         # @see http://en.wikipedia.org/wiki/User:Chdev/tarpipe
         # ssh user@remotehost "tar -cf - srcdir | tar -C destdir -xf -
+        # SSH authentication is by ssh public/private key pairs (see .ssh/authorized_keys on export host).
+        # Note that symbolic links from /dor/export to /dor/workspace get translated into real files by use of --dereference
         def tarpipe_command(druid, deposit_home)
           'ssh ' + Sdr::Config.ingest_transfer.account +
               ' "tar -C ' + Sdr::Config.ingest_transfer.export_dir +
@@ -93,7 +131,7 @@ module Robots
         end
 
         def verification_files(druid)
-          deposit_bag_pathname = find_deposit_pathname(druid)
+          deposit_bag_pathname = Replication::SdrObject.new(druid).deposit_bag_pathname
           files = []
           files << deposit_bag_pathname.to_s
           files

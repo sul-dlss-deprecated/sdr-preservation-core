@@ -58,6 +58,7 @@ require 'lyber_core/robot'
 require 'lyber_core/log'
 require 'moab_stanford'
 include Stanford
+require 'sdr_replication'
 
 # Load the environment file based on Environment.  Default to local
 environment = ENV['ROBOT_ENVIRONMENT'] || ENV["RAILS_ENV"] ||= 'development'

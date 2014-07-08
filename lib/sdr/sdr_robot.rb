@@ -23,35 +23,6 @@ module Robots
         super('sdr', workflow_name, step_name, opts)
       end
 
-      # Find the location of the deposited object version
-      # @param [String] druid The object identifier
-      # @return [Pathname] The location of the deposited object version, or raise exception
-      def find_deposit_pathname(druid)
-        storage_object = StorageServices.find_storage_object(druid, include_deposit=true)
-        deposit_pathname = storage_object.deposit_bag_pathname
-        return deposit_pathname
-      rescue Exception => e
-        raise ItemError.new(druid, "Unable to determine deposit pathname", e)
-      end
-
-      # Executes a system command in a subprocess.
-      # The method will return stdout from the command if execution was successful.
-      # The method will raise an exception if if execution fails.
-      # The exception's message will contain the explaination of the failure.
-      # @param [String] command the command to be executed
-      # @return [String] stdout from the command if execution was successful
-      def shell_execute(command)
-        status, stdout, stderr = systemu(command)
-        if (status.exitstatus != 0)
-          raise stderr
-        end
-        return stdout
-      rescue
-        msg = "Command failed to execute: [#{command}] caused by <STDERR = #{stderr.split($/).join('; ')}>"
-        msg << " STDOUT = #{stdout.split($/).join('; ')}" if (stdout && (stdout.length > 0))
-        raise msg
-      end
-
       # @param druid [String] The object being processed
       # @return [Boolean] process the object, then set success or error status
       def process_item(druid)

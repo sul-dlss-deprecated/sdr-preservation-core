@@ -22,7 +22,7 @@ module Robots
         #   See LyberCore::Robot#work
         def perform(druid)
           LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
-          bag_pathname = find_deposit_pathname(druid)
+          bag_pathname = Replication::SdrObject.new(druid).deposit_bag_pathname
           ingest_cleanup(druid, bag_pathname)
         end
 

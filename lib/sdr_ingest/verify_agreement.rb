@@ -9,7 +9,10 @@ module Robots
       class VerifyAgreement < SdrRobot
 
         # A cache of APO/agreement object identifiers that have already been verified to exist in Sedora
-        attr_accessor :valid_apo_ids
+        @@valid_apo_ids = []
+        def self.valid_apo_ids
+          @@valid_apo_ids
+        end
 
         # class instance variables (accessors defined in SdrRobot parent class)
         @workflow_name = 'sdrIngestWF'
@@ -37,7 +40,7 @@ module Robots
         def verify_agreement(druid)
           LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter verify_agreement")
           LyberCore::Log.debug("Druid being processed is #{druid}")
-          deposit_pathname = find_deposit_pathname(druid)
+          deposit_pathname = Replication::SdrObject.new(druid).deposit_bag_pathname
           if relationship_md_pathname = find_relationship_metadata(deposit_pathname)
             if apo_id = find_apo_id(druid, relationship_md_pathname)
               if verify_apo_id(druid, apo_id)
@@ -109,12 +112,12 @@ module Robots
         # @return [Boolean] Return true if the object for the apo_druid is found in storage, or raise exception
         def verify_apo_id(druid, apo_druid)
           LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter verify_identifier")
-          if @valid_apo_ids.include?(apo_druid)
+          if @@valid_apo_ids.include?(apo_druid)
             true
           else
             apo_object = StorageServices.find_storage_object(apo_druid)
             if apo_object.object_pathname.directory?
-              @valid_apo_ids << apo_druid
+              @@valid_apo_ids << apo_druid
               true
             else
               raise ItemError.new(druid, "APO object #{apo_druid} not found")

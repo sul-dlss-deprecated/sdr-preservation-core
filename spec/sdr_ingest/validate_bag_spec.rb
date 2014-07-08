@@ -5,8 +5,8 @@ include Robots::SdrRepo::SdrIngest
 describe ValidateBag do
 
   before(:all) do
-    @druid = "druid:jc837rq9922"
-    @bag_pathname = @fixtures.join('deposit','aa111bb2222')
+    @druid = "druid:jq937jp0017"
+    @bag_pathname = @fixtures.join('deposit','jq937jp0017')
   end
 
   before(:each) do
@@ -21,65 +21,32 @@ describe ValidateBag do
   end
 
   specify "ValidateBag#perform" do
-    expect(@vb).to receive(:validate_bag).with(@druid,@fixtures.join('deposit','jc837rq9922'), 0)
+    expect(@vb).to receive(:validate_bag).with(@druid)
     @vb.perform(@druid)
   end
 
   specify "ValidateBag#validate_bag" do
-    expect(@vb).to receive(:verify_bag_structure).with(@bag_pathname)
-    expect(@vb).to receive(:verify_version_number).with(@bag_pathname,0)
-    expect(@vb).to receive(:validate_bag_data).with(@bag_pathname)
-    @vb.validate_bag(@druid,@bag_pathname,0)
-  end
+    # storage_object = Replication::SdrObject.new(druid)
+    # bag = Replication::BagitBag.open_bag(storage_object.deposit_bag_pathname)
+    # verify_version_number(bag, storage_object.current_version_id)
+    # bag.verify_bag
 
-  specify "ValidateBag#validate_bag_structure" do
-    @bag_pathname.stub(:to_s).and_return('bagdir')
-    @bag_pathname.stub(:exist?).and_return(false)
-    expect{@vb.verify_bag_structure(@bag_pathname)}.to raise_exception(/aa111bb2222 not found at bagdir/)
-    @bag_pathname.stub(:exist?).and_return(true)
-
-    data_dir = double('datadir')
-    @bag_pathname.stub(:join).with('data').and_return(data_dir)
-    data_dir.stub(:to_s).and_return('datadir')
-    data_dir.stub(:basename).and_return('data')
-    data_dir.stub(:exist?).and_return(false)
-    expect{@vb.verify_bag_structure(@bag_pathname)}.to raise_exception(/data not found at datadir/)
-    data_dir.stub(:exist?).and_return(true)
-
-    bagit_txt_file = double('bagit_txt_path')
-    @bag_pathname.stub(:join).with('bagit.txt').and_return(bagit_txt_file)
-    bagit_txt_file.stub(:to_s).and_return('bagit_txt_path')
-    bagit_txt_file.stub(:basename).and_return('bagit.txt')
-    bagit_txt_file.stub(:exist?).and_return(false)
-    expect{@vb.verify_bag_structure(@bag_pathname)}.to raise_exception(/bagit.txt not found at bagit_txt_path/)
-    bagit_txt_file.stub(:exist?).and_return(true)
-
-    bag_info_txt_file = double('bag_info_txt_path')
-    @bag_pathname.stub(:join).with('bag-info.txt').and_return(bag_info_txt_file)
-    bag_info_txt_file.stub(:to_s).and_return('bag_info_txt_path')
-    bag_info_txt_file.stub(:basename).and_return('bag-info.txt')
-    bag_info_txt_file.stub(:exist?).and_return(false)
-    expect{@vb.verify_bag_structure(@bag_pathname)}.to raise_exception(/bag-info.txt not found at bag_info_txt_path/)
-    bag_info_txt_file.stub(:exist?).and_return(true)
-
-    expect(@bag_pathname).to receive(:join).exactly(7).times.and_return(double('', :exist? => true))
-    expect(@vb.verify_bag_structure(@bag_pathname)).to eq(true)
-  end
-
-  specify "ValidateBag#validate_bag_data" do
-    druid = 'druid:jq937jp0017'
-    good_bag = @fixtures.join('deposit/jq937jp0017')
-    expect(@vb.validate_bag_data(good_bag )).to eq(true)
-    bag_missing_file = @fixtures.join('deposit/bag_missing_file')
-    expect{@vb.validate_bag_data(bag_missing_file )}.to raise_exception(Errno::ENOENT)
-    bag_bad_fixity = @fixtures.join('deposit/bag_bad_fixity')
-    expect{@vb.validate_bag_data(bag_bad_fixity )}.to raise_exception(/Bag data validation error/)
+    mock_bag = double(Replication::BagitBag)
+    expect(Replication::BagitBag).to receive(:open_bag).with(@bag_pathname).and_return(mock_bag)
+    expect_any_instance_of(Replication::SdrObject).to receive(:current_version_id).and_return(0)
+    expect(@vb).to receive(:verify_version_number).with(mock_bag,0).and_return(true)
+    expect(mock_bag).to receive(:verify_bag).and_return(true)
+    @vb.validate_bag(@druid)
   end
 
   specify "ValidateBag#verify_version_number" do
-    bag_pathname = @fixtures.join('deposit/jq937jp0017')
-    expect(@vb.verify_version_number(bag_pathname,0)).to eq(true)
-    expect{@vb.verify_version_number( bag_pathname,1)}.to raise_exception(/Version mismatch/)
+    bag = Replication::BagitBag.open_bag(@bag_pathname)
+    expect(bag).to receive(:verify_pathname).with(@bag_pathname.join('data', 'metadata', 'versionMetadata.xml'))
+    expect(bag).to receive(:verify_pathname).with(@bag_pathname.join('versionInventory.xml'))
+    expect(bag).to receive(:verify_pathname).with(@bag_pathname.join('versionAdditions.xml'))
+    expect(@vb.verify_version_number(bag,0)).to eq(true)
+    expect(bag).to receive(:verify_pathname).with(@bag_pathname.join('data', 'metadata', 'versionMetadata.xml'))
+    expect{@vb.verify_version_number(bag,1)}.to raise_exception(/Version mismatch/)
   end
 
   specify "ValidateBag#verify_version_id" do

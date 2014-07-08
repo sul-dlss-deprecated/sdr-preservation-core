@@ -30,7 +30,7 @@ describe VerifyAgreement do
   describe "VerifyAgreement#verify_agreement" do
 
     specify "apo_id retrieved from relationship metadata and verified" do
-      expect(@va).to receive(:find_deposit_pathname).with(@druid).and_return(@deposit_pathname)
+      expect_any_instance_of(Replication::SdrObject).to receive(:deposit_bag_pathname).and_return(@deposit_pathname)
       expect(@va).to receive(:find_relationship_metadata).with(@deposit_pathname).and_return(@relationship_md_pathname)
       expect(@va).to receive(:find_apo_id).with(@druid, @relationship_md_pathname).and_return(@apo_id)
       expect(@va).to receive(:verify_apo_id).with(@druid, @apo_id).and_return(true)
@@ -39,7 +39,7 @@ describe VerifyAgreement do
     end
 
     specify "apo_id retrieved from relationship metadata but the APO object does not exist in storage" do
-      expect(@va).to receive(:find_deposit_pathname).with(@druid).and_return(@deposit_pathname)
+      expect_any_instance_of(Replication::SdrObject).to receive(:deposit_bag_pathname).and_return(@deposit_pathname)
       expect(@va).to receive(:find_relationship_metadata).with(@deposit_pathname).and_return(@relationship_md_pathname)
       expect(@va).to receive(:find_apo_id).with(@druid, @relationship_md_pathname).and_return(@apo_id)
       expect(@va).to receive(:verify_apo_id).with(@druid, @apo_id).and_return(false)
@@ -48,7 +48,7 @@ describe VerifyAgreement do
     end
 
     specify "apo_id could not be retrieved from an existing relationship metadata file" do
-      expect(@va).to receive(:find_deposit_pathname).with(@druid).and_return(@deposit_pathname)
+      expect_any_instance_of(Replication::SdrObject).to receive(:deposit_bag_pathname).and_return(@deposit_pathname)
       expect(@va).to receive(:find_relationship_metadata).with(@deposit_pathname).and_return(@relationship_md_pathname)
       expect(@va).to receive(:find_apo_id).with(@druid, @relationship_md_pathname).and_return(nil)
       expect(@va).to_not receive(:verify_apo_id)
@@ -58,7 +58,7 @@ describe VerifyAgreement do
 
     specify "relationship metadata not found in deposit area, but that's OK because version > 1" do
       # relationship metadata not found in deposit area, but that's OK because version > 1
-      expect(@va).to receive(:find_deposit_pathname).with(@druid).and_return(@deposit_pathname)
+      expect_any_instance_of(Replication::SdrObject).to receive(:deposit_bag_pathname).and_return(@deposit_pathname)
       expect(@va).to receive(:find_relationship_metadata).with(@deposit_pathname).and_return(nil)
       expect(@va).to_not receive(:find_apo_id)
       expect(@va).to_not receive(:verify_apo_id)
@@ -68,7 +68,7 @@ describe VerifyAgreement do
 
     specify "relationship metadata not found in deposit area, raise error because version = 1" do
       # relationship metadata not found in deposit area, but that's OK because version > 1
-      expect(@va).to receive(:find_deposit_pathname).with(@druid).and_return(@deposit_pathname)
+      expect_any_instance_of(Replication::SdrObject).to receive(:deposit_bag_pathname).and_return(@deposit_pathname)
       expect(@va).to receive(:find_relationship_metadata).with(@deposit_pathname).and_return(nil)
       expect(@va).to_not receive(:find_apo_id)
       expect(@va).to_not receive(:verify_apo_id)
@@ -103,19 +103,16 @@ describe VerifyAgreement do
 
   specify "VerifyAgreement#verify_apo_id" do
     apo_druid = "druid:zn292gq7284"
-    @va.valid_apo_ids << apo_druid
+    VerifyAgreement.valid_apo_ids << apo_druid
     expect(@va.verify_apo_id(@druid,apo_druid)).to eq(true)
 
     apo_druid = "druid:jq937jp0017"
-    expect(@va.valid_apo_ids.include?(apo_druid)).to eq(false)
+    expect(VerifyAgreement.valid_apo_ids.include?(apo_druid)).to eq(false)
     expect(@va.verify_apo_id(@druid,apo_druid)).to eq(true)
-    expect(@va.valid_apo_ids.include?(apo_druid)).to eq(true)
+    expect(VerifyAgreement.valid_apo_ids.include?(apo_druid)).to eq(true)
 
     apo_druid = "druid:bad"
     expect{@va.verify_apo_id(@druid,apo_druid)}.to raise_exception(/Unable to verify APO object/)
-
-    @va.valid_apo_ids = nil
-    expect{@va.verify_apo_id(@druid,apo_druid)}.to raise_exception(/undefined method/)
   end
 
 end

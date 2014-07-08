@@ -76,7 +76,7 @@ module Robots
           # and http://www.rsync.net/resources/howto/mac_images.html
           # trailing slash on the source path means "copy the contents of the source dir to the target dir"
           rsync_command = "rsync -qac --inplace #{source_pathname}/ #{target_pathname}/"
-          shell_execute(rsync_command)
+          Replication::OperatingSystem.execute(rsync_command)
           LyberCore::Log.debug("#{source_pathname} transferred to #{target_pathname}")
         rescue Exception => e
           raise ItemError.new(druid, "Error transferring object", e)
@@ -143,7 +143,7 @@ module Robots
         end
 
         def verification_files(druid)
-          deposit_bag_pathname = find_deposit_pathname(druid)
+          deposit_bag_pathname = Replication::SdrObject.new(druid).deposit_bag_pathname
           files = []
           files << deposit_bag_pathname.to_s
           files << deposit_bag_pathname.join("bag-info.txt").to_s

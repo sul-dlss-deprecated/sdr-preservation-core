@@ -23,7 +23,7 @@ describe MigrationTransfer do
   end
 
   specify "MigrationTransfer#perform" do
-    expect(@mt).to receive(:transfer_object).with(@druid,@fixtures.join('deposit','jq937jp0017'))
+    expect(@mt).to receive(:transfer_object).with(@druid)
     @mt.perform(@druid)
   end
   
