@@ -156,7 +156,7 @@ class StatusWorkflow  < Status
     options = {}
     options[:ssl_client_cert] = OpenSSL::X509::Certificate.new(File.read(cert)) if cert
     options[:ssl_client_key]  = OpenSSL::PKey::RSA.new(File.read(key), pass) if key
-    options[:timeout] = 200 # sec
+    options[:timeout] = 300 # sec
     options[:open_timeout] = 30 # sec
     RestClient::Resource.new(url, options)
   end
