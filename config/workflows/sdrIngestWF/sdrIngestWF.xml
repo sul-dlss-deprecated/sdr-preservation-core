@@ -4,6 +4,7 @@
    <process name="transfer-object" status="waiting" />
    <process name="validate-bag" status="waiting"/>
    <process name="verify-agreement" status="waiting" />
-   <process name="complete-deposit" lifecycle="deposited" status="waiting" />
+   <process name="complete-deposit" status="waiting" />
+   <process name="update-catalog" status="waiting" />
    <process name="ingest-cleanup" status="waiting" />
 </workflow>

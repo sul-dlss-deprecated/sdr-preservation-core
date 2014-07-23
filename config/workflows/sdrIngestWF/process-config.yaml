@@ -37,8 +37,15 @@ complete-deposit:
   classname: "Robots::SdrRepo::SdrIngest::CompleteDeposit"
   classpath: "sdr_ingest/complete_deposit"
 
-ingest-cleanup:
+update-catalog:
   prerequisite: complete-deposit
+  batch_limit: 200
+  error_limit: 5
+  classname: "Robots::SdrRepo::SdrIngest::UpdateCatalog"
+  classpath: "sdr_ingest/update_catalog"
+
+ingest-cleanup:
+  prerequisite: update-catalog
   batch_limit: 200
   error_limit: 5
   classname: "Robots::SdrRepo::SdrIngest::IngestCleanup"

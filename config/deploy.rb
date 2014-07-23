@@ -7,8 +7,19 @@ set :repo_url, 'https://github.com/sul-dlss/sdr-preservation-core.git'
 # Default branch is :master
 ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 
-# Default deploy_to directory is /var/www/my_app
-set :deploy_to, "/var/sdr2service/#{fetch(:application)}"
+# Userid used for deployment
+ask :user, 'for deployment to user@hostname'
+
+# Server deployed to
+ask :hostname, 'for deployment to user@hostname'
+
+# Target path
+set :deploy_to, "/var/#{fetch(:user)}/#{fetch(:application)}"
+
+# set the server variable
+server fetch(:hostname), user: fetch(:user), roles: %w{app}
+
+Capistrano::OneTimeKey.generate_one_time_key!
 
 # Default value for :scm is :git
 # set :scm, :git
