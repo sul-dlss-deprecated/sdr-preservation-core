@@ -120,7 +120,7 @@ GEM
     rspec-expectations (2.14.5)
       diff-lcs (>= 1.1.3, < 2.0)
     rspec-mocks (2.14.6)
-    sdr-replication (0.2.0)
+    sdr-replication (0.3.0)
       json_pure
       moab-versioning (~> 1.3)
       rest-client
@@ -173,7 +173,7 @@ DEPENDENCIES
   rest-client
   robot-controller (~> 0.3, >= 0.3.5)
   rspec (~> 2.14)
-  sdr-replication
+  sdr-replication (>= 0.3.0)
   simplecov (~> 0.7.1)
   sys-filesystem
   yard

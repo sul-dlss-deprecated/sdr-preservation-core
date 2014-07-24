@@ -6,5 +6,6 @@
    <process name="verify-agreement" status="waiting" />
    <process name="complete-deposit" status="waiting" />
    <process name="update-catalog" status="waiting" />
+   <process name="create-replica" status="waiting" />
    <process name="ingest-cleanup" status="waiting" />
 </workflow>

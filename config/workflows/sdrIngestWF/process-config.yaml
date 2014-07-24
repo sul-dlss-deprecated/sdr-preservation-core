@@ -44,8 +44,15 @@ update-catalog:
   classname: "Robots::SdrRepo::SdrIngest::UpdateCatalog"
   classpath: "sdr_ingest/update_catalog"
 
-ingest-cleanup:
+create-replica:
   prerequisite: update-catalog
+  batch_limit: 200
+  error_limit: 5
+  classname: "Robots::SdrRepo::SdrIngest::CreateReplica"
+  classpath: "sdr_ingest/create_replica"
+
+ingest-cleanup:
+  prerequisite: create-replica
   batch_limit: 200
   error_limit: 5
   classname: "Robots::SdrRepo::SdrIngest::IngestCleanup"

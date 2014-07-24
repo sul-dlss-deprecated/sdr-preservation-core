@@ -6,11 +6,11 @@ module Robots
     module SdrIngest
 
       # A robot for creating new entries in the Archive Catalog for the object version
-      class UpdateCatalog < SdrRobot
+      class CreateReplica < SdrRobot
 
         # class instance variables (accessors defined in SdrRobot parent class)
         @workflow_name = 'sdrIngestWF'
-        @step_name = 'update-catalog'
+        @step_name = 'create-replica'
 
         # set workflow name, step name, log location, log severity level
         def initialize(opts = {})
@@ -22,17 +22,19 @@ module Robots
         #   See LyberCore::Robot#work
         def perform(druid)
           LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
-          update_catalog(druid)
+          create_replica(druid)
         end
 
         # @param druid [String] The item to be processed
-        # @return [void] Update the Archive Catalog's object and version tables for the new version
-        def update_catalog(druid)
+        # @return [void] Craeate a replica bag for the new object version in the replica cache
+        #   and update the Archive Catalog's replica table
+        def create_replica(druid)
           sdr_object = Replication::SdrObject.new(druid)
           latest_version_id = sdr_object.current_version_id
           sdr_object_version = Replication::SdrObjectVersion.new(sdr_object,latest_version_id)
-          sdr_object_version.update_object_data
-          sdr_object_version.update_version_data
+          replica = sdr_object_version.create_replica
+          replica.get_bag_data
+          replica.update_replica_data
         end
 
         def verification_queries(druid)
@@ -53,6 +55,6 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  dm_robot = Robots::SdrRepo::SdrIngest::UpdateCatalog.new()
+  dm_robot = Robots::SdrRepo::SdrIngest::CreateReplica.new()
   dm_robot.start
 end
