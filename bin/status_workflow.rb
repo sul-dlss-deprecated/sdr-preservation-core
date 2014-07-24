@@ -142,7 +142,7 @@ class StatusWorkflow  < Status
     count = Nokogiri::XML(xml).at_xpath('/objects/@count').value.to_i
     count
   rescue
-    0
+    0  # TODO: Use 'NaN' ?
   end
 
   def workflow_service
@@ -153,10 +153,12 @@ class StatusWorkflow  < Status
     cert=Dor::Config.ssl.cert_file
     key=Dor::Config.ssl.key_file
     pass=Dor::Config.ssl.key_pass
-    params = {}
-    params[:ssl_client_cert] = OpenSSL::X509::Certificate.new(File.read(cert)) if cert
-    params[:ssl_client_key]  = OpenSSL::PKey::RSA.new(File.read(key), pass) if key
-    RestClient::Resource.new(url, params,:timeout => 200, :open_timeout => 200 )
+    options = {}
+    options[:ssl_client_cert] = OpenSSL::X509::Certificate.new(File.read(cert)) if cert
+    options[:ssl_client_key]  = OpenSSL::PKey::RSA.new(File.read(key), pass) if key
+    options[:timeout] = 300 # sec
+    options[:open_timeout] = 30 # sec
+    RestClient::Resource.new(url, options)
   end
 
   def sdr_service
