@@ -2,10 +2,10 @@
 ruby '2.1.0'
 
 source 'http://rubygems.org'
-source 'http://sul-gems.stanford.edu'
+#source 'http://sul-gems.stanford.edu'
 
 gem 'confstruct'
-gem 'dor-workflow-service', '~> 1.6', '>= 1.6.3'
+gem 'dor-workflow-service', '~> 1.7'
 gem 'druid-tools'
 gem 'json_pure'
 gem 'lyber-core',  '~> 3.2', '>= 3.2.2'
@@ -14,7 +14,7 @@ gem 'nokogiri'
 gem 'rake'
 gem 'rest-client'
 gem 'sys-filesystem'
-gem 'robot-controller', '~> 0.3', '>= 0.3.5'
+gem 'robot-controller', '~> 0.3', '>= 0.3.7'
 gem 'sdr-replication', '>= 0.3.0'
 
 group :development do
