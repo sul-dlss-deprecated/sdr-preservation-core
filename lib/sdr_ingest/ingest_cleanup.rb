@@ -49,7 +49,7 @@ module Robots
             sleep sleep_time[attempts].to_i
             retry
           else
-            raise ItemError.new(druid, "Failed cleanup deposit (#{attempts} attempts)", e)
+            raise ItemError.new("Failed cleanup deposit (#{attempts} attempts)", e)
           end
         end
 

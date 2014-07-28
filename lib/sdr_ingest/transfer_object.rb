@@ -45,7 +45,7 @@ module Robots
           transfer_cmd = tarpipe_command(druid, deposit_home)
           Replication::OperatingSystem.execute(transfer_cmd)
         rescue Exception => e
-          raise ItemError.new(druid, "Error transferring object", e)
+          raise ItemError.new("Error transferring object", e)
         end
 
         # @param druid [String] The object identifier
@@ -55,7 +55,7 @@ module Robots
           if accession_status == 'completed'
             true
           else
-            raise ItemError.new(druid, "accessionWF:sdr-ingest-transfer status is #{accession_status}")
+            raise ItemError.new("accessionWF:sdr-ingest-transfer status is #{accession_status}")
           end
         end
 
@@ -109,7 +109,7 @@ module Robots
             GC.start
             retry
           else
-            raise ItemError.new(druid, "Failed cleanup deposit (3 attempts)", e)
+            raise ItemError.new("Failed cleanup deposit (3 attempts)", e)
           end
         end
 

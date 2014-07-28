@@ -10,7 +10,7 @@ module Robots
     class ChainedError < StandardError
       def initialize(message, cause=nil)
         if (cause && cause.is_a?(Exception))
-          # exaample: "My message; caused by #<Interrupt: interrupt message>"
+          # example: "My message; caused by #<Interrupt: interrupt message>"
           super("#{message}; caused by #{cause.inspect}")
           self.set_backtrace(cause.backtrace)
         else

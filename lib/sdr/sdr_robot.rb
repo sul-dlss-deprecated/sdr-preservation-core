@@ -34,11 +34,11 @@ module Robots
           LyberCore::Log.info "Completed #{druid} in #{elapsed} seconds"
           return 'completed'
         rescue FatalError => e
-          LyberCore::Log.fatal e.message + "\n" + e.backtrace.join("\n")
+          LyberCore::Log.fatal druid + " - " + e.message + "\n" + e.backtrace.join("\n")
           update_workflow_error_status 'sdr', druid, self.class.workflow_name, self.class.step_name, e.message
           return 'fatal'
         rescue Exception => e
-          LyberCore::Log.error e.message + "\n" + e.backtrace.join("\n")
+          LyberCore::Log.error druid + " - " + e.message + "\n" + e.backtrace.join("\n")
           update_workflow_error_status 'sdr', druid, self.class.workflow_name, self.class.step_name, e.message
           return 'error'
         end
@@ -76,7 +76,12 @@ module Robots
         transmit(opts) { Dor::WorkflowService.update_workflow_status(repo, druid, workflow_name, step_name, status, :elapsed => elapsed, :note => Socket.gethostname) }
       end
 
-      def update_workflow_error_status(repo, druid, workflow_name, step_name, message, opts={})
+      def update_workflow_error_status(repo, druid, workflow_name, step_name, msg, opts={})
+        LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter update_workflow_error_status")
+        message = msg.lines.first.chomp[0..80] + (msg.length > 80 ? ' ...' : '')
+        params = {repo: repo, druid: druid, workflow_name: workflow_name, step_name: step_name, message: message}
+        LyberCore::Log.debug(params.inspect)
+        LyberCore::Log.debug(opts.inspect)
         transmit(opts) { Dor::WorkflowService.update_workflow_error_status(repo, druid, workflow_name, step_name, message, :error_text => Socket.gethostname) }
       end
 

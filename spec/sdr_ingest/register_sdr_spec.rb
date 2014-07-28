@@ -27,7 +27,7 @@ describe RegisterSdr do
     @rs.perform(@druid)
     expect(@rs).to receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
         and_return("error")
-    expect{@rs.perform(@druid)}.to raise_exception(/druid:jc837rq9922 - accessionWF:sdr-ingest-transfer status is error/)
+    expect{@rs.perform(@druid)}.to raise_exception(/accessionWF:sdr-ingest-transfer status is error/)
 
   end
 

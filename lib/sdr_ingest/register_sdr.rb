@@ -25,7 +25,7 @@ module Robots
           druid=druid
           accession_status = get_workflow_status('dor', druid, 'accessionWF', 'sdr-ingest-transfer')
           unless accession_status == 'completed'
-            raise ItemError.new(druid, "accessionWF:sdr-ingest-transfer status is #{accession_status}")
+            raise ItemError.new("accessionWF:sdr-ingest-transfer status is #{accession_status}")
           end
           # Create a step (table row) in the current workflow instance for ingest-cleanup robot
           update_workflow_status('sdr', druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting', 0) if @workflow_name == 'sdrIngestWF'

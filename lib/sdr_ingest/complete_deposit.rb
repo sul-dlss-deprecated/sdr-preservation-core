@@ -35,7 +35,7 @@ module Robots
           result = new_version.verify_version_storage
           if result.verified == false
             LyberCore::Log.info result.to_json(verbose=false)
-            raise ItemError.new(druid, "Failed verification")
+            raise ItemError.new("Failed verification")
           end
         end
 

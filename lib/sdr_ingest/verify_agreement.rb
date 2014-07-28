@@ -47,10 +47,10 @@ module Robots
                 LyberCore::Log.debug("APO id #{apo_id} was verified")
                 true
               else
-                raise ItemError.new(druid, "APO object #{apo_id} was not found in repository")
+                raise ItemError.new("APO object #{apo_id} was not found in repository")
               end
             else
-              raise ItemError.new(druid, "APO ID not found in relationshipMetadata")
+              raise ItemError.new("APO ID not found in relationshipMetadata")
             end
           else
             version = find_deposit_version(druid, deposit_pathname)
@@ -58,7 +58,7 @@ module Robots
               LyberCore::Log.debug("APO verification skipped for version > 1")
               true
             else
-              raise ItemError.new(druid, "relationshipMetadata.xml not found in deposited metadata files")
+              raise ItemError.new("relationshipMetadata.xml not found in deposited metadata files")
             end
           end
         end
@@ -80,7 +80,7 @@ module Robots
           raise "version_id is nil" if version_id.nil?
           version_id.to_i
         rescue Exception => e
-          raise ItemError.new(druid, "Unable to find deposit version", e)
+          raise ItemError.new("Unable to find deposit version", e)
         end
 
         # Extract the APO id from the relationship metadata
@@ -97,13 +97,13 @@ module Robots
             if apo_id
               return apo_id.text.split('/')[-1]
             else
-              raise ItemError.new(druid, "Unable to find resource attribute in isGovernedBy node of relationshipMetadata")
+              raise ItemError.new("Unable to find resource attribute in isGovernedBy node of relationshipMetadata")
             end
           else
-            raise ItemError.new(druid, "Unable to find isGovernedBy node of relationshipMetadata")
+            raise ItemError.new("Unable to find isGovernedBy node of relationshipMetadata")
           end
         rescue Exception => e
-          raise ItemError.new(druid, "Unable to find APO id in relationshipMetadata", e)
+          raise ItemError.new("Unable to find APO id in relationshipMetadata", e)
         end
 
         # Confirm that the APO identifier for the object corresponds to an already ingested object
@@ -120,11 +120,11 @@ module Robots
               @@valid_apo_ids << apo_druid
               true
             else
-              raise ItemError.new(druid, "APO object #{apo_druid} not found")
+              raise ItemError.new("APO object #{apo_druid} not found")
             end
           end
         rescue Exception => e
-          raise ItemError.new(druid, "Unable to verify APO object #{apo_druid}", e)
+          raise ItemError.new("Unable to verify APO object #{apo_druid}", e)
         end
 
         def verification_queries(druid)

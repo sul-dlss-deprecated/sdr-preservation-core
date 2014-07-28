@@ -65,7 +65,7 @@ describe TransferObject do
     @to.verify_accesssion_status(@druid)
     expect(@to).to receive(:get_workflow_status).with('dor', @druid, 'accessionWF', 'sdr-ingest-transfer').
         and_return("error")
-    expect{@to.verify_accesssion_status(@druid)}.to raise_exception(/druid:jc837rq9922 - accessionWF:sdr-ingest-transfer status is error/)
+    expect{@to.verify_accesssion_status(@druid)}.to raise_exception(/accessionWF:sdr-ingest-transfer status is error/)
   end
 
   specify "TransferObject#verify_dor_export" do

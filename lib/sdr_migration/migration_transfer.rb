@@ -36,7 +36,7 @@ module Robots
           return tree_based_pathname if tree_based_pathname && tree_based_pathname.exist?
           date_based_pathname = date_based_location(druid, old_storage_area)
           return date_based_pathname if date_based_pathname.exist?
-          raise ItemError.new(druid, "No bag found for druid #{druid}")
+          raise ItemError.new("No bag found for druid #{druid}")
         end
 
         # @param druid [String] The object identifier
@@ -65,7 +65,7 @@ module Robots
           end
           object_path = @toc_hash[druid]
           return old_storage_area.join(object_path) if object_path
-          raise ItemError.new(druid, "No line found in deposit-complete.toc for druid #{druid}")
+          raise ItemError.new("No line found in deposit-complete.toc for druid #{druid}")
         end
 
         # @param source_pathname [Pathname] The object's original ingest location
@@ -79,7 +79,7 @@ module Robots
           Replication::OperatingSystem.execute(rsync_command)
           LyberCore::Log.debug("#{source_pathname} transferred to #{target_pathname}")
         rescue Exception => e
-          raise ItemError.new(druid, "Error transferring object", e)
+          raise ItemError.new("Error transferring object", e)
         end
 
         # @param druid [String] The object identifier

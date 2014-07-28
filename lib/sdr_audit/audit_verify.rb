@@ -35,7 +35,7 @@ module Robots
             LyberCore::Log.info "Verification Result:\n" + result.to_json(verbose=Sdr::Config.audit_verbose)
           else
             LyberCore::Log.info "Verification Result:\n" + result.to_json(verbose=false)
-            raise ItemError.new(druid, "Failed verification", e)
+            raise ItemError.new("Failed verification", e)
           end
           true
         end
