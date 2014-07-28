@@ -60,6 +60,8 @@ end
 
 # This is the equivalent of a java main method
 if __FILE__ == $0
-  audit_robot = Robots::SdrRepo::SdrAudit::AuditVerify.new()
-  audit_robot.start
+  ARGF.each do |druid|
+    audit_robot = Robots::SdrRepo::SdrAudit::AuditVerify.new()
+    audit_robot.process_item(druid)
+  end
 end
