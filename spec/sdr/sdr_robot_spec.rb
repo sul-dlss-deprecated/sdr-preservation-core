@@ -20,21 +20,19 @@ describe SdrRobot do
     specify "SdrRobot#update_workflow_status success" do
       input = ['dor', 'druid', 'accessionWF', 'sdr-ingest-received', 'completed', 5]
       params = input[0..4]
-      params << {:elapsed=>5, :note=>Socket.gethostname}
+      opts = {:elapsed=>5, :note=>Socket.gethostname, interval: 1}
+      params << opts
       expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params).twice.and_raise(TimeoutError)
       expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params)
-      opts = {interval: 1}
-      params << opts
       expect(@robot.update_workflow_status(*input, opts)).to eq(nil)
     end
 
     specify "SdrRobot#update_workflow_status failure" do
       input = ['dor', 'druid', 'accessionWF', 'sdr-ingest-received', 'completed',5]
       params = input[0..4]
-      params << {:elapsed=>5, :note=>Socket.gethostname}
-      expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params).exactly(3).times.and_raise(TimeoutError)
-      opts = {interval: 1}
+      opts = {:elapsed=>5, :note=>Socket.gethostname, interval: 1}
       params << opts
+      expect(Dor::WorkflowService).to receive(:update_workflow_status).with(*params).exactly(3).times.and_raise(TimeoutError)
       expect{@robot.update_workflow_status(*input, opts)}.to raise_exception(FatalError)
     end
 

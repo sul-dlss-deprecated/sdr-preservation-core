@@ -27,8 +27,13 @@ module Robots
           unless accession_status == 'completed'
             raise ItemError.new("accessionWF:sdr-ingest-transfer status is #{accession_status}")
           end
-          # Create a step (table row) in the current workflow instance for ingest-cleanup robot
-          update_workflow_status('sdr', druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting', 0) if @workflow_name == 'sdrIngestWF'
+          # Create a step (table row) in the current workflow instance for robots not yet in workflow template
+          if self.class.workflow_name ==  'sdrIngestWF'
+            opts = {:lane_id => 'default'}
+            update_workflow_status('sdr', druid, 'sdrIngestWF', 'update-catalog', 'waiting', 0, opts)
+            update_workflow_status('sdr', druid, 'sdrIngestWF', 'create-replica', 'waiting', 0, opts)
+            update_workflow_status('sdr', druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting', 0, opts)
+          end
         end
 
         def verification_queries(druid)

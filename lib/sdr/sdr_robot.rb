@@ -73,7 +73,9 @@ module Robots
       end
 
       def update_workflow_status(repo, druid, workflow_name, step_name, status, elapsed, opts={})
-        transmit(opts) { Dor::WorkflowService.update_workflow_status(repo, druid, workflow_name, step_name, status, :elapsed => elapsed, :note => Socket.gethostname) }
+        opts[:elapsed] = elapsed
+        opts[:note] = Socket.gethostname
+        transmit(opts) { Dor::WorkflowService.update_workflow_status(repo, druid, workflow_name, step_name, status, opts) }
       end
 
       def update_workflow_error_status(repo, druid, workflow_name, step_name, msg, opts={})
@@ -82,7 +84,8 @@ module Robots
         params = {repo: repo, druid: druid, workflow_name: workflow_name, step_name: step_name, message: message}
         LyberCore::Log.debug(params.inspect)
         LyberCore::Log.debug(opts.inspect)
-        transmit(opts) { Dor::WorkflowService.update_workflow_error_status(repo, druid, workflow_name, step_name, message, :error_text => Socket.gethostname) }
+        opts[:note] = Socket.gethostname
+        transmit(opts) { Dor::WorkflowService.update_workflow_error_status(repo, druid, workflow_name, step_name, message, opts ) }
       end
 
       # A method that can be passed to transmit which will then return true

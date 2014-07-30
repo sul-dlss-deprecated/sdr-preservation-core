@@ -2,7 +2,6 @@
 ruby '2.1.0'
 
 source 'http://rubygems.org'
-#source 'http://sul-gems.stanford.edu'
 
 gem 'confstruct'
 gem 'dor-workflow-service', '~> 1.7'
@@ -15,7 +14,7 @@ gem 'rake'
 gem 'rest-client'
 gem 'sys-filesystem'
 gem 'robot-controller', '~> 0.3', '>= 0.3.7'
-gem 'sdr-replication', '>= 0.3.0'
+gem 'sdr-replication', '>= 0.3.2' #, :path => '/Users/rnanders/Code/Github/sdr-replication' #
 
 group :development do
 	gem 'awesome_print'

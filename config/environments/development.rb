@@ -38,3 +38,7 @@ end
 
 # Location of the master controller which handles object queues
 REDIS_URL ||= "localhost:6379/resque:development"
+
+Replication::ArchiveCatalog.root_uri = 'http://localhost:3000'
+Replication::Replica.replica_cache_pathname = '/tmp/tape-replication'
+Replication::Fixity.default_checksum_types= :sha256
