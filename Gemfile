@@ -1,7 +1,7 @@
 # If the Ruby version being use does not match, Bundler will raise an exception
 ruby '2.1.0'
 
-source 'http://rubygems.org'
+source 'https://rubygems.org'
 
 gem 'confstruct'
 gem 'dor-workflow-service', '~> 1.7'
