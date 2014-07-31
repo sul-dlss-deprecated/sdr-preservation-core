@@ -31,8 +31,8 @@ module Robots
           sdr_object = Replication::SdrObject.new(druid)
           latest_version_id = sdr_object.current_version_id
           sdr_object_version = Replication::SdrObjectVersion.new(sdr_object,latest_version_id)
-          sdr_object_version.update_object_data
-          sdr_object_version.update_version_data
+          sdr_object_version.catalog_object_data
+          sdr_object_version.catalog_version_data
         end
 
         def verification_queries(druid)

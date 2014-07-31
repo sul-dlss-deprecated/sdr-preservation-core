@@ -14,7 +14,7 @@ gem 'rake'
 gem 'rest-client'
 gem 'sys-filesystem'
 gem 'robot-controller', '~> 0.3', '>= 0.3.7'
-gem 'sdr-replication', '>= 0.3.2' #, :path => '/Users/rnanders/Code/Github/sdr-replication' #
+gem 'sdr-replication', '~> 0.4' #,:path => '/Users/rnanders/Code/Github/sdr-replication' #
 
 group :development do
 	gem 'awesome_print'

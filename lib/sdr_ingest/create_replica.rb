@@ -34,7 +34,7 @@ module Robots
           sdr_object_version = Replication::SdrObjectVersion.new(sdr_object,latest_version_id)
           replica = sdr_object_version.create_replica
           replica.get_bag_data
-          replica.update_replica_data
+          replica.catalog_replica_data
         end
 
         def verification_queries(druid)

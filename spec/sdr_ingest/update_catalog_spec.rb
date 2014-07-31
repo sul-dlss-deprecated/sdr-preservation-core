@@ -30,8 +30,8 @@ describe UpdateCatalog do
     sdr_object_version = double(Replication::SdrObjectVersion)
     expect(Replication::SdrObjectVersion).to receive(:new).
          with(an_instance_of(Replication::SdrObject),3).and_return(sdr_object_version)
-    expect(sdr_object_version).to receive(:update_object_data)
-    expect(sdr_object_version).to receive(:update_version_data)
+    expect(sdr_object_version).to receive(:catalog_object_data)
+    expect(sdr_object_version).to receive(:catalog_version_data)
     @uc.perform('druid:jq937jp0017')
   end
 

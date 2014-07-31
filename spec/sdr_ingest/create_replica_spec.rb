@@ -34,7 +34,7 @@ describe CreateReplica do
     replica = double(Replication::Replica)
     expect(sdr_object_version).to receive(:create_replica).and_return(replica)
     expect(replica).to receive(:get_bag_data)
-    expect(replica).to receive(:update_replica_data)
+    expect(replica).to receive(:catalog_replica_data)
     @uc.perform('druid:jq937jp0017')
   end
 
