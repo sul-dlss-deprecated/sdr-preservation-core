@@ -5,6 +5,7 @@
 .rspec-local
 .ruby-gemset
 .rvmrc
+.ruby-version
 .yardoc
 *~
 config/certs
