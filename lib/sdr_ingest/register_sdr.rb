@@ -30,9 +30,10 @@ module Robots
           # Create a step (table row) in the current workflow instance for robots not yet in workflow template
           if self.class.workflow_name ==  'sdrIngestWF'
             opts = {:lane_id => 'default'}
-            update_workflow_status('sdr', druid, 'sdrIngestWF', 'update-catalog', 'waiting', 0, opts)
-            update_workflow_status('sdr', druid, 'sdrIngestWF', 'create-replica', 'waiting', 0, opts)
-            update_workflow_status('sdr', druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting', 0, opts)
+            # TODO: Fedora update for /config/workflows/sdrIngestWF/workflowDefinition.xml
+            #update_workflow_status('sdr', druid, 'sdrIngestWF', 'update-catalog', 'waiting', 0, opts)
+            #update_workflow_status('sdr', druid, 'sdrIngestWF', 'create-replica', 'waiting', 0, opts)
+            #update_workflow_status('sdr', druid, 'sdrIngestWF', 'ingest-cleanup', 'waiting', 0, opts)
           end
         end
 
