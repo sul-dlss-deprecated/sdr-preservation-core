@@ -25,11 +25,11 @@
 
   <!-- Skip update-catalog and create-replica stages -->
   <!-- Could use status='skipped'? -->
-  <process name="update-catalog" sequence="7" status="completed">
+  <process name="update-catalog" sequence="7" status="completed" skip-queue="true">
     <label>Insert data in archive catalog for object and version</label>
     <prereq>complete-deposit</prereq>
   </process>
-  <process name="create-replica" sequence="8" status="completed">
+  <process name="create-replica" sequence="8" status="completed" skip-queue="true">
     <label>Create the replica tarfile</label>
     <prereq>update-catalog</prereq>
   </process>
