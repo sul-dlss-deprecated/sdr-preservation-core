@@ -24,20 +24,18 @@
   </process>
 
   <!-- Skip update-catalog and create-replica stages -->
-  <!-- Could use status='skipped'? -->
-  <process name="update-catalog" sequence="7" status="completed" skip-queue="true">
+  <process name="update-catalog" sequence="7" status="skipped" skip-queue="true">
     <label>Insert data in archive catalog for object and version</label>
     <prereq>complete-deposit</prereq>
   </process>
-  <process name="create-replica" sequence="8" status="completed" skip-queue="true">
+  <process name="create-replica" sequence="8" status="skipped" skip-queue="true">
     <label>Create the replica tarfile</label>
     <prereq>update-catalog</prereq>
   </process>
 
   <process name="ingest-cleanup" sequence="9">
     <label>Clean up workspace, route back to accession workflow</label>
+    <prereq>create-replica</prereq>
     <prereq>complete-deposit</prereq>
-    <!-- Ensure cleanup depends on complete-deposit <prereq>create-replica</prereq>-->
-    <!-- TODO: when update-catalog & create-replica are enabled, use: <prereq>create-replica</prereq>-->
   </process>
 </workflow-def>
