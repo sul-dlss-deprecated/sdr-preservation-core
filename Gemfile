@@ -6,6 +6,7 @@ gem 'nokogiri'
 gem 'rake'
 gem 'rest-client'
 gem 'sys-filesystem'
+gem 'pry'
 
 # DLSS gems
 gem 'dor-workflow-service', '~> 1.7'
@@ -19,8 +20,6 @@ group :development do
 	gem 'awesome_print'
 	gem 'equivalent-xml'
 	gem 'fakeweb'
-  #gem "pry-debugger", '0.2.2'
-  gem 'pry'
 	gem 'rspec', '~> 2.14'
 	gem 'simplecov', '~> 0.7.1'
 	gem 'yard'
