@@ -57,6 +57,6 @@ end
 if __FILE__ == $0
   ARGF.each do |druid|
     dm_robot = Robots::SdrRepo::SdrIngest::RegisterSdr.new()
-    dm_robot.process_item(druid)
+    dm_robot.process_item(druid)  # calls RegisterSdr.perform
   end
 end
