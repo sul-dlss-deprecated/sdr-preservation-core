@@ -103,6 +103,7 @@ module Robots
         end
 
         def get_version_inventory(druid, deposit_bag_pathname)
+          # Create new version inventory for version 1.
           version_inventory = FileInventory.new(:type => "version", :digital_object_id => druid, :version_id => 1)
           content_group = get_data_group(deposit_bag_pathname, 'content')
           version_inventory.groups << content_group
