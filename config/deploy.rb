@@ -3,24 +3,8 @@ lock '3.2.1'
 
 set :application, 'sdr-preservation-core'
 
-# Userid used for deployment
-ask :user, 'for deployment to user@hostname'
-
-# Server deployed to
-ask :hostname, 'for deployment to user@hostname'
-
-# set the server variable
-server fetch(:hostname), user: fetch(:user), roles: %w{app}
-Capistrano::OneTimeKey.generate_one_time_key!
-
-# Target path
-set :deploy_to, "/var/#{fetch(:user)}/#{fetch(:application)}"
-
 # Default value for :scm is :git
 # set :scm, :git
-
-# NOTE: production is not working with https (old openssl?)
-# set :repo_url, 'https://github.com/sul-dlss/sdr-preservation-core.git'
 set :repo_url, 'git://github.com/sul-dlss/sdr-preservation-core.git'
 
 # Default branch is :master
@@ -67,3 +51,8 @@ namespace :deploy do
   after :publishing, :restart
 
 end
+
+
+# capistrano next reads config/deploy/#{target}.rb, e.g.:
+# config/deploy/development.rb
+
