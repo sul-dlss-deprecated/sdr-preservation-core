@@ -88,7 +88,7 @@ GEM
       rack
     rainbow (2.0.0)
     rake (10.3.2)
-    rdoc (4.1.1)
+    rdoc (4.1.2)
       json (~> 1.4)
     redis (3.1.0)
     redis-namespace (1.5.1)
