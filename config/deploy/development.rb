@@ -39,5 +39,3 @@ Capistrano::OneTimeKey.generate_one_time_key!
 USER_HOME = `ssh #{ENV['SDR_USER']}@#{ENV['SDR_HOST']} 'echo $HOME'`.chomp
 set :deploy_to, "#{USER_HOME}/#{ENV['SDR_APP']}"
 
-set :repo_url, "https://github.com/sul-dlss/#{ENV['SDR_APP']}.git"
-
