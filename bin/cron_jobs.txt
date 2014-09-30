@@ -1,0 +1,27 @@
+# THIS IS OBSOLETE WHEN RUNNING ON THE RESQUE ROBOT SYSTEM
+# At top of every hour, check process state configuration and start new pipeline(s)
+# - if number of running pipelines < MAX,
+# - time of day is within the operational window, and
+# - STATE != STOP
+#*/30 * * * *  /bin/bash -l -c "${HOME}/sdr2/current/bin/bundle-exec.sh status_process.rb sdrIngestWF start! cron"
+
+# THIS IS OBSOLETE WHEN RUNNING ON THE RESQUE ROBOT SYSTEM
+# Every 2 minutes, add more object ids from the workflow waiting list into the
+# ingest pipeline directory queue but only if a robot pipeline is running and
+# the queue is empty.
+#*/2 * * * *  /bin/bash -l -c "${HOME}/sdr2/current/bin/bundle-exec.sh status_monitor.rb sdrIngestWF queue cron"
+
+# Every Sunday morning, generate and email a report containing a summary of the
+# disk space used and number of objects in storage.
+0 4 * * 0 /bin/bash -l -c "${HOME}/sdr-preservation-core/current/bin/weekly-status.sh"
+
+# Every evening send object count and terabytes of storage to sulstats.
+30 23 * * * /bin/bash -l -c "${HOME}/sdr-preservation-core/current/bin/daily-status.sh"
+
+# Every day at 6am, noon and 6pm, email the last 25 lines of all the SDR-PC
+# logs.
+0 6,12,18 * * * /bin/bash -l -c "$HOME/bin/sdr-preservation-core_logs.sh 25 | /bin/mail -s '[sdr-pc] ingest workflow logs' $USER"
+
+# Every 5 minutes, test the connectivity of SDR-PC to /dor/export/.
+*/5 * * * *  /bin/bash -l -c "$HOME/bin/sdr-verify-versionMetadata.sh testTransfers/bb335qc9336"
+
