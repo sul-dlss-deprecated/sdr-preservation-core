@@ -9,11 +9,14 @@
 #
 # You run the script by:
 # - ssh into one of the robot VMs in test
-# - scp the attached script to that VM
-# - cd common-accessioning/current
-# - ./bin/console test
-# - load "#{ENV['HOME']}/register_objs.rb'
-# - WfMuxTester.test
+# - scp the attached script to that VM, into a ~/bin path
+# - bash$ cd common-accessioning/current/
+# - bash$ export SDR_HOST='sdr-host'
+# - bash$ export SDR_USER='sdr-user'
+# - bash$ kinit <user_with_access_to_sdr>
+# - bash$ bundle exec ./bin/console test
+# - pry> load "#{ENV['HOME']}/bin/register_objs.rb"
+# - pry> WfMuxTester.test
 
 
 class WfMuxObjSetup
