@@ -40,6 +40,14 @@ class WfMuxObjSetup
     md_base = File.join(BAG_DIR, assembly_dr.id, 'data', 'metadata')
     cm_doc = Nokogiri::XML IO.read File.join(md_base, 'contentMetadata.xml')
 
+    # Verify the APO exists?
+    # begin
+    #   puts "Found APO: #{@apo}" if Dor::Item.find @apo
+    # rescue ActiveFedora::ObjectNotFoundError => onfe
+    #   puts "Missing APO #{@apo}"
+    #   raise onfe
+    # end
+
     # contentMetadata cleanup
     #   remove jp2 file nodes
     jp2_nodes = cm_doc.xpath( '/contentMetadata/resource/file[@mimetype = "image/jp2"]')
