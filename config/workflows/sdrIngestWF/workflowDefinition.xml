@@ -22,17 +22,14 @@
     <label>Store the object on disk in the Moab structure</label>
     <prereq>verify-agreement</prereq>
   </process>
-  <process name="update-catalog" sequence="7">
-    <label>Insert data in archive catalog for object and version</label>
+  <process name="create-replica" sequence="7"> <!-- status="skipped" skip-queue="true"> -->
+    <label>Create the replica tarfile</label>
     <prereq>complete-deposit</prereq>
   </process>
-
-  <!-- Skip create-replica -->
-  <process name="create-replica" sequence="8" status="skipped" skip-queue="true">
-    <label>Create the replica tarfile</label>
-    <prereq>update-catalog</prereq>
+  <process name="update-catalog" sequence="8">
+    <label>Insert data in archive catalog for object and version</label>
+    <prereq>create-replica</prereq>
   </process>
-
   <process name="ingest-cleanup" sequence="9">
     <label>Clean up workspace, route back to accession workflow</label>
     <prereq>update-catalog</prereq>
