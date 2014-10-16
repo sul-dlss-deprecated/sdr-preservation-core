@@ -28,7 +28,7 @@ GEM
       capistrano (~> 3.0)
     capistrano-releaseboard (0.0.1)
       faraday
-    capistrano-rvm (0.1.1)
+    capistrano-rvm (0.1.2)
       capistrano (~> 3.0)
       sshkit (~> 1.2)
     coderay (1.1.0)
