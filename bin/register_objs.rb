@@ -162,3 +162,15 @@ class WfMuxTester
 end
 
 
+# Fallback code when nuke! fails:
+def dor_nuke_steps
+  bag_dir =  ENV['DOR_BAG_DIR'] || '/dor/test-content'
+  druids = Dir.entries(bag_dir).reject! {|d| d =~ /^\.\.?$/}.map! {|dr| "druid:#{dr}" }
+  druids.each {|d| Dor::CleanupService.cleanup_by_druid d rescue nil }
+  druids.each {|d| Dor::CleanupService.cleanup_stacks d rescue nil }
+  druids.each {|d| Dor::CleanupService.cleanup_purl_doc_cache d rescue nil }
+  druids.each {|d| Dor::CleanupService.remove_active_workflows d rescue nil };
+  druids.each {|d| Dor::CleanupService.delete_from_dor d rescue nil };
+  druids.each {|d| Dor::CleanupService.delete_from_dor d rescue nil };
+end
+
