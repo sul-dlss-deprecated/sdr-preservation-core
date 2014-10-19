@@ -14,7 +14,7 @@ gem 'druid-tools'
 gem 'lyber-core',  '~> 3.2', '>= 3.2.2'
 gem 'moab-versioning', '~> 1.3' #, :path => '/Users/rnanders/Code/Github/moab-versioning' #
 gem 'robot-controller', '~> 1.0'
-gem 'sdr-replication', '~> 0.4' #,:path => '/Users/rnanders/Code/Github/sdr-replication' #
+gem 'sdr-replication', '~> 0.5' #,:path => '/Users/rnanders/Code/Github/sdr-replication' #
 
 group :development do
 	gem 'awesome_print'
