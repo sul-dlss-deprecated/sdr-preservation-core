@@ -19,9 +19,8 @@ for disk in $repo_path; do
         rm $metaDataFileSize
         while read line; do
             files=$(find "$line" -type f | grep -v 'data.content')
-            size=$(cat "$files" | xargs stat --printf="%s\t%n\n" | awk '{s+=$1} END {print s}')
+            size=$(echo "$files" | xargs stat --printf="%s\t%n\n" | awk '{s+=$1} END {print s}')
             echo -e "$size\t$line" >> $metaDataFileSize
         done < ${disk_name}_druid_paths.txt
 done
-
 
