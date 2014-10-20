@@ -32,8 +32,7 @@ module Robots
           sdr_object = Replication::SdrObject.new(druid)
           latest_version_id = sdr_object.current_version_id
           sdr_object_version = Replication::SdrObjectVersion.new(sdr_object,latest_version_id)
-          # TODO: ensure a duplicate replica cannot be created?
-          @replica = sdr_object_version.create_replica
+          @replica = sdr_object_version.create_replica # can raise ReplicaExistsError
           @replica.get_bag_data
           @replica.catalog_replica_data
           # TODO: replicate to tape

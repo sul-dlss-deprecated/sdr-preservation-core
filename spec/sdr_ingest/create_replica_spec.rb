@@ -36,6 +36,14 @@ describe CreateReplica do
     expect(replica).to receive(:get_bag_data)
     expect(replica).to receive(:catalog_replica_data)
     @uc.perform('druid:jq937jp0017')
+
+
+
+    #require 'pry'; binding.pry
+    # TODO: check that it raises an error on trying to create a duplicate replica.
+
+
+
   end
 
 end
