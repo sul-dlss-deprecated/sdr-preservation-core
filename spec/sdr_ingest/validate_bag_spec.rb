@@ -27,12 +27,12 @@ describe ValidateBag do
 
   specify "ValidateBag#validate_bag" do
     # storage_object = Replication::SdrObject.new(druid)
-    # bag = Replication::BagitBag.open_bag(storage_object.deposit_bag_pathname)
+    # bag = Archive::BagitBag.open_bag(storage_object.deposit_bag_pathname)
     # verify_version_number(bag, storage_object.current_version_id)
     # bag.verify_bag
 
-    mock_bag = double(Replication::BagitBag)
-    expect(Replication::BagitBag).to receive(:open_bag).with(@bag_pathname).and_return(mock_bag)
+    mock_bag = double(Archive::BagitBag)
+    expect(Archive::BagitBag).to receive(:open_bag).with(@bag_pathname).and_return(mock_bag)
     expect_any_instance_of(Replication::SdrObject).to receive(:current_version_id).and_return(0)
     expect(@vb).to receive(:verify_version_number).with(mock_bag,0).and_return(true)
     expect(mock_bag).to receive(:verify_bag).and_return(true)
@@ -40,7 +40,7 @@ describe ValidateBag do
   end
 
   specify "ValidateBag#verify_version_number" do
-    bag = Replication::BagitBag.open_bag(@bag_pathname)
+    bag = Archive::BagitBag.open_bag(@bag_pathname)
     expect(bag).to receive(:verify_pathname).with(@bag_pathname.join('data', 'metadata', 'versionMetadata.xml'))
     expect(bag).to receive(:verify_pathname).with(@bag_pathname.join('versionInventory.xml'))
     expect(bag).to receive(:verify_pathname).with(@bag_pathname.join('versionAdditions.xml'))

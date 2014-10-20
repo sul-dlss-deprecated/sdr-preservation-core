@@ -32,7 +32,7 @@ describe TransferObject do
     # verify_version_metadata(druid)
     # deposit_home = get_deposit_home(druid)
     # transfer_cmd = tarpipe_command(druid, deposit_home)
-    # Replication::OperatingSystem.execute(transfer_cmd)
+    # Archive::OperatingSystem.execute(transfer_cmd)
 
     Pathname.any_instance.stub(:exist?).and_return(false)
     Pathname.any_instance.stub(:mkpath)
@@ -41,7 +41,7 @@ describe TransferObject do
     expect(@to).to receive(:verify_version_metadata).with(@druid).and_return(true)
     expect(@to).to receive(:get_deposit_home).with(@druid).and_return(@bag_pathname.parent)
     expect(@to).to receive(:tarpipe_command).with(@druid,@bag_pathname.parent).and_return('thecommand')
-    expect(Replication::OperatingSystem).to receive(:execute).with('thecommand')
+    expect(Archive::OperatingSystem).to receive(:execute).with('thecommand')
     @to.transfer_object(@druid)
 
     expect(@to).to receive(:verify_accesssion_status).with(@druid).and_return(true)
@@ -49,7 +49,7 @@ describe TransferObject do
     expect(@to).to receive(:verify_version_metadata).with(@druid).and_return(true)
     expect(@to).to receive(:get_deposit_home).with(@druid).and_return(@bag_pathname.parent)
     expect(@to).to receive(:tarpipe_command).with(@druid,@bag_pathname.parent).and_return('thecommand')
-    Replication::OperatingSystem.stub(:execute).and_raise("cmd failed")
+    Archive::OperatingSystem.stub(:execute).and_raise("cmd failed")
     expect{@to.transfer_object(@druid)}.to raise_exception(Robots::SdrRepo::ItemError)
 
     expect(@to).to receive(:verify_accesssion_status).with(@druid).and_return(true)
@@ -83,9 +83,9 @@ describe TransferObject do
   specify "TransferObject#verify_dor_path" do
     vmpath = '/dor/export/jc837rq9922/data/metadata/versionMetadata.xml'
     vmcmd = "if ssh userid@dor-host.stanford.edu test -e #{vmpath}; then echo exists; else echo notfound; fi"
-    expect(Replication::OperatingSystem).to receive(:execute).with(vmcmd).and_return("exists")
+    expect(Archive::OperatingSystem).to receive(:execute).with(vmcmd).and_return("exists")
     expect(@to.verify_dor_path(vmpath)).to eq(true)
-    expect(Replication::OperatingSystem).to receive(:execute).with(vmcmd).and_return("not")
+    expect(Archive::OperatingSystem).to receive(:execute).with(vmcmd).and_return("not")
     expect{@to.verify_dor_path(vmpath)}.to raise_exception(/not found/)
   end
 

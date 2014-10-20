@@ -30,7 +30,7 @@ module Robots
         def validate_bag(druid)
           LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter validate_bag")
           storage_object = Replication::SdrObject.new(druid)
-          bag = Replication::BagitBag.open_bag(storage_object.deposit_bag_pathname)
+          bag = Archive::BagitBag.open_bag(storage_object.deposit_bag_pathname)
           verify_version_number(bag, storage_object.current_version_id)
           bag.verify_bag
           true
@@ -38,7 +38,7 @@ module Robots
           raise ItemError.new("Bag validation failure", e)
         end
 
-        # @param [Replication::BagitBag] bag the BagIt bag whose versionMetadata is to be verified
+        # @param [Archive::BagitBag] bag the BagIt bag whose versionMetadata is to be verified
         # @param current_version_id [Integer] The version number of the object's current version (or 0 if none)
         # @return [Boolean] Test existence and correct version number of versionMetadata. Return true if OK, raise exception if not
         def verify_version_number(bag, current_version_id)

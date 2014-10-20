@@ -43,7 +43,7 @@ module Robots
           verify_version_metadata(druid)
           deposit_home = get_deposit_home(druid)
           transfer_cmd = tarpipe_command(druid, deposit_home)
-          Replication::OperatingSystem.execute(transfer_cmd)
+          Archive::OperatingSystem.execute(transfer_cmd)
         rescue Exception => e
           raise ItemError.new("Error transferring object", e)
         end
@@ -77,7 +77,7 @@ module Robots
         def verify_dor_path(vmpath)
           exists_cmd = "if ssh " + Sdr::Config.ingest_transfer.account +
               " test -e " + vmpath + ";" + " then echo exists; else echo notfound; fi"
-          if (Replication::OperatingSystem.execute(exists_cmd).chomp == 'exists')
+          if (Archive::OperatingSystem.execute(exists_cmd).chomp == 'exists')
             true
           else
             raise "#{vmpath} not found"

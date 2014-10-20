@@ -40,6 +40,6 @@ end
 REDIS_URL ||= "localhost:6379/resque:development"
 REDIS_TIMEOUT = '10' # seconds
 
+Archive::Fixity.default_checksum_types= :sha256
 Replication::ArchiveCatalog.root_uri = 'http://localhost:3000'
 Replication::Replica.replica_cache_pathname = '/tmp/tape-replication'
-Replication::Fixity.default_checksum_types= :sha256
