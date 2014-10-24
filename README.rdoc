@@ -4,6 +4,7 @@
 * Alpana Pande
 * Bess Sadler
 * Richard Anderson
+* Darren Weber
 
 == An overview of the workflow
 You can see the steps of the workflow in
@@ -39,7 +40,7 @@ function log() { cd ~/sdr-preservation-core/current/log/$1/current; }
 
 == Running tests
     cd ~/sdr-preservation-core
-    rspec
+    bundle exec rspec
 
 == Project Directory Structure
     |
