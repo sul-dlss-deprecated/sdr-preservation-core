@@ -8,7 +8,7 @@ class DruidQueue < DirectoryQueue
 
   def self.syntax
     puts <<-EOF
-  
+
     Syntax: bundle-exec.sh druid_queue.rb {#{WorkflowNames.join('|')}}
     EOF
     self.options
@@ -19,7 +19,7 @@ class DruidQueue < DirectoryQueue
 
     queue options:
 
-      add {druid|filename|query_batch_size} =  add item(s) to queue
+      #DISABLED: add {druid|filename|query_batch_size} =  add item(s) to queue
       size     = report how many items are in the queue
       head {n} = list the first n items that are in the queue (default is 10)
 
@@ -34,27 +34,33 @@ class DruidQueue < DirectoryQueue
 
     EOF
   end
-  
+
   def initialize(workflow)
     @workflow = workflow
     queue_pathname = AppHome.join("log",workflow,"current","queue")
+    FileUtils::mkpath queue_pathname
     super(queue_pathname)
   end
 
   def enqueue(druid_arg)
-    if druid_arg.to_s =~ /\A(?:druid:)?([a-z]{2})(\d{3})([a-z]{2})(\d{4})\z/
-      add_item(druid_arg)
-      true
-    elsif Pathname(druid_arg.to_s).exist?
-      add_list_from_file(druid_arg)
-      true
-    elsif is_integer?(druid_arg)
-      add_workflow_waiting(Integer(druid_arg))
-      true
-    else
-      DruidQueue.syntax
-      false
-    end
+
+    # TODO: evaluate how resque robots replace this functionality.
+    puts 'resque robots replace this functionality'
+    return false
+
+    # if druid_arg.to_s =~ /\A(?:druid:)?([a-z]{2})(\d{3})([a-z]{2})(\d{4})\z/
+    #   add_item(druid_arg)
+    #   true
+    # elsif Pathname(druid_arg.to_s).exist?
+    #   add_list_from_file(druid_arg)
+    #   true
+    # elsif is_integer?(druid_arg)
+    #   add_workflow_waiting(Integer(druid_arg))
+    #   true
+    # else
+    #   DruidQueue.syntax
+    #   false
+    # end
   end
 
   def is_integer?(n)
@@ -66,11 +72,12 @@ class DruidQueue < DirectoryQueue
   def add_workflow_waiting(druid_arg)
     if druid_arg > 4000
       puts "Limiting batch size to 4000 or less"
-      batch_size =  4000
+      batch_size = 4000
     else
-      batch_size =  druid_arg
+      batch_size = druid_arg
     end
     require 'boot'
+    druids = []
     if @workflow == 'sdrIngestWF'
       druids = Dor::WorkflowService.get_objects_for_workstep(
           completed='start-ingest', waiting='register-sdr', repository='sdr', workflow=@workflow)
@@ -100,7 +107,8 @@ class DruidQueue < DirectoryQueue
   def exec(args)
     case args.shift.to_s.upcase
       when 'ADD'
-        puts "queue size = #{queue_size}" if enqueue(args.shift)
+        puts "this feature is disabled (resque robots handle the process queue)."
+        #puts "queue size = #{queue_size}" if enqueue(args.shift)
       when 'SIZE'
         puts "queue size = #{queue_size}"
       when 'HEAD'

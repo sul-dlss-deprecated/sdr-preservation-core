@@ -46,26 +46,32 @@ class StatusMonitor
   end
 
   def monitor_queue
+
+    #TODO: evaluate how resque robots replace and/or modify this method.
+
     queue_size = @druid_queue.queue_size
-    if queue_size < 1
-      stopped,why_not = @status_process.stop_process?
-      unless stopped
-        workflow_waiting = @status_workflow.workflow_waiting
-        if workflow_waiting > 0
-          @druid_queue.enqueue(Sdr::Config.enqueue_max)
-          queue_size = @druid_queue.queue_size
-          message = "queued #{queue_size} items"
-          @status_process.write_process_log(message)
-          return message
-        else
-          return "workflow waiting = 0"
-        end
-      else
-        return why_not
-      end
-    else
-      return "queue currently has #{queue_size} items"
-    end
+    return "queue currently has #{queue_size} items"
+
+    # TODO: do not allow this method to queue items.
+    # if queue_size < 1
+    #   stopped,why_not = @status_process.stop_process?
+    #   unless stopped
+    #     workflow_waiting = @status_workflow.workflow_waiting
+    #     if workflow_waiting > 0
+    #       @druid_queue.enqueue(Sdr::Config.enqueue_max)
+    #       queue_size = @druid_queue.queue_size
+    #       message = "queued #{queue_size} items"
+    #       @status_process.write_process_log(message)
+    #       return message
+    #     else
+    #       return "workflow waiting = 0"
+    #     end
+    #   else
+    #     return why_not
+    #   end
+    # else
+    #   return "queue currently has #{queue_size} items"
+    # end
   end
 
   def monitor_status
@@ -177,7 +183,7 @@ class StatusMonitor
          end
 
       when 'QUEUE'
-        outcome =  monitor_queue
+        outcome = monitor_queue
         puts outcome unless args.shift.to_s.upcase == 'CRON'
      else
        StatusMonitor.options

@@ -13,7 +13,7 @@ case `hostname -s`.chomp
   when "sdr-services"
     'production'
   when "sdr-services-test"
-    'staging'
+    'test'
   when "sul-sdr-services-dev"
     'integration'
   else
@@ -23,7 +23,7 @@ end
 
 # Make sure this cannot run on the production machine
 case environment
-  when 'development', 'test', 'integration', 'staging'
+  when 'development', 'test', 'integration'
   else
     puts "Not allowed to delete objects from #{environment} environment"
     exit
@@ -72,6 +72,9 @@ class PurgeObject
     storage_object = find_storage_object(druid)
     object_pathname = storage_object.object_pathname
     delete_storage(object_pathname)
+
+    # TODO: remove any replicas from the replica-cache.
+
   end
 
   # Delete the storage location of the specified object

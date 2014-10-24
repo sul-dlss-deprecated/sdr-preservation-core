@@ -9,6 +9,7 @@ require_relative 'status_workflow'
 require_relative 'status_monitor'
 
 class Menu
+
   def self.syntax()
     puts <<-EOF
 
@@ -19,7 +20,6 @@ class Menu
   end
 
   def initialize(workflow)
-    @environs = ENV['ROBOT_ENVIRONMENT']
     @workflow = workflow
     @druid_queue = DruidQueue.new(@workflow)
     @status_activity = StatusActivity.new(@workflow)
@@ -85,11 +85,14 @@ class Menu
           when 'workflow'
             @status_workflow.exec(args)
           when 'queue'
-            @druid_queue.exec(args)
+            puts 'disabled: see resque robot master'
+            #@druid_queue.exec(args)
           when 'process'
-            @status_process.exec(args)
+            puts 'disabled: see resque robot master'
+            #@status_process.exec(args)
           when 'monitor'
-            @status_monitor.exec(args)
+            puts 'disabled: see resque robot master'
+            #@status_monitor.exec(args)
         end
     end
   rescue Exception => e
@@ -114,7 +117,7 @@ class Menu
       end
       puts ""
       STDOUT.flush
-      system "printf '#{@workflow} (#{@environs}) > ' >&2"
+      system "printf '#{@workflow} (#{ENV['ROBOT_ENVIRONMENT']}) > ' >&2"
       args = STDIN.gets.strip.split(/\s+/)
     end
   end

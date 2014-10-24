@@ -9,11 +9,14 @@
 #
 # You run the script by:
 # - ssh into one of the robot VMs in test
-# - scp the attached script to that VM
-# - cd common-accessioning/current
-# - ./bin/console test
-# - load "#{ENV['HOME']}/register_objs.rb'
-# - WfMuxTester.test
+# - scp the attached script to that VM, into a ~/bin path
+# - bash$ cd common-accessioning/current/
+# - bash$ export SDR_HOST='sdr-host'
+# - bash$ export SDR_USER='sdr-user'
+# - bash$ kinit <user_with_access_to_sdr>
+# - bash$ bundle exec ./bin/console test
+# - pry> load "#{ENV['HOME']}/bin/register_objs.rb"
+# - pry> WfMuxTester.test
 
 
 class WfMuxObjSetup
@@ -36,6 +39,14 @@ class WfMuxObjSetup
     assembly_dr = DruidTools::Druid.new @druid, ASSEMBLY_DIR
     md_base = File.join(BAG_DIR, assembly_dr.id, 'data', 'metadata')
     cm_doc = Nokogiri::XML IO.read File.join(md_base, 'contentMetadata.xml')
+
+    # Verify the APO exists?
+    # begin
+    #   puts "Found APO: #{@apo}" if Dor::Item.find @apo
+    # rescue ActiveFedora::ObjectNotFoundError => onfe
+    #   puts "Missing APO #{@apo}"
+    #   raise onfe
+    # end
 
     # contentMetadata cleanup
     #   remove jp2 file nodes
@@ -150,4 +161,16 @@ class WfMuxTester
 
 end
 
+
+# Fallback code when nuke! fails:
+def dor_nuke_steps
+  bag_dir =  ENV['DOR_BAG_DIR'] || '/dor/test-content'
+  druids = Dir.entries(bag_dir).reject! {|d| d =~ /^\.\.?$/}.map! {|dr| "druid:#{dr}" }
+  druids.each {|d| Dor::CleanupService.cleanup_by_druid d rescue nil }
+  druids.each {|d| Dor::CleanupService.cleanup_stacks d rescue nil }
+  druids.each {|d| Dor::CleanupService.cleanup_purl_doc_cache d rescue nil }
+  druids.each {|d| Dor::CleanupService.remove_active_workflows d rescue nil };
+  druids.each {|d| Dor::CleanupService.delete_from_dor d rescue nil };
+  druids.each {|d| Dor::CleanupService.delete_from_dor d rescue nil };
+end
 
