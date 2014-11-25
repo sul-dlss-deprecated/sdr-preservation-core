@@ -5,7 +5,7 @@ set :application, 'sdr-preservation-core'
 
 # Default value for :scm is :git
 # set :scm, :git
-set :repo_url, 'git://github.com/sul-dlss/sdr-preservation-core.git'
+set :repo_url, 'https://github.com/sul-dlss/sdr-preservation-core.git'
 
 # Default branch is :master
 ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
