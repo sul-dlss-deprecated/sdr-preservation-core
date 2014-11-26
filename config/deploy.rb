@@ -1,17 +1,23 @@
 # config valid only for Capistrano 3.x
 lock '3.2.1'
 
-set :application, 'sdr-preservation-core'
-
-# Default value for :scm is :git
-# set :scm, :git
-set :repo_url, 'git://github.com/sul-dlss/sdr-preservation-core.git'
-
+set :log_level, :debug
 # set :ssh_options, {
+#                     verbose: :debug,
 #                     keys: [Capistrano::OneTimeKey.temporary_ssh_private_key_path],
 #                     forward_agent: true,
 #                     auth_methods: %w(publickey password)
 #                 }
+
+
+
+
+set :application, 'sdr-preservation-core'
+
+# Default value for :scm is :git
+# set :scm, :git
+set :repo_url, 'git@github.com:sul-dlss/sdr-preservation-core.git'
+#set :repo_url, 'https://github.com/sul-dlss/sdr-preservation-core.git'
 
 # Default branch is :master
 ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
