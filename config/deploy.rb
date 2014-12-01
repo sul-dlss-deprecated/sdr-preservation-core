@@ -1,23 +1,11 @@
 # config valid only for Capistrano 3.x
 lock '3.2.1'
 
-set :log_level, :debug
-# set :ssh_options, {
-#                     verbose: :debug,
-#                     keys: [Capistrano::OneTimeKey.temporary_ssh_private_key_path],
-#                     forward_agent: true,
-#                     auth_methods: %w(publickey password)
-#                 }
-
-
-
-
 set :application, 'sdr-preservation-core'
 
 # Default value for :scm is :git
 # set :scm, :git
 set :repo_url, 'git@github.com:sul-dlss/sdr-preservation-core.git'
-#set :repo_url, 'https://github.com/sul-dlss/sdr-preservation-core.git'
 
 # Default branch is :master
 ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
@@ -26,7 +14,7 @@ ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 # set :format, :pretty
 
 # Default value for :log_level is :debug
-set :log_level, :info
+#set :log_level, :info
 
 # Default value for :pty is false
 # set :pty, true
@@ -61,6 +49,6 @@ namespace :deploy do
   after :publishing, :restart
 end
 
-# capistrano next reads config/deploy/#{target}.rb, e.g.:
+# capistrano next reads config/deploy/#{environment}.rb, e.g.:
 # config/deploy/development.rb
 
