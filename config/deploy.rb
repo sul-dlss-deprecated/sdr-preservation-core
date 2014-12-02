@@ -1,11 +1,21 @@
 # config valid only for Capistrano 3.x
-lock '3.2.1'
+#lock '3.2.1'
 
 set :application, 'sdr-preservation-core'
 
 # Default value for :scm is :git
 # set :scm, :git
-set :repo_url, 'git@github.com:sul-dlss/sdr-preservation-core.git'
+
+# ssh access to github is restricted, using https instead (see config/deploy/github_repo.rb)
+#set :repo_url, 'git@github.com:sul-dlss/sdr-preservation-core.git'
+
+# Ensure config/deploy/github_repo.rb contains the following content, where
+# AuthUser:AuthToken is replaced with credentials for authorized access to the repository.
+# The personal access token should have at least the 'repo' scope.
+# https://help.github.com/articles/creating-an-access-token-for-command-line-use/
+# https://github.com/blog/1509-personal-api-tokens
+#set :repo_url, 'https://AuthUser:AuthToken@github.com/sul-dlss/sdr-preservation-core.git'
+require_relative 'deploy/github_repo'
 
 # Default branch is :master
 ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
@@ -49,6 +59,8 @@ namespace :deploy do
   after :publishing, :restart
 end
 
-# capistrano next reads config/deploy/#{environment}.rb, e.g.:
-# config/deploy/development.rb
+# capistrano next reads config/deploy/#{server}.rb, where #{server} is the first argument to cap; e.g.:
+# cap localhost deploy:check # invokes config/deploy/localhost.rb
+# cap test1 deploy:check # invokes config/deploy/test1.rb
+# cap test2 deploy:check # invokes config/deploy/test2.rb
 

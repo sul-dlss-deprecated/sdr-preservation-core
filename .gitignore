@@ -1,5 +1,6 @@
 ._*
 .bundle
+.capistrano
 .DS_Store
 .idea
 .rspec-local
@@ -10,10 +11,11 @@
 *~
 config/certs
 config/deploy/*
-!config/deploy/development.rb
+!config/deploy/localhost.rb
 !config/deploy/server_settings.rb
 config/environments/*
 !config/environments/development.rb
+!config/environments/robots_development.yml
 coverage
 coverage.data
 doc

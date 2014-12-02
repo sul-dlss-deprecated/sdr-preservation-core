@@ -6,42 +6,6 @@
 * Richard Anderson
 * Darren Weber
 
-== An overview of the workflow
-You can see the steps of the workflow in
-    config/workflows/sdrIngestWF/sdrIngestWF.xml
-
-You can see the dependencies and settings for each step in
-    config/workflows/sdrIngestWF/process-config.yaml
-
-== Admin Menu
-
-alias sdr2='cd ~/sdr-preservation-core/current/bin'
-alias ingest='sdr2 ; ./bundle-exec.sh menu.rb sdrIngestWF; cd $OLDPWD'
-alias ingest-log='log sdrIngestWF'
-function log() { cd ~/sdr-preservation-core/current/log/$1/current; }
-
-== Crontab
-
-# At top of every hour, check process state configuration and start new pipeline(s)
-# - if number of running pipelines < MAX,
-# - time of day is within the operational window, and
-# - STATE != STOP
-*/30 * * * *  /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/bundle-exec.sh status_process.rb sdrIngestWF start! cron'
-
-# Every 2 minutes, add more object ids from the workflow waiting list into the ingest pipeline directory queue
-# but only if a robot pipeline is running and the queue is empty
-*/2 * * * *  /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/bundle-exec.sh status_monitor.rb sdrIngestWF queue cron'
-
-# Every Sunday morning, generate and email a report containing a summary of the disk space used and number of objects in storage
-0 4 * * 0 /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/weekly-status.sh'
-
-# Every evening send object count and terabytes of storage to sulstats
-30 23 * * * /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/daily-status.sh'
-
-== Running tests
-    cd ~/sdr-preservation-core
-    bundle exec rspec
-
 == Project Directory Structure
     |
     ---config
@@ -59,4 +23,118 @@ function log() { cd ~/sdr-preservation-core/current/log/$1/current; }
       |
       ---lib : spec for library classes
       ---sdrIngest : specs for the workflow
+
+
+== An overview of the workflow
+You can see the steps of the workflow in
+    config/workflows/sdrIngestWF/sdrIngestWF.xml
+
+You can see the dependencies and settings for each step in
+    config/workflows/sdrIngestWF/workflowDefinition.xml
+
+
+== Running tests
+    cd ~/sdr-preservation-core/current
+    bundle exec rspec
+
+
+== Admin Menu
+
+    alias sdr2='cd ~/sdr-preservation-core/current/bin'
+    alias ingest='sdr2 ; ./bundle-exec.sh menu.rb sdrIngestWF; cd $OLDPWD'
+    alias ingest-log='log sdrIngestWF'
+    function log() { cd ~/sdr-preservation-core/current/log/$1/current; }
+
+
+== Crontab
+
+    # At top of every hour, check process state configuration and start new pipeline(s)
+    # - if number of running pipelines < MAX,
+    # - time of day is within the operational window, and
+    # - STATE != STOP
+    */30 * * * *  /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/bundle-exec.sh status_process.rb sdrIngestWF start! cron'
+
+    # Every 2 minutes, add more object ids from the workflow waiting list into the ingest pipeline directory queue
+    # but only if a robot pipeline is running and the queue is empty
+    */2 * * * *  /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/bundle-exec.sh status_monitor.rb sdrIngestWF queue cron'
+
+    # Every Sunday morning, generate and email a report containing a summary of the disk space used and number of objects in storage
+    0 4 * * 0 /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/weekly-status.sh'
+
+    # Every evening send object count and terabytes of storage to sulstats
+    30 23 * * * /bin/bash -l -c '/var/sdr2service/sdr-preservation-core/current/bin/daily-status.sh'
+
+
+
+== Deploying Robots to a new machine checklist
+
+* clone the code repository to your laptop, using the master branch, and install dependencies:
+    git clone git@github.com:sul-dlss/sdr-preservation-core.git
+    bundle install
+* create or update config/deploy/github_repo.rb
+** This is required when capistrano does a remote git operation with https authentication
+** ensure config/deploy/github_repo.rb contains the following content:
+** set :repo_url, 'https://AuthUser:AuthToken@github.com/sul-dlss/sdr-preservation-core.git'
+** AuthUser:AuthToken is replaced with credentials for authorized access to the 'repo' scope, see
+** https://help.github.com/articles/creating-an-access-token-for-command-line-use/
+* create or update config/deploy/<deploy_server>.rb to specify the server parameters, e.g.
+    cp config/deploy/localhost.rb config/deploy/staging1.rb
+    # modify the defaults, e.g.
+    #ENV['SDR_HOST'] ||= 'sdr-staging1'
+    #ENV['SDR_USER'] ||= 'sdr_user'
+    #ENV['ROBOT_ENVIRONMENT'] = 'staging'
+    # Note that the value of ROBOT_ENVIRONMENT entails the existence of two config files:
+    # config/environments/${ROBOT_ENVIRONMENT}.rb
+    # config/environments/robots_${ROBOT_ENVIRONMENT}.yml
+    cp config/deploy/staging1.rb config/deploy/staging2.rb
+    # modify ENV['SDR_HOST']; other settings are likely to be the same.
+** there is one config/deploy/<deploy_server>.rb file for every vm in the deployment system
+** capistrano can deploy to multiple servers simultaneously, but that's not desired for this app
+** the <deploy_server> file name can be any name, it doesn't have to be the same as a ROBOT_ENVIRONMENT
+* create or update config/environments/<ROBOT_ENVIRONMENT>.rb
+** see config/environments/development.rb
+* create or update config/environments/robots_<ROBOT_ENVIRONMENT>.yml
+** This defines robot names, queue lanes they are associated with, and the number of instances of the robot
+** See the extensive comments in the example file at config/environments/robots_development.yml
+* check and initialize the deployment directory structure on each <deploy_server>, e.g.
+    cap staging1 deploy:check
+    cap staging2 deploy:check
+    #cap -T # this should display all the available capistrano tasks (and subtasks)
+* deploy and restart the robots, e.g.
+    cap staging1 deploy
+    cap staging2 deploy
+    # to undo a deploy, use:
+    #cap <deploy_server> deploy:rollback
+
+
+== Restarting Robots
+
+*all of the robots on a server*
+    cap <deploy_server> deploy:restart # restarts all the robots
+
+*individual robots on individual servers*
+    ssh <deploy_server>
+    cd ~/sdr-preservation-core/current
+    export ROBOT_ENVIRONMENT=<environment>
+    bundle exec controller status  # shows the status of the robots
+    bundle exec controller restart # to restart all of them
+    bundle exec controller restart sdr_sdrIngestWF_register-sdr # to restart just this robot
+
+*safest way to restart*
+    ssh <deploy_server>
+    cd ~/sdr-preservation-core/current
+    export ROBOT_ENVIRONMENT=<environment>
+    bundle exec controller stop
+    bundle exec controller quit
+    bundle exec controller boot
+
+*kill a specific robot*
+    kill -QUIT $PID # graceful shutdown
+    kill -9 $PID # kill it now!
+    bundle exec controller status # the robot should be restarted
+
+*some things to note*
+* the robot machines need to be in the same zone as DOR services for firewall reasons
+* the robot machines need to access the /dor/export filesystem on DOR services
+* the robot machines need to access mount points configured for Moab::Config.storage_roots
 
