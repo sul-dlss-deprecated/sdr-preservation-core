@@ -26,10 +26,11 @@
 
 
 == An overview of the workflow
-You can see the steps of the workflow in
+
+* See the workflow steps in config/workflows, e.g.
     config/workflows/sdrIngestWF/sdrIngestWF.xml
 
-You can see the dependencies and settings for each step in
+* See the dependencies and settings for each step in
     config/workflows/sdrIngestWF/workflowDefinition.xml
 
 
@@ -72,11 +73,11 @@ You can see the dependencies and settings for each step in
     git clone git@github.com:sul-dlss/sdr-preservation-core.git
     bundle install
 * create or update config/deploy/github_repo.rb
-** This is required when capistrano does a remote git operation with https authentication
-** ensure config/deploy/github_repo.rb contains the following content:
-** set :repo_url, 'https://AuthUser:AuthToken@github.com/sul-dlss/sdr-preservation-core.git'
-** AuthUser:AuthToken is replaced with credentials for authorized access to the 'repo' scope, see
-** https://help.github.com/articles/creating-an-access-token-for-command-line-use/
+    # This is required when capistrano does a remote git operation with https authentication
+    # ensure config/deploy/github_repo.rb contains the following content:
+    set :repo_url, 'https://AuthUser:AuthToken@github.com/sul-dlss/sdr-preservation-core.git'
+    # AuthUser:AuthToken is replaced with credentials for authorized access to the 'repo' scope, see
+    # https://help.github.com/articles/creating-an-access-token-for-command-line-use/
 * create or update config/deploy/<deploy_server>.rb to specify the server parameters, e.g.
     cp config/deploy/localhost.rb config/deploy/staging1.rb
     # modify the defaults, e.g.
@@ -88,14 +89,14 @@ You can see the dependencies and settings for each step in
     # config/environments/robots_${ROBOT_ENVIRONMENT}.yml
     cp config/deploy/staging1.rb config/deploy/staging2.rb
     # modify ENV['SDR_HOST']; other settings are likely to be the same.
-** there is one config/deploy/<deploy_server>.rb file for every vm in the deployment system
-** capistrano can deploy to multiple servers simultaneously, but that's not desired for this app
-** the <deploy_server> file name can be any name, it doesn't have to be the same as a ROBOT_ENVIRONMENT
+  * there is one config/deploy/<deploy_server>.rb file for every vm in the deployment system
+  * capistrano can deploy to multiple servers simultaneously, but that's not desired for this app
+  * the <deploy_server> file name can be any name, it doesn't have to be the same as a ROBOT_ENVIRONMENT
 * create or update config/environments/<ROBOT_ENVIRONMENT>.rb
-** see config/environments/development.rb
+  * see config/environments/development.rb
 * create or update config/environments/robots_<ROBOT_ENVIRONMENT>.yml
-** This defines robot names, queue lanes they are associated with, and the number of instances of the robot
-** See the extensive comments in the example file at config/environments/robots_development.yml
+  * This defines robot names, queue lanes they are associated with, and the number of instances of the robot
+  * See the extensive comments in the example file at config/environments/robots_development.yml
 * check and initialize the deployment directory structure on each <deploy_server>, e.g.
     cap staging1 deploy:check
     cap staging2 deploy:check
@@ -109,10 +110,10 @@ You can see the dependencies and settings for each step in
 
 == Restarting Robots
 
-*all of the robots on a server*
+=== all of the robots on a server
     cap <deploy_server> deploy:restart # restarts all the robots
 
-*individual robots on individual servers*
+=== individual robots on individual servers
     ssh <deploy_server>
     cd ~/sdr-preservation-core/current
     export ROBOT_ENVIRONMENT=<environment>
@@ -120,7 +121,7 @@ You can see the dependencies and settings for each step in
     bundle exec controller restart # to restart all of them
     bundle exec controller restart sdr_sdrIngestWF_register-sdr # to restart just this robot
 
-*safest way to restart*
+=== safest way to restart
     ssh <deploy_server>
     cd ~/sdr-preservation-core/current
     export ROBOT_ENVIRONMENT=<environment>
@@ -128,12 +129,12 @@ You can see the dependencies and settings for each step in
     bundle exec controller quit
     bundle exec controller boot
 
-*kill a specific robot*
+=== kill a specific robot
     kill -QUIT $PID # graceful shutdown
     kill -9 $PID # kill it now!
     bundle exec controller status # the robot should be restarted
 
-*some things to note*
+=== some things to note
 * the robot machines need to be in the same zone as DOR services for firewall reasons
 * the robot machines need to access the /dor/export filesystem on DOR services
 * the robot machines need to access mount points configured for Moab::Config.storage_roots
