@@ -61,8 +61,8 @@ require 'moab_stanford'
 include Stanford
 require 'sdr_replication'
 
-# Load the environment file based on Environment.  Default to local
-environment = ENV['ROBOT_ENVIRONMENT'] || ENV["RAILS_ENV"] ||= 'development'
+# Load the environment file.
+environment = ENV['ROBOT_ENVIRONMENT'] || 'development'
 require File.join(ROBOT_ROOT,"config/environments/#{environment}")
 
 require 'sdr/sdr_robot'
@@ -77,10 +77,16 @@ module Dor
       # @option opts [String] :client_key_pass password for the key file
       def configure(url, opts={})
         params = {}
-        params[:ssl_client_cert] = OpenSSL::X509::Certificate.new(File.read(opts[:client_cert_file])) if opts[:client_cert_file]
-        params[:ssl_client_key]  = OpenSSL::PKey::RSA.new(File.read(opts[:client_key_file]), opts[:client_key_pass]) if opts[:client_key_file]
         params[:timeout] = 120
         params[:open_timeout] = 120
+        if opts[:client_cert_file]
+          cert_file = File.read(opts[:client_cert_file])
+          params[:ssl_client_cert] = OpenSSL::X509::Certificate.new(cert_file)
+        end
+        if opts[:client_key_file]
+          key_file = File.read(opts[:client_key_file])
+          params[:ssl_client_key]  = OpenSSL::PKey::RSA.new(key_file, opts[:client_key_pass])
+        end
         @@resource = RestClient::Resource.new(url, params)
       end
     end
