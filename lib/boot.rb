@@ -5,6 +5,7 @@ require 'confstruct'
 require 'nokogiri'
 require_relative 'libdir'
 ROBOT_ROOT = Pathname(__dir__).parent.to_s
+HOME = ENV['HOME']
 
 # The Dor::Config object is created in dor-services-gem/lib/dor/config.rb
 # and initialized with the data in dor-services-gem/config/config_defaults.yml
@@ -18,8 +19,8 @@ module Dor
        url 'https://workflow-server.stanford.edu/workflow'
      end
      ssl do
-       cert_file '/var/sdr2service/sdr-preservation-core/config/certs/ls-xxx.crt'
-       key_file '/var/sdr2service/sdr-preservation-core/config/certs/ls-xxx.key'
+       cert_file "$HOME/sdr-preservation-core/config/certs/ls-xxx.crt"
+       key_file "$HOME/sdr-preservation-core/config/keys/ls-xxx.key"
        key_pass 'yyy'
      end
    end

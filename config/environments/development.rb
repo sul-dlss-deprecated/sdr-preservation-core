@@ -18,7 +18,7 @@ end
 
 Sdr::Config.configure do
   ingest_transfer do
-    account "userid@dor-host.stanford.edu"
+    account "userid@dor-host"
     export_dir "/dor/export/"
   end
   logdir File.join(ROBOT_ROOT, 'log')
