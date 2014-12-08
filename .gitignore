@@ -1,5 +1,6 @@
 ._*
 .bundle
+.capistrano/*
 .DS_Store
 .idea
 .rspec-local
