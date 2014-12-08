@@ -85,6 +85,9 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
+    pry-doc (0.6.0)
+      pry (~> 0.9)
+      yard (~> 0.8)
     rack (1.5.2)
     rack-protection (1.5.3)
       rack
@@ -162,6 +165,7 @@ DEPENDENCIES
   moab-versioning (~> 1.4)
   nokogiri
   pry
+  pry-doc
   rake
   rest-client
   robot-controller (~> 1.0)

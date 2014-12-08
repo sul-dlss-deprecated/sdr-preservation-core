@@ -20,6 +20,7 @@ group :development do
 	gem 'awesome_print'
 	gem 'equivalent-xml'
 	gem 'fakeweb'
+        gem 'pry-doc'
 	gem 'rspec', '~> 2.14'
 	gem 'simplecov', '~> 0.7.1'
 	gem 'yard'
