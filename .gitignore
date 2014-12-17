@@ -1,4 +1,5 @@
 ._*
+.binstubs
 .bundle
 .capistrano/*
 .DS_Store
@@ -20,5 +21,6 @@ coverage
 coverage.data
 doc
 pkg
+vendor
 *.iml
 deploy-log-*
