@@ -25,7 +25,7 @@ environment = (
       'development'
   end
 )
-require File.join(ENV['HOME'],"sdr-services-app/current/config/environments/#{environment}")
+require File.join(ENV['HOME'], "sdr-preservation-core/current/config/environments/#{environment}")
 
 
 #pull the file from the commandline argument and read each line into the druids array
