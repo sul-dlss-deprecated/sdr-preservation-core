@@ -44,7 +44,7 @@ module SdrServices
       rsync_destination_home nil
   end
 end
-require File.join(ENV['HOME'], "sdr-services-app/current/config/environments/#{environment}")
+require File.join(ENV['HOME'], "sdr-preservation-core/current/config/environments/#{environment}")
 
 class PurgeObject
 
@@ -108,6 +108,5 @@ if __FILE__ == $0
       po.delete_object(druid) unless druid.empty?
     rescue
     end
-
   end
 end
