@@ -28,7 +28,7 @@ for f in $LOG_FILES; do
 		echo -e "\n\n********************************************************************************"
 		echo -e "$f\n"
 		grep $today $f | grep -v -E 'bundle/ruby|/usr/local/rvm|resque-signals' > /tmp/sdr_today_tmp.log
-		druid_count=$(cat /tmp/sdr_today_tmp.log | sed -e 's/.*\(druid:...........\).*/\1/' | uniq | wc -l)
+		druid_count=$(cat /tmp/sdr_today_tmp.log | sed -e 's/.*\(druid:...........\).*/\1/' | sort -u | wc -l)
 		echo "DRUID COUNT:  $druid_count "
 		echo "LOG TAIL:"
 		echo
