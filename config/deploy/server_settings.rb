@@ -43,7 +43,7 @@ namespace :deploy do
         [ CONFIG_ENV_FILE, CONFIG_ROBOT_FILE ].each do |local_path|
           if File.exist? local_path
             #`scp #{local_path} #{SERVER_CONFIG_ENV_PATH}`
-            config_file = File.join(shared_path, "config","environments", File.basename(local_path))
+            config_file = File.join(shared_path, 'config','environments', File.basename(local_path))
             info "Uploading local config file: #{local_path}"
             upload! StringIO.new(IO.read(local_path)), config_file
           else
@@ -54,5 +54,5 @@ namespace :deploy do
     end
   end
 end
-after "deploy:check:linked_dirs", "deploy:upload_configs"
+after 'deploy:check:linked_dirs', 'deploy:upload_configs'
 
