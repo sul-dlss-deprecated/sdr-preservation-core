@@ -15,21 +15,21 @@ FILENAMES
 
 today=$(date +%Y-%m-%d)
 
-for f in $LOG_FILES; do
-	if [ -s $f ]; then
+for f in ${LOG_FILES}; do
+	if [ -s ${f} ]; then
 		echo -e "\n\n********************************************************************************"
-		echo -e "ERRORS TODAY in $f\n"
-		grep -B1 -F 'ERROR' $f | grep $today
+		echo -e "ERRORS for $today in $f\n"
+		grep ${today} ${f} | grep -B1 -F 'ERROR'
 	else
 		echo -e "\n********************************************************************************"
 		echo -e "EMPTY: $f"
 	fi
 done
-for f in $LOG_FILES; do
-	if [ -s $f ]; then
+for f in ${LOG_FILES}; do
+	if [ -s ${f} ]; then
 		echo -e "\n\n********************************************************************************"
-		echo -e "WARNINGS TODAY in $f\n"
-		grep -F 'WARN' $f | grep -v 'resque-signals' | grep $today
+		echo -e "WARNINGS for $today in $f\n"
+		grep -F 'WARN' ${f} | grep -v 'resque-signals' | grep ${today}
 	fi
 done
 echo

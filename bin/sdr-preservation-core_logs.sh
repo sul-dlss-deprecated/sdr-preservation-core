@@ -23,23 +23,39 @@ FILENAMES
 
 today=$(date +%Y-%m-%d)
 
-for f in $LOG_FILES; do
-	if [ -s $f ]; then
-		echo -e "\n\n********************************************************************************"
-		echo -e "$f\n"
-		grep $today $f | grep -v -E 'bundle/ruby|/usr/local/rvm|resque-signals' > /tmp/sdr_today_tmp.log
-		druid_count=$(cat /tmp/sdr_today_tmp.log | sed -e 's/.*\(druid:...........\).*/\1/' | sort -u | wc -l)
-		echo "DRUID COUNT:  $druid_count "
-		echo "LOG TAIL:"
-		echo
-		tail -n$tailN /tmp/sdr_today_tmp.log
-	else
-		echo -e "\n********************************************************************************"
-		echo -e "EMPTY: $f"
-	fi
+tmp_file="/tmp/sdr_pc_tmp_$$.log"
+
+#regex_druid='[a-z]{2}[0-9]{3}[a-z]{2}[0-9]{4}'
+regex_druid='[[:lower:]]{2}[[:digit:]]{3}[[:lower:]]{2}[[:digit:]]{4}'
+
+for f in ${LOG_FILES}; do
+    if [ -s ${f} ]; then
+        echo -e "\n\n********************************************************************************"
+        echo -e "LOG for $today in $f\n"
+        grep ${today} ${f} | grep -v -E 'bundle/ruby|/usr/local/rvm|resque-signals' > ${tmp_file}
+        if [ -s ${tmp_file} ]; then
+            # Stats on DRUIDS
+            cat ${tmp_file} | sed -n -r -e "/$regex_druid/s/.*($regex_druid).*/\1/p" | sort -u > /tmp/sdr_pc_druids.log
+            druid_count=$(cat /tmp/sdr_pc_druids.log | wc -l)
+            echo
+            echo "DRUID count: $druid_count"
+            echo
+            echo "Log tail for $today:"
+            echo
+            tail -n${tailN} ${tmp_file}
+        else
+            echo
+            echo "No activity today; latest activity was:"
+            echo
+            tail -n${tailN} ${f}
+        fi
+    else
+        echo -e "\n********************************************************************************"
+        echo -e "EMPTY: $f"
+    fi
 done
 
-rm /tmp/sdr_today_tmp.log
+rm /tmp/sdr_pc*
 echo
 echo
 
