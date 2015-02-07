@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'confstruct'
+gem 'dotenv'
 gem 'json_pure'
 gem 'nokogiri'
 gem 'rake'
@@ -17,13 +18,13 @@ gem 'robot-controller', '~> 1.0'
 gem 'sdr-replication', '~> 0.5' #,:path => '/Users/rnanders/Code/Github/sdr-replication' #
 
 group :development do
-	gem 'awesome_print'
-	gem 'equivalent-xml'
-	gem 'fakeweb'
-        gem 'pry-doc'
-	gem 'rspec', '~> 2.14'
-	gem 'simplecov', '~> 0.7.1'
-	gem 'yard'
+  gem 'awesome_print'
+  gem 'equivalent-xml'
+  gem 'fakeweb'
+  gem 'pry-doc'
+  gem 'rspec', '~> 2.14'
+  gem 'simplecov', '~> 0.7.1'
+  gem 'yard'
 end
 
 # Do not place the capistrano-related gems in the default or development bundle group
