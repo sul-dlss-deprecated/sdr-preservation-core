@@ -35,7 +35,7 @@ for f in ${LOG_FILES}; do
         grep ${today} ${f} | grep -v -E 'bundle/ruby|/usr/local/rvm|resque-signals' > ${tmp_file}
         if [ -s ${tmp_file} ]; then
             # Stats on DRUIDS
-            cat ${tmp_file} | sed -n -r -e "/$regex_druid/s/.*($regex_druid).*/\1/p" | sort -u > /tmp/sdr_pc_druids.log
+            cat ${tmp_file} | sed -n -r -e "/${regex_druid}.*completed/s/.*($regex_druid).*/\1/p" | sort -u > /tmp/sdr_pc_druids.log
             druid_count=$(cat /tmp/sdr_pc_druids.log | wc -l)
             echo
             echo "DRUID count: $druid_count"
