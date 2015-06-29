@@ -13,7 +13,7 @@ gem 'dor-workflow-service', '~> 1.7'
 gem 'druid-tools'
 gem 'lyber-core',  '~> 3.2', '>= 3.2.2'
 gem 'moab-versioning', '~> 1.3' #, :path => '/Users/rnanders/Code/Github/moab-versioning' #
-gem 'robot-controller', '~> 1.0'
+gem 'robot-controller', '~> 2.0'
 gem 'sdr-replication', '~> 0.5' #,:path => '/Users/rnanders/Code/Github/sdr-replication' #
 
 group :development do

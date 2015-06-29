@@ -9,7 +9,7 @@ GEM
       systemu (~> 2.6)
     awesome_print (1.2.0)
     blue-daemons (1.1.11)
-    bluepill (0.0.69)
+    bluepill (0.0.68)
       activesupport (>= 3, < 5)
       blue-daemons (~> 1.1.11)
       i18n (~> 0.5)
@@ -103,8 +103,8 @@ GEM
     rest-client (1.6.8)
       mime-types (~> 1.16)
       rdoc (>= 2.4.2)
-    robot-controller (1.0.2)
-      bluepill (~> 0.0.67)
+    robot-controller (2.0.0)
+      bluepill (= 0.0.68)
       rake (~> 10.3.2)
       resque (~> 1.25.2)
     rspec (2.99.0)
@@ -164,7 +164,7 @@ DEPENDENCIES
   pry
   rake
   rest-client
-  robot-controller (~> 1.0)
+  robot-controller (~> 2.0)
   rspec (~> 2.14)
   sdr-replication (~> 0.5)
   simplecov (~> 0.7.1)

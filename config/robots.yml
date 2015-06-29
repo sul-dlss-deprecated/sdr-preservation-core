@@ -1,0 +1,8 @@
+- sdr_sdrIngestWF_complete-deposit
+- sdr_sdrIngestWF_create-replica
+- sdr_sdrIngestWF_ingest-cleanup
+- sdr_sdrIngestWF_register-sdr
+- sdr_sdrIngestWF_transfer-object
+- sdr_sdrIngestWF_update-catalog
+- sdr_sdrIngestWF_validate-bag
+- sdr_sdrIngestWF_verify-agreement
