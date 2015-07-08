@@ -1,5 +1,7 @@
 #
 # robots.yml - Provides the complete list of all robots in this suite
+#              used by the robot controller's verify command
+#              (see http://github.com/sul-dlss/robot-controller).
 #
 - sdr_sdrIngestWF_complete-deposit
 - sdr_sdrIngestWF_create-replica
