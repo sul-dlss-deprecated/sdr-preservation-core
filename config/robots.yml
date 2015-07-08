@@ -1,3 +1,6 @@
+#
+# robots.yml - Provides the complete list of all robots in this suite
+#
 - sdr_sdrIngestWF_complete-deposit
 - sdr_sdrIngestWF_create-replica
 - sdr_sdrIngestWF_ingest-cleanup
