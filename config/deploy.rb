@@ -42,6 +42,8 @@ set :linked_dirs, %w(log run config/environments config/certs)
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
+set :whenever_identifier, ->{ "#{fetch(:application)}_#{fetch(:stage)}" }
+
 namespace :deploy do
   # the sshkit's test method will return to this script even if the call to stop or quit fails
   # http://vladigleba.com/blog/2014/04/10/deploying-rails-apps-part-6-writing-capistrano-tasks/
