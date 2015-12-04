@@ -7,44 +7,13 @@
 # echo xg086nq7357 | ~/sdr-preservation-core/current/bin/bundle-exec.sh purge_object.rb
 # ~/sdr-preservation-core/current/bin/bundle-exec.sh purge_object.rb  myfile.txt
 
-# Figure out the deployment environment from the hostname
-environment = (
-case `hostname -s`.chomp
-  when "sdr-services"
-    'production'
-  when "sdr-services-test"
-    'test'
-  when "sul-sdr-services-dev"
-    'integration'
-  else
-    'unknown'
-end
-)
+# Load the deployment environment
+require_relative 'environment'
 
 # Make sure this cannot run on the production machine
-case environment
-  when 'development', 'test', 'integration'
-  else
-    puts "Not allowed to delete objects from #{environment} environment"
-    exit
+if ENV['ROBOT_ENVIRONMENT'] == 'production'
+  raise 'Not allowed to delete objects on a production environment'
 end
-
-require 'rubygems'
-require 'bundler/setup'
-require 'pathname'
-
-require 'moab_stanford'
-include Stanford
-module SdrServices
-  Config = Confstruct::Configuration.new do
-      username  nil
-      password nil
-      storage_filesystems nil
-      rsync_destination_host nil
-      rsync_destination_home nil
-  end
-end
-require File.join(ENV['HOME'], "sdr-preservation-core/current/config/environments/#{environment}")
 
 class PurgeObject
 
