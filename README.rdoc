@@ -28,10 +28,17 @@
 == An overview of the workflow
 
 * See the workflow steps in config/workflows, e.g.
-    config/workflows/sdrIngestWF/sdrIngestWF.xml
+    - config/workflows/sdrIngestWF/sdrIngestWF.xml
 
 * See the dependencies and settings for each step in
-    config/workflows/sdrIngestWF/workflowDefinition.xml
+    - config/workflows/sdrIngestWF/workflowDefinition.xml
+
+* Worflows must be updated in ARGO, e.g.
+    - https://argo-test.stanford.edu/catalog/druid:bb163sd6279
+    - https://argo-test.stanford.edu/view/druid:bb163sd6279/ds/workflowDefinition
+
+* Workflow updates require restarting the robot master
+    - https://github.com/sul-dlss/robot-master
 
 
 == Running tests
