@@ -82,7 +82,7 @@ describe TransferObject do
 
   specify "TransferObject#verify_dor_path" do
     vmpath = '/dor/export/jc837rq9922/data/metadata/versionMetadata.xml'
-    vmcmd = "if ssh userid@dor-host.stanford.edu test -e #{vmpath}; then echo exists; else echo notfound; fi"
+    vmcmd = "if ssh userid@dor-host test -e #{vmpath}; then echo exists; else echo notfound; fi"
     expect(Archive::OperatingSystem).to receive(:execute).with(vmcmd).and_return("exists")
     expect(@to.verify_dor_path(vmpath)).to eq(true)
     expect(Archive::OperatingSystem).to receive(:execute).with(vmcmd).and_return("not")
@@ -119,7 +119,7 @@ describe TransferObject do
 
   specify "TransferObject#tarpipe_command" do
     cmd = @to.tarpipe_command(@druid, "#{ROBOT_ROOT}/spec/fixtures/deposit")
-    expect(cmd).to eq( "ssh userid@dor-host.stanford.edu \"tar -C /dor/export/ --dereference -cf - jc837rq9922 \" | tar -C #{ROBOT_ROOT}/spec/fixtures/deposit -xf -")
+    expect(cmd).to eq( "ssh userid@dor-host \"tar -C /dor/export/ --dereference -cf - jc837rq9922 \" | tar -C #{ROBOT_ROOT}/spec/fixtures/deposit -xf -")
   end
 
 
