@@ -12,10 +12,10 @@ gem 'pry'
 # DLSS gems
 gem 'dor-workflow-service', '~> 1.7'
 gem 'druid-tools'
-gem 'lyber-core',  '~> 3.2', '>= 3.2.2'
-gem 'moab-versioning', '~> 1.4' #, :path => '/Users/rnanders/Code/Github/moab-versioning' #
+gem 'lyber-core', '~> 3.2', '>= 3.2.2'
+gem 'moab-versioning', '~> 1.4'
 gem 'robot-controller', '~> 2.0'
-gem 'sdr-replication', '~> 0.5' #,:path => '/Users/rnanders/Code/Github/sdr-replication' #
+gem 'sdr-replication', '~> 0.5'
 
 group :development do
   gem 'awesome_print'
@@ -37,3 +37,4 @@ group :deployment do
   gem 'capistrano-rvm', '~> 0.1'
   gem 'lyberteam-capistrano-devel', '~> 3.0'
 end
+
