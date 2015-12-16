@@ -10,9 +10,9 @@ gem 'sys-filesystem'
 gem 'pry'
 
 # DLSS gems
-gem 'dor-workflow-service', '~> 1.7'
+gem 'dor-workflow-service', '~> 1.8'
 gem 'druid-tools'
-gem 'lyber-core', '~> 3.2', '>= 3.2.2'
+gem 'lyber-core', '~> 3.3'
 gem 'moab-versioning', '~> 1.4'
 gem 'robot-controller', '~> 2.0'
 gem 'sdr-replication', '~> 0.5'
