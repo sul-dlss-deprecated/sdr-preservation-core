@@ -1,9 +1,7 @@
 #!/usr/bin/env ruby
 
 require_relative 'environment'
-require_relative 'druid_queue'
 require_relative 'status_activity'
-require_relative 'status_process'
 require_relative 'status_storage'
 require_relative 'status_workflow'
 require_relative 'status_monitor'
@@ -21,12 +19,9 @@ class Menu
 
   def initialize(workflow)
     @workflow = workflow
-    @druid_queue = DruidQueue.new(@workflow)
     @status_activity = StatusActivity.new(@workflow)
-    @status_process = StatusProcess.new(@workflow)
     @status_storage = StatusStorage.new
     @status_workflow = StatusWorkflow.new(@workflow)
-    @status_monitor =StatusMonitor.new(@workflow)
     @status_home = AppHome.join('log',@workflow,'current','status')
     @storage_report = @status_home.join("storage-filesystems.txt")
     @workflow_report = @status_home.join("workflow-summary.txt")
@@ -44,7 +39,6 @@ class Menu
       subdirs.each { |subdir| current.join(subdir).mkdir }
       status = current.join('status')
       FileUtils.touch status.join('ingest-history.txt').to_s
-      @status_process.set_config('RUN',1,6,22)
     end
   end
 
@@ -54,14 +48,11 @@ class Menu
       @menu << 'menu                                = Display this menu'
       @menu << 'storage                             = Report storage filesystem status'
       @menu << 'workflow {detail|summary|waiting}   = Report workflow database status'
-      @menu << 'queue    {add item(s)|size|head n}  = Add to queue or report queue status '
-      @menu << 'process  {config|start|stop|list}   = Configure, run, or report status of robot pipelines'
-      @menu << 'list     {comp..|err..|realtime}[n] = Report current or recent robot activity '
+      @menu << 'list     {comp..|err..}[n] = Report current or recent robot activity '
       @menu << 'set      {druid|version|group} {id} = Set the object/version/filegroup focus and/or list the object versions'
       @menu << 'view     {druid|version|group} {id} = Set the object/version/filegroup focus and list the child folders/files'
       @menu << 'view     {log|pipeline|urls|dor}    = view object\'s logfile, recent pipeline history, URLs, or DOR files'
       @menu << 'view     file/tree {name|path}      = view specified file or directory structure'
-      @menu << 'monitor  {report [n]|queue}         = Report overall status or queue new workflow db items'
       @menu << 'quit                                = Exit'
     end
     title = "Menu for #{@workflow}:"
@@ -84,15 +75,6 @@ class Menu
             @status_storage.exec(args)
           when 'workflow'
             @status_workflow.exec(args)
-          when 'queue'
-            puts 'disabled: see resque robot master'
-            #@druid_queue.exec(args)
-          when 'process'
-            puts 'disabled: see resque robot master'
-            #@status_process.exec(args)
-          when 'monitor'
-            puts 'disabled: see resque robot master'
-            #@status_monitor.exec(args)
         end
     end
   rescue Exception => e

@@ -1,8 +1,6 @@
 #!/usr/bin/env ruby
 
 require_relative 'environment'
-require_relative 'status_process'
-require_relative 'druid_queue'
 require 'pathname'
 require 'time'
 require 'timeout'
@@ -30,7 +28,6 @@ class StatusActivity < Status
     list options:
       completed  [n] = report recent ingest details (default is 10)
       errors     [n] = report error details
-      realtime   [n] = report activity, looping every n seconds (default is 10)
       pipeline   [n] = report recent pipeline starts and stops
 
     set options:
@@ -58,40 +55,10 @@ class StatusActivity < Status
     @history_file = @current_dir.join("status/ingest-history.txt")
     @latest_ingest = @current_dir.join("status/latest-item.txt")
     @process_log = @current_dir.join("status/process.log")
-    @druid_queue = DruidQueue.new(@workflow)
-    @status_process = StatusProcess.new(@workflow)
   end
 
   def date_label(time)
     time.strftime('%Y/%m/%d')
-  end
-
-  def real_time_summary
-    summary = ActivityStatus.new
-    summary.queue = @druid_queue.queue_size
-    summary.active = @current_dir.join('active').children.size
-    summary.completed = @current_dir.join('completed').children.size
-    summary.error = @current_dir.join('error').children.size
-    summary
-  end
-  
-  def real_time_statistics
-    summary = real_time_summary
-    detail = ActivityStatus.new
-    detail.active = latest_druids('active')
-    n = [1,detail.active.size].max
-    detail.queue = @druid_queue.top_id(n)
-    detail.completed = latest_druids('completed',n)
-    detail.error = latest_druids('error',n)
-    [summary,detail,n]
-  end
-
-  def latest_druids(status,n=nil)
-    status_dir = @current_dir.join(status)
-    return [] unless status_dir.exist?
-    druids = status_dir.children.sort{|a,b| a.mtime <=> b.mtime }.collect{|f| f.basename.to_s}
-    return druids unless n
-    druids.last(n)
   end
 
   def error_history()
@@ -139,21 +106,6 @@ class StatusActivity < Status
     )
     s
   end
-  
-  def report_realtime_activity(summary,detail,n)
-    body = Array.new
-    body << summary.values
-    n.times do |i|
-      body << ActivityStatus.members.map{|m| detail[m.to_s][i] || "" }
-    end
-    s = report_table(
-        "#{@workflow} Current Queue & Activity",
-        ActivityStatus.members,
-        body,
-        [11, 11, 11, 11]
-    )
-    s
-  end
 
   def exec_history(subcmd, args)
     case subcmd
@@ -166,29 +118,6 @@ class StatusActivity < Status
       when /^ERR/
         errors = error_history
         puts report_context + report_error_history(errors, n=(args.shift || 10).to_i)
-      when 'REALTIME'
-        seconds = (args.shift || 10).to_i
-        oldrpt = nil
-        while true
-          rts = real_time_summary
-          rpt = report_realtime_activity(rts,nil,0)
-          if rpt != oldrpt
-            # overwrite previous output by moving curser up 7 rows
-            print "\e[7A" unless oldrpt.nil?
-            puts rpt
-            STDOUT.flush
-            oldrpt = rpt
-          end
-          begin
-            timeout(seconds) do
-              # exit method if user hits enter key
-              gets
-              return
-            end
-          rescue Timeout::Error
-            # loop again if specified number of seconds have elapsed
-          end
-        end
       when /^PIPE/
         system("cat #{@process_log} | grep -v queued | tail #{(args.shift || 10).to_i}")
     end
