@@ -34,7 +34,7 @@ module Robots
           result = recovery_object.verify_object_storage
           if result.verified == false
             LyberCore::Log.info result.to_json(verbose=false)
-            raise ItemError.new("Failed verification", e)
+            raise ItemError.new("Failed verification")
           end
           true
         end

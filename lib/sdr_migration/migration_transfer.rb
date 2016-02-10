@@ -79,7 +79,7 @@ module Robots
           Replication::OperatingSystem.execute(rsync_command)
           LyberCore::Log.debug("#{source_pathname} transferred to #{target_pathname}")
         rescue Exception => e
-          raise ItemError.new("Error transferring object", e)
+          raise ItemError.new("Error transferring object")
         end
 
         # @param druid [String] The object identifier

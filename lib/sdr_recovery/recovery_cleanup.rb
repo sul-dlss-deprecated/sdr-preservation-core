@@ -46,7 +46,7 @@ module Robots
             GC.start
             retry
           else
-            raise ItemError.new("Failed rmtree #{recovery_path} (3 attempts)", e)
+            raise ItemError.new("Failed rmtree #{recovery_path} (3 attempts)")
           end
         end
 

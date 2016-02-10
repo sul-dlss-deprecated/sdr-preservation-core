@@ -1,6 +1,5 @@
 require_relative '../libdir'
 require 'boot'
-require 'sdr/chained_error'
 require 'sdr/item_error'
 require 'sdr/fatal_error'
 
@@ -26,22 +25,28 @@ module Robots
       # @param druid [String] The object being processed
       # @return [Boolean] process the object, then set success or error status
       def process_item(druid)
-        begin
-          elapsed = Benchmark.realtime do
-            self.perform druid # implemented in the robot subclass
-          end
-          update_workflow_status 'sdr', druid, self.class.workflow_name, self.class.step_name, 'completed', elapsed
-          LyberCore::Log.info "Completed #{druid} in #{elapsed} seconds"
-          return 'completed'
-        rescue FatalError => e
-          LyberCore::Log.fatal druid + " - " + e.message + "\n" + e.backtrace.join("\n")
-          update_workflow_error_status 'sdr', druid, self.class.workflow_name, self.class.step_name, e.message
-          return 'fatal'
-        rescue Exception => e
-          LyberCore::Log.error druid + " - " + e.message + "\n" + e.backtrace.join("\n")
-          update_workflow_error_status 'sdr', druid, self.class.workflow_name, self.class.step_name, e.message
-          return 'error'
+        elapsed = Benchmark.realtime do
+          perform druid # implemented in the robot subclass
         end
+        update_workflow_status 'sdr', druid, self.class.workflow_name, self.class.step_name, 'completed', elapsed
+        LyberCore::Log.info "Completed #{druid} in #{elapsed} seconds"
+        return 'completed'
+      rescue Exception => e
+        message = if e.cause
+                    "#{e.message}; caused by #{e.cause.inspect}"
+                  else
+                    e.message
+                  end
+
+        backtrace = if e.cause
+                      e.cause.backtrace
+                    else
+                      e.backtrace
+                    end
+
+        LyberCore::Log.error "#{druid} #{message} #{backtrace.join("\n")}"
+        update_workflow_error_status 'sdr', druid, self.class.workflow_name, self.class.step_name, message
+        e.is_a?(FatalError) ? 'fatal' : 'error'
       end
 
       # @param opts [Hash] options (:tries and :interval)
@@ -56,7 +61,7 @@ module Robots
           sleep interval
           retry
         else
-          raise FatalError.new("Failed to transmit request", e)
+          raise FatalError.new("Failed to transmit request")
         end
       end
 
