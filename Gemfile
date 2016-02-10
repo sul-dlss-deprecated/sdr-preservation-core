@@ -26,7 +26,7 @@ end
 group :test do
   gem 'equivalent-xml'
   gem 'fakeweb'
-  gem 'rspec', '~> 2.14'
+  gem 'rspec', '~> 3.0'
   gem 'simplecov', require: false
   gem 'coveralls', require: false
   gem 'yard'
