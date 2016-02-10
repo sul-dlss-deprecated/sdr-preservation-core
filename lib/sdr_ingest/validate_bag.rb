@@ -35,7 +35,7 @@ module Robots
           bag.verify_bag
           true
         rescue Exception => e
-          raise ItemError.new("Bag validation failure", e)
+          raise ItemError.new("Bag validation failure")
         end
 
         # @param [Archive::BagitBag] bag the BagIt bag whose versionMetadata is to be verified
