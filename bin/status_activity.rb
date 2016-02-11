@@ -205,7 +205,7 @@ class StatusActivity < Status
         druid = args.shift.to_s.downcase
         if druid != ''
           druid = "druid:#{druid}" unless druid.start_with?('druid')
-          @storage_object = StorageServices.find_storage_object(druid, include_deposit=true)
+          @storage_object = Moab::StorageServices.find_storage_object(druid, include_deposit=true)
           @storage_version = @storage_object.current_version
           @filegroup = @storage_version.file_category_pathname('metadata')
           @storage_deposit = @storage_object.deposit_bag_pathname

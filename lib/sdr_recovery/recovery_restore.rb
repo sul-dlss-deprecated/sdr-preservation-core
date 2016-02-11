@@ -30,7 +30,7 @@ module Robots
         # @return [void] transfer recovered object files to repository storage.
         def recovery_restore(druid)
           LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter recovery_restore")
-          storage_object = StorageServices.storage_object(druid, create=true)
+          storage_object = Moab::StorageServices.storage_object(druid, create=true)
           recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(druid.sub('druid:', ''))
           storage_object.restore_object(recovery_path)
           result = storage_object.verify_object_storage
@@ -57,7 +57,7 @@ module Robots
 
         def verification_files(druid)
           files = []
-          files << StorageServices.object_path(druid).to_s
+          files << Moab::StorageServices.object_path(druid).to_s
           files
         end
 

@@ -64,7 +64,7 @@ module Robots
 
         def verification_files(druid)
           files = []
-          files << StorageServices.object_path(druid).to_s
+          files << Moab::StorageServices.object_path(druid).to_s
           files
         end
 

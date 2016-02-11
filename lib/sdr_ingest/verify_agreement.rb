@@ -115,7 +115,7 @@ module Robots
           if @@valid_apo_ids.include?(apo_druid)
             true
           else
-            apo_object = StorageServices.find_storage_object(apo_druid)
+            apo_object = Moab::StorageServices.find_storage_object(apo_druid)
             if apo_object.object_pathname.directory?
               @@valid_apo_ids << apo_druid
               true
