@@ -22,7 +22,7 @@ module Robots
         #   See LyberCore::Robot#work
         def perform(druid)
           LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter perform")
-          storage_object = StorageServices.find_storage_object(druid, include_deposit=true)
+          storage_object = Moab::StorageServices.find_storage_object(druid, include_deposit=true)
           storage_object.object_pathname.mkpath
           complete_deposit(druid, storage_object)
         end
@@ -51,7 +51,7 @@ module Robots
 
         def verification_files(druid)
           files = []
-          files << StorageServices.object_path(druid).to_s
+          files << Moab::StorageServices.object_path(druid).to_s
           files
         end
 

@@ -53,7 +53,7 @@ class PurgeObject
   # @return [Moab::StorageObject] The storage object representing the digital object's storage
   def find_storage_object(druid)
     druid = "druid:#{druid}" unless druid.start_with?('druid')
-    StorageServices.find_storage_object(druid)
+    Moab::StorageServices.find_storage_object(druid)
   end
 
   # Find the digital object version's storage sub-location (not used at present)
