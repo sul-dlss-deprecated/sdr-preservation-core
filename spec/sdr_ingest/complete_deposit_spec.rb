@@ -34,7 +34,7 @@ describe CompleteDeposit do
     new_version = double(StorageObjectVersion)
     expect(storage_object).to receive(:ingest_bag).and_return(new_version)
     result = double(VerificationResult)
-    result.stub(:verified).and_return(true)
+    allow(result).to receive(:verified).and_return(true)
     expect(new_version).to receive(:verify_version_storage).and_return(result)
     @cd.complete_deposit(@druid,storage_object)
   end

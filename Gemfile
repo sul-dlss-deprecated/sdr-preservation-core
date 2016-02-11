@@ -22,7 +22,7 @@ group :development do
   gem 'equivalent-xml'
   gem 'fakeweb'
   gem 'pry-doc'
-  gem 'rspec', '~> 2.14'
+  gem 'rspec',  '~> 3.0'
   gem 'simplecov', '~> 0.7.1'
   gem 'yard'
 end
