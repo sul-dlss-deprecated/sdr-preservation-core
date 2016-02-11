@@ -22,9 +22,9 @@ describe MigrationComplete do
   end
 
   specify "MigrationComplete#perform" do
-    mock_so = double(StorageObject)
+    mock_so = double(Moab::StorageObject)
     mock_path = double(Pathname)
-    expect(StorageServices).to receive(:find_storage_object).with(@druid,true).and_return(mock_so)
+    expect(Moab::StorageServices).to receive(:find_storage_object).with(@druid,true).and_return(mock_so)
     expect(mock_so).to receive(:object_pathname).and_return(mock_path)
     expect(mock_path).to receive(:mkpath)
     expect(@rs).to receive(:complete_deposit).with(@druid,mock_so)

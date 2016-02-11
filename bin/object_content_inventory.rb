@@ -39,7 +39,7 @@ druidlist.each_line {|line|
 
 druids.each do |druid|
   druid = "druid:#{druid}" unless druid.start_with?('druid')
-  content_group = StorageServices.retrieve_file_group('content',druid)
+  content_group = Moab::StorageServices.retrieve_file_group('content',druid)
   content_group.path_hash.each do |file,signature|
     puts "#{druid}, #{file.to_s}, #{signature.md5}, #{signature.size}"
   end
