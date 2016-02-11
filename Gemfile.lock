@@ -43,6 +43,11 @@ GEM
     diff-lcs (1.2.5)
     domain_name (0.5.25)
       unf (>= 0.0.5, < 1.0.0)
+    dlss-capistrano (3.2.0)
+      capistrano (~> 3.0)
+      capistrano-bundle_audit (>= 0.0.3)
+      capistrano-one_time_key
+      capistrano-releaseboard
     dor-workflow-service (1.8.0)
       activesupport (>= 3.2.1, < 5)
       confstruct (>= 0.2.7, < 2)
@@ -67,11 +72,6 @@ GEM
     json_pure (1.8.3)
     lyber-core (3.3.0)
       dor-workflow-service (~> 1.7)
-    lyberteam-capistrano-devel (3.2.0)
-      capistrano (~> 3.0)
-      capistrano-bundle_audit (>= 0.0.3)
-      capistrano-one_time_key
-      capistrano-releaseboard
     method_source (0.8.2)
     mime-types (2.99)
     mini_portile2 (2.0.0)
@@ -176,6 +176,7 @@ DEPENDENCIES
   capistrano-bundler (~> 1.1)
   capistrano-rvm (~> 0.1)
   confstruct
+  dlss-capistrano (~> 3.0)
   dor-workflow-service (~> 1.8)
   dotenv
   druid-tools
@@ -183,7 +184,6 @@ DEPENDENCIES
   fakeweb
   json_pure
   lyber-core (~> 3.3)
-  lyberteam-capistrano-devel (~> 3.0)
   moab-versioning (~> 1.4)
   nokogiri
   pry
@@ -198,4 +198,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   1.10.6
+   1.11.2
