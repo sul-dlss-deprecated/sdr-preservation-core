@@ -1,16 +1,3 @@
-# THIS IS OBSOLETE WHEN RUNNING ON THE RESQUE ROBOT SYSTEM
-# At top of every hour, check process state configuration and start new pipeline(s)
-# - if number of running pipelines < MAX,
-# - time of day is within the operational window, and
-# - STATE != STOP
-#*/30 * * * *  /bin/bash -l -c "${HOME}/sdr2/current/bin/bundle-exec.sh status_process.rb sdrIngestWF start! cron"
-
-# THIS IS OBSOLETE WHEN RUNNING ON THE RESQUE ROBOT SYSTEM
-# Every 2 minutes, add more object ids from the workflow waiting list into the
-# ingest pipeline directory queue but only if a robot pipeline is running and
-# the queue is empty.
-#*/2 * * * *  /bin/bash -l -c "${HOME}/sdr2/current/bin/bundle-exec.sh status_monitor.rb sdrIngestWF queue cron"
-
 # Every Sunday morning, generate and email a report containing a summary of the
 # disk space used and number of objects in storage.
 0 4 * * 0 /bin/bash -l -c "${HOME}/sdr-preservation-core/current/bin/weekly-status.sh"
