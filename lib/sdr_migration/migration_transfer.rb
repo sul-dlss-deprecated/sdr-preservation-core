@@ -104,7 +104,7 @@ module Robots
 
         def get_version_inventory(druid, deposit_bag_pathname)
           # Create new version inventory for version 1.
-          version_inventory = FileInventory.new(:type => "version", :digital_object_id => druid, :version_id => 1)
+          version_inventory = Moab::FileInventory.new(:type => "version", :digital_object_id => druid, :version_id => 1)
           content_group = get_data_group(deposit_bag_pathname, 'content')
           version_inventory.groups << content_group
           upgrade_content_metadata(deposit_bag_pathname, content_group)
@@ -133,7 +133,7 @@ module Robots
         end
 
         def get_version_additions(druid, version_inventory)
-          signature_catalog = SignatureCatalog.new(:digital_object_id => druid)
+          signature_catalog = Moab::SignatureCatalog.new(:digital_object_id => druid)
           version_additions = signature_catalog.version_additions(version_inventory)
           version_additions
         end

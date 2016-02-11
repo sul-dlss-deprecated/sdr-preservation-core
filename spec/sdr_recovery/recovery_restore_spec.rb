@@ -29,9 +29,9 @@ describe RecoveryRestore do
   specify "RecoveryComplete#recovery_restore" do
     storage_object = double(Moab::StorageObject)
     recovery_path = Pathname(Sdr::Config.sdr_recovery_home).join(@druid.sub('druid:',''))
-    expect(StorageServices).to receive(:storage_object).with(@druid,true).and_return(storage_object)
+    expect(Moab::StorageServices).to receive(:storage_object).with(@druid,true).and_return(storage_object)
     expect(storage_object).to receive(:restore_object).with(recovery_path)
-    verification_result = double(VerificationResult)
+    verification_result = double(Moab::VerificationResult)
     allow(verification_result).to receive(:verified).and_return(true)
     expect(storage_object).to receive(:verify_object_storage).and_return(verification_result)
     @rr.recovery_restore(@druid)
