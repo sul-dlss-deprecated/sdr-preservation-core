@@ -56,8 +56,7 @@ end
 require 'druid-tools'
 require 'lyber_core/robot'
 require 'lyber_core/log'
-require 'moab_stanford'
-include Stanford
+require 'moab/stanford'
 require 'sdr_replication'
 
 # Load the environment file.  The environment config file should

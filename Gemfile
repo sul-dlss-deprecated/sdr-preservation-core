@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
 gem 'confstruct'
-gem 'json_pure'
 gem 'nokogiri'
 gem 'rake'
 gem 'rest-client'
@@ -15,9 +14,9 @@ gem 'pry-doc'
 gem 'dor-workflow-service', '~> 1.8'
 gem 'druid-tools'
 gem 'lyber-core', '~> 3.3'
-gem 'moab-versioning', '~> 1.3' #, :path => '/Users/rnanders/Code/Github/moab-versioning' #
+gem 'moab-versioning', '~> 2.0'
 gem 'robot-controller', '~> 2.0'
-gem 'sdr-replication', '~> 0.5' #,:path => '/Users/rnanders/Code/Github/sdr-replication' #
+gem 'sdr-replication', '~> 1.0'
 
 group :development do
   gem 'awesome_print'
