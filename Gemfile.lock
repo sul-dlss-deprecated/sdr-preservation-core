@@ -76,7 +76,7 @@ GEM
     mime-types (2.99)
     mini_portile2 (2.0.0)
     minitest (5.8.3)
-    moab-versioning (1.4.4)
+    moab-versioning (2.0.0)
       confstruct
       json
       nokogiri
@@ -137,10 +137,9 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.4.0)
     rspec-support (3.4.1)
-    sdr-replication (0.6.0)
+    sdr-replication (1.0.0)
       archive-utils (~> 0.0)
-      json_pure (~> 1.8)
-      moab-versioning (~> 1.3)
+      moab-versioning (~> 2.0)
       rest-client (~> 1.6)
     simplecov (0.7.1)
       multi_json (~> 1.0)
@@ -189,7 +188,7 @@ DEPENDENCIES
   fakeweb
   json_pure
   lyber-core (~> 3.3)
-  moab-versioning (~> 1.4)
+  moab-versioning (~> 2.0)
   nokogiri
   pry
   pry-doc
@@ -197,7 +196,7 @@ DEPENDENCIES
   rest-client
   robot-controller (~> 2.0)
   rspec (~> 3.0)
-  sdr-replication (~> 0.5)
+  sdr-replication (~> 1.0)
   simplecov (~> 0.7.1)
   sys-filesystem
   yard
