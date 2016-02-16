@@ -13,9 +13,9 @@ gem 'pry'
 gem 'dor-workflow-service', '~> 1.8'
 gem 'druid-tools'
 gem 'lyber-core', '~> 3.3'
-gem 'moab-versioning', '~> 1.4'
+gem 'moab-versioning', '~> 2.0'
 gem 'robot-controller', '~> 2.0'
-gem 'sdr-replication', '~> 0.5'
+gem 'sdr-replication', '~> 1.0'
 
 group :development do
   gem 'awesome_print'
