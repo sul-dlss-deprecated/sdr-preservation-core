@@ -1,12 +1,14 @@
-= SDR Ingest Workflow Robots
+# SDR Ingest Workflow Robots
 
-== Authors
+[![Build Status](https://travis-ci.org/sul-dlss/sdr-preservation-core.png?branch=master)](https://travis-ci.org/sul-dlss/sdr-preservation-core) | [![Coverage Status](https://coveralls.io/repos/sul-dlss/sdr-preservation-core/badge.png?branch=master)](https://coveralls.io/r/sul-dlss/sdr-preservation-core) | [![Dependency Status](https://gemnasium.com/sul-dlss/sdr-preservation-core.svg)](https://gemnasium.com/sul-dlss/sdr-preservation-core) 
+
+## Authors
 * Alpana Pande
 * Bess Sadler
 * Richard Anderson
 * Darren Weber
 
-== Project Directory Structure
+## Project Directory Structure
     |
     ---config
     |  |
@@ -25,7 +27,7 @@
       ---sdrIngest : specs for the workflow
 
 
-== An overview of the workflow
+## An overview of the workflow
 
 * See the workflow steps in config/workflows, e.g.
     - config/workflows/sdrIngestWF/sdrIngestWF.xml
@@ -41,12 +43,12 @@
     - https://github.com/sul-dlss/robot-master
 
 
-== Running tests
+## Running tests
     cd ~/sdr-preservation-core/current
     bundle exec rspec
 
 
-== Admin Menu
+## Admin Menu
 
     alias sdr2='cd ~/sdr-preservation-core/current/bin'
     alias ingest='sdr2 ; ./bundle-exec.sh menu.rb sdrIngestWF; cd $OLDPWD'
@@ -54,11 +56,11 @@
     function log() { cd ~/sdr-preservation-core/current/log/$1/current; }
 
 
-== Crontab
+## Crontab
 
 See bin/cron_jobs.txt
 
-== Deploying Robots to a new machine checklist
+## Deploying Robots to a new machine checklist
 
 * clone the code repository to your laptop, using the master branch, and install dependencies:
     git clone git@github.com:sul-dlss/sdr-preservation-core.git
@@ -99,12 +101,12 @@ See bin/cron_jobs.txt
     #cap <deploy_server> deploy:rollback
 
 
-== Restarting Robots
+## Restarting Robots
 
-=== all of the robots on a server
+### all of the robots on a server
     cap <deploy_server> deploy:restart # restarts all the robots
 
-=== individual robots on individual servers
+### individual robots on individual servers
     ssh <deploy_server>
     cd ~/sdr-preservation-core/current
     export ROBOT_ENVIRONMENT=<environment>
@@ -112,7 +114,7 @@ See bin/cron_jobs.txt
     bundle exec controller restart # to restart all of them
     bundle exec controller restart sdr_sdrIngestWF_register-sdr # to restart just this robot
 
-=== safest way to restart
+### safest way to restart
     ssh <deploy_server>
     cd ~/sdr-preservation-core/current
     export ROBOT_ENVIRONMENT=<environment>
@@ -120,12 +122,12 @@ See bin/cron_jobs.txt
     bundle exec controller quit
     bundle exec controller boot
 
-=== kill a specific robot
+### kill a specific robot
     kill -QUIT $PID # graceful shutdown
     kill -9 $PID # kill it now!
     bundle exec controller status # the robot should be restarted
 
-=== some things to note
+### some things to note
 * the robot machines need to be in the same zone as DOR services for firewall reasons
 * the robot machines need to access the /dor/export filesystem on DOR services
 * the robot machines need to access mount points configured for Moab::Config.storage_roots
