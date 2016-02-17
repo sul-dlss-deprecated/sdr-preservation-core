@@ -6,7 +6,6 @@ gem 'nokogiri'
 gem 'rake'
 gem 'rest-client'
 gem 'sys-filesystem'
-gem 'pry'
 
 # DLSS gems
 gem 'dor-workflow-service', '~> 1.8'
@@ -18,12 +17,16 @@ gem 'sdr-replication', '~> 1.0'
 
 group :development do
   gem 'awesome_print'
+  gem 'pry'
+  gem 'pry-doc'
+end
+
+group :test do
   gem 'equivalent-xml'
   gem 'fakeweb'
-  gem 'pry-doc'
-  gem 'rspec',  '~> 3.0'
-  gem 'simplecov'
-  gem 'coveralls'
+  gem 'rspec', '~> 3.0'
+  gem 'simplecov', require: false
+  gem 'coveralls', require: false
   gem 'yard'
 end
 
