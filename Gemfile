@@ -22,7 +22,8 @@ group :development do
   gem 'fakeweb'
   gem 'pry-doc'
   gem 'rspec',  '~> 3.0'
-  gem 'simplecov', '~> 0.7.1'
+  gem 'simplecov'
+  gem 'coveralls'
   gem 'yard'
 end
 
