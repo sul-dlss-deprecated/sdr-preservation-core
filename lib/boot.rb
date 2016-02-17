@@ -64,8 +64,7 @@ Dor::WorkflowService.configure Dor::Config.workflow.url, wfs_options
 require 'druid-tools'
 require 'lyber_core/robot'
 require 'lyber_core/log'
-require 'moab_stanford'
-include Stanford
+require 'moab/stanford'
 require 'sdr_replication'
 
 # Load the environment file.

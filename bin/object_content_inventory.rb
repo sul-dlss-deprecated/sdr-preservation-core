@@ -2,7 +2,7 @@
 
 require 'rubygems'
 require 'bundler/setup'
-require 'moab_stanford'
+require 'moab/stanford'
 include Stanford
 
 module SdrServices

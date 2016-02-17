@@ -5,8 +5,14 @@ require 'equivalent-xml'
 require 'fakeweb'
 require 'pry'
 require 'rspec'
+
 require 'simplecov'
-SimpleCov.start
+require 'coveralls' if ENV['CI']
+
+SimpleCov.formatter = Coveralls::SimpleCov::Formatter if ENV['CI']
+SimpleCov.start do
+  add_filter '/spec/'
+end
 
 require 'sdr'
 include Sdr
