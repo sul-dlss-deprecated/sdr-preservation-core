@@ -7,8 +7,7 @@ GEM
       minitest (~> 5.1)
       thread_safe (~> 0.3, >= 0.3.4)
       tzinfo (~> 1.1)
-    archive-utils (0.0.1)
-      json_pure (~> 1.8)
+    archive-utils (0.1.0)
       systemu (~> 2.6)
     awesome_print (1.2.0)
     blue-daemons (1.1.11)
@@ -69,7 +68,6 @@ GEM
       domain_name (~> 0.5)
     i18n (0.7.0)
     json (1.8.3)
-    json_pure (1.8.3)
     lyber-core (3.3.0)
       dor-workflow-service (~> 1.7)
     method_source (0.8.2)
@@ -186,7 +184,6 @@ DEPENDENCIES
   druid-tools
   equivalent-xml
   fakeweb
-  json_pure
   lyber-core (~> 3.3)
   moab-versioning (~> 2.0)
   nokogiri
