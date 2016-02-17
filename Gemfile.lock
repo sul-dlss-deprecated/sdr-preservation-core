@@ -1,7 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (4.2.5)
+    activesupport (4.2.5.1)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
       minitest (~> 5.1)
@@ -52,7 +52,7 @@ GEM
       capistrano-one_time_key
       capistrano-releaseboard
     docile (1.1.5)
-    domain_name (0.5.25)
+    domain_name (0.5.20160128)
       unf (>= 0.0.5, < 1.0.0)
     dor-workflow-service (1.8.0)
       activesupport (>= 3.2.1, < 5)
@@ -75,12 +75,13 @@ GEM
       domain_name (~> 0.5)
     i18n (0.7.0)
     json (1.8.3)
-    lyber-core (3.3.0)
+    lyber-core (4.0.1)
+      activesupport
       dor-workflow-service (~> 1.7)
     method_source (0.8.2)
     mime-types (2.99)
     mini_portile2 (2.0.0)
-    minitest (5.8.3)
+    minitest (5.8.4)
     moab-versioning (2.0.0)
       confstruct
       json
@@ -173,7 +174,7 @@ GEM
       thread_safe (~> 0.1)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.1)
+    unf_ext (0.0.7.2)
     vegas (0.1.11)
       rack (>= 1.0.0)
     whenever (0.9.4)
@@ -196,7 +197,7 @@ DEPENDENCIES
   druid-tools
   equivalent-xml
   fakeweb
-  lyber-core (~> 3.3)
+  lyber-core (~> 4.0)
   moab-versioning (~> 2.0)
   nokogiri
   pry
