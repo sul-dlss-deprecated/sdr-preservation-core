@@ -41,14 +41,6 @@ module Dor
    end
 end
 
-require 'dor/services/workflow_service'
-log_file = File.join(ROBOT_ROOT, 'log', 'workflow_service.log')
-wfs_logger = Logger.new(log_file, 'weekly')
-wfs_options = {
-  logger: wfs_logger
-}
-Dor::WorkflowService.configure Dor::Config.workflow.url, wfs_options
-
 #
 # The Moab::Config object is created in moab-versioning/lib/moab/config.rb
 # module Moab
@@ -67,9 +59,18 @@ require 'lyber_core/log'
 require 'moab/stanford'
 require 'sdr_replication'
 
-# Load the environment file.
+# Load the environment file.  The environment config file should
+# override the default configurations above.
 environment = ENV['ROBOT_ENVIRONMENT'] || 'development'
 require File.join(ROBOT_ROOT,"config/environments/#{environment}")
+
+require 'dor/services/workflow_service'
+log_file = File.join(ROBOT_ROOT, 'log', 'workflow_service.log')
+wfs_logger = Logger.new(log_file, 'weekly')
+wfs_options = {
+  logger: wfs_logger
+}
+Dor::WorkflowService.configure Dor::Config.workflow.url, wfs_options
 
 require 'sdr/sdr_robot'
 
