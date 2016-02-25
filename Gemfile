@@ -8,7 +8,7 @@ gem 'rest-client'
 gem 'sys-filesystem'
 
 # DLSS gems
-gem 'dor-workflow-service', '~> 1.8'
+gem 'dor-workflow-service', '~> 2.0'
 gem 'druid-tools'
 gem 'lyber-core', '~> 4.0'
 gem 'moab-versioning', '~> 2.0'

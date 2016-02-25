@@ -52,15 +52,14 @@ GEM
       capistrano-one_time_key
       capistrano-releaseboard
     docile (1.1.5)
-    domain_name (0.5.20160128)
+    domain_name (0.5.20160216)
       unf (>= 0.0.5, < 1.0.0)
-    dor-workflow-service (1.8.0)
+    dor-workflow-service (2.0.0)
       activesupport (>= 3.2.1, < 5)
       confstruct (>= 0.2.7, < 2)
       faraday (~> 0.9.2)
       net-http-persistent (~> 2.9.4)
       nokogiri (~> 1.6.0)
-      rest-client (~> 1.7)
       retries
     dotenv (2.0.2)
     druid-tools (0.4.1)
@@ -75,11 +74,11 @@ GEM
       domain_name (~> 0.5)
     i18n (0.7.0)
     json (1.8.3)
-    lyber-core (4.0.1)
+    lyber-core (4.0.2)
       activesupport
-      dor-workflow-service (~> 1.7)
+      dor-workflow-service (>= 1.7, < 3)
     method_source (0.8.2)
-    mime-types (2.99)
+    mime-types (2.99.1)
     mini_portile2 (2.0.0)
     minitest (5.8.4)
     moab-versioning (2.0.0)
@@ -192,7 +191,7 @@ DEPENDENCIES
   confstruct
   coveralls
   dlss-capistrano (~> 3.0)
-  dor-workflow-service (~> 1.8)
+  dor-workflow-service (~> 2.0)
   dotenv
   druid-tools
   equivalent-xml
