@@ -21,7 +21,8 @@ group :development do
 	gem 'equivalent-xml'
 	gem 'fakeweb'
 	gem 'rspec', '~> 2.14'
-	gem 'simplecov', '~> 0.7.1'
+	gem 'simplecov'
+	gem 'coveralls'
 	gem 'yard'
 end
 
