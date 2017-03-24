@@ -62,7 +62,7 @@ include Stanford
 require 'sdr_replication'
 
 # Load the environment file based on Environment.  Default to local
-environment = ENV['ROBOT_ENVIRONMENT'] || ENV["RAILS_ENV"] ||= 'development'
+environment = ENV['ROBOT_ENVIRONMENT'] || 'development'
 require File.join(ROBOT_ROOT,"config/environments/#{environment}")
 
 require 'sdr/sdr_robot'
@@ -88,4 +88,3 @@ module Dor
 end
 
 Dor::WorkflowService.configure Dor::Config.workflow.url
-
