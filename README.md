@@ -8,7 +8,9 @@
 * Richard Anderson
 * Darren Weber
 
-## Project Directory Structure
+See the [Wiki](https://github.com/sul-dlss/robot-master/wiki) for general documentation on the robots infrastructure.
+
+== Project Directory Structure
     |
     ---config
     |  |
