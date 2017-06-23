@@ -34,8 +34,7 @@ describe TransferObject do
     # transfer_cmd = tarpipe_command(druid, deposit_home)
     # Archive::OperatingSystem.execute(transfer_cmd)
 
-    Pathname.any_instance.stub(:exist?).and_return(false)
-    Pathname.any_instance.stub(:mkpath)
+    allow_any_instance_of(Pathname).to receive_messages(exist?: false, mkpath: nil)
     expect(@to).to receive(:verify_accesssion_status).with(@druid).and_return(true)
     expect(@to).to receive(:verify_dor_export).with(@druid).and_return(true)
     expect(@to).to receive(:verify_version_metadata).with(@druid).and_return(true)
@@ -49,7 +48,7 @@ describe TransferObject do
     expect(@to).to receive(:verify_version_metadata).with(@druid).and_return(true)
     expect(@to).to receive(:get_deposit_home).with(@druid).and_return(@bag_pathname.parent)
     expect(@to).to receive(:tarpipe_command).with(@druid,@bag_pathname.parent).and_return('thecommand')
-    Archive::OperatingSystem.stub(:execute).and_raise("cmd failed")
+    allow(Archive::OperatingSystem).to receive(:execute).and_raise("cmd failed")
     expect{@to.transfer_object(@druid)}.to raise_exception(Robots::SdrRepo::ItemError)
 
     expect(@to).to receive(:verify_accesssion_status).with(@druid).and_return(true)

@@ -87,19 +87,7 @@ module Robots
         opts[:note] = Socket.gethostname
         transmit(opts) { Dor::WorkflowService.update_workflow_error_status(repo, druid, workflow_name, step_name, message, opts ) }
       end
-
-      # A method that can be passed to transmit which will then return true
-      def test_success
-        return "success"
-      end
-
-      # A method that can be passed to transmit which will then raise an exception
-      def test_failure
-        raise "failure"
-      end
-
     end
-
   end
 end
 
