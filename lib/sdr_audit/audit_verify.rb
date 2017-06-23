@@ -29,7 +29,7 @@ module Robots
         # @return [Boolean] Reconcile manifests against the files in the digital object's storage location
         def audit_verify(druid)
           LyberCore::Log.debug("( #{__FILE__} : #{__LINE__} ) Enter audit_verify")
-          storage_object = StorageServices.storage_object(druid, create=false)
+          storage_object = Moab::StorageServices.storage_object(druid, create=false)
           result = storage_object.verify_object_storage
           if result.verified
             LyberCore::Log.info "Verification Result:\n" + result.to_json(verbose=Sdr::Config.audit_verbose)
