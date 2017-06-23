@@ -77,7 +77,7 @@ class Menu
             @status_workflow.exec(args)
         end
     end
-  rescue Exception => e
+  rescue StandardError => e
     puts e.message
     puts e.backtrace
   end

@@ -44,7 +44,7 @@ module Robots
           deposit_home = get_deposit_home(druid)
           transfer_cmd = tarpipe_command(druid, deposit_home)
           Archive::OperatingSystem.execute(transfer_cmd)
-        rescue Exception => e
+        rescue StandardError => e
           raise ItemError.new("Error transferring object")
         end
 
@@ -104,7 +104,7 @@ module Robots
           tries ||= 3
           bag_pathname.rmtree
           return true
-        rescue Exception => e
+        rescue StandardError => e
           if (tries -= 1) > 0
             retry
           else
