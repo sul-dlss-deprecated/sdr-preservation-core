@@ -9,21 +9,21 @@ gem 'sys-filesystem'
 gem 'pry'
 
 # DLSS gems
-gem 'dor-workflow-service', '~> 1.7'
+gem 'dor-workflow-service', '~> 1.8'
 gem 'druid-tools'
-gem 'lyber-core',  '~> 3.2', '>= 3.2.2'
+gem 'lyber-core', '~> 3.3'
 gem 'moab-versioning', '~> 1.3' #, :path => '/Users/rnanders/Code/Github/moab-versioning' #
 gem 'robot-controller', '~> 2.0'
 gem 'sdr-replication', '~> 0.5' #,:path => '/Users/rnanders/Code/Github/sdr-replication' #
 
 group :development do
-	gem 'awesome_print'
-	gem 'equivalent-xml'
-	gem 'fakeweb'
-	gem 'rspec', '~> 2.14'
-	gem 'simplecov'
-	gem 'coveralls'
-	gem 'yard'
+  gem 'awesome_print'
+  gem 'equivalent-xml'
+  gem 'fakeweb'
+  gem 'rspec', '~> 2.14'
+  gem 'simplecov'
+  gem 'coveralls'
+  gem 'yard'
 end
 
 # Do not place the capistrano-related gems in the default or development bundle group
