@@ -7,6 +7,10 @@ gem 'rake'
 gem 'rest-client'
 gem 'sys-filesystem'
 
+# bin/console.rb uses pry
+gem 'pry'
+gem 'pry-doc'
+
 # DLSS gems
 gem 'dor-workflow-service', '~> 2.0'
 gem 'druid-tools'
@@ -17,8 +21,6 @@ gem 'sdr-replication', '~> 1.0'
 
 group :development do
   gem 'awesome_print'
-  gem 'pry'
-  gem 'pry-doc'
 end
 
 group :test do
