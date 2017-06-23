@@ -6,7 +6,10 @@ gem 'nokogiri'
 gem 'rake'
 gem 'rest-client'
 gem 'sys-filesystem'
+
+# bin/console.rb uses pry
 gem 'pry'
+gem 'pry-doc'
 
 # DLSS gems
 gem 'dor-workflow-service', '~> 1.8'
@@ -18,11 +21,14 @@ gem 'sdr-replication', '~> 0.5' #,:path => '/Users/rnanders/Code/Github/sdr-repl
 
 group :development do
   gem 'awesome_print'
+end
+
+group :test do
   gem 'equivalent-xml'
   gem 'fakeweb'
   gem 'rspec', '~> 2.14'
-  gem 'simplecov'
-  gem 'coveralls'
+  gem 'simplecov', require: false
+  gem 'coveralls', require: false
   gem 'yard'
 end
 
@@ -34,5 +40,5 @@ group :deployment do
   gem 'capistrano', '~> 3.1'
   gem 'capistrano-bundler', '~> 1.1'
   gem 'capistrano-rvm', '~> 0.1'
-  gem 'dlss-capistrano'
+  gem 'dlss-capistrano', '~> 3.0'
 end
