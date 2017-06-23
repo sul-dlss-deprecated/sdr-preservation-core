@@ -48,7 +48,7 @@ class Menu
       @menu << 'menu                                = Display this menu'
       @menu << 'storage                             = Report storage filesystem status'
       @menu << 'workflow {detail|summary|waiting}   = Report workflow database status'
-      @menu << 'list     {comp..|err..}[n] = Report current or recent robot activity '
+      @menu << 'list     {comp..|err..}[n]          = Report current or recent robot activity '
       @menu << 'set      {druid|version|group} {id} = Set the object/version/filegroup focus and/or list the object versions'
       @menu << 'view     {druid|version|group} {id} = Set the object/version/filegroup focus and list the child folders/files'
       @menu << 'view     {log|pipeline|urls|dor}    = view object\'s logfile, recent pipeline history, URLs, or DOR files'
