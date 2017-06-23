@@ -38,7 +38,7 @@ module Robots
             LyberCore::Log.info result.to_json(verbose=false)
             raise ItemError.new("Failed validation")
           end
-        rescue Exception => e
+        rescue StandardError => e
           raise ItemError.new("Failed restore")
         end
 

@@ -31,7 +31,7 @@ module Robots
         update_workflow_status 'sdr', druid, self.class.workflow_name, self.class.step_name, 'completed', elapsed
         LyberCore::Log.info "Completed #{druid} in #{elapsed} seconds"
         return 'completed'
-      rescue Exception => e
+      rescue StandardError => e
         message = if e.cause
                     "#{e.message}; caused by #{e.cause.inspect}"
                   else
@@ -64,7 +64,7 @@ module Robots
         tries ||= opts[:tries] || 3
         interval ||= opts[:interval] || 20
         request.call(nil)
-      rescue Exception => e
+      rescue StandardError => e
         if (tries -= 1) > 0
           sleep interval
           retry

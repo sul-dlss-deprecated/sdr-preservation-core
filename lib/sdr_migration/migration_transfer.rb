@@ -78,7 +78,7 @@ module Robots
           rsync_command = "rsync -qac --inplace #{source_pathname}/ #{target_pathname}/"
           Replication::OperatingSystem.execute(rsync_command)
           LyberCore::Log.debug("#{source_pathname} transferred to #{target_pathname}")
-        rescue Exception => e
+        rescue StandardError => e
           raise ItemError.new("Error transferring object")
         end
 

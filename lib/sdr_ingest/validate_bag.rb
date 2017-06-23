@@ -34,7 +34,7 @@ module Robots
           verify_version_number(bag, storage_object.current_version_id)
           bag.verify_bag
           true
-        rescue Exception => e
+        rescue StandardError => e
           raise ItemError.new("Bag validation failure")
         end
 

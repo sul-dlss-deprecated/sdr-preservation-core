@@ -161,7 +161,7 @@ class StatusActivity < Status
           begin
             @storage_version = @storage_object.find_object_version(version.to_i)
             @filegroup = @storage_version.file_category_pathname('metadata')
-          rescue Exception => e
+          rescue StandardError => e
             puts e.message
             return
           end

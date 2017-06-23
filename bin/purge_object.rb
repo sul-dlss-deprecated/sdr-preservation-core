@@ -56,7 +56,7 @@ class PurgeObject
     object_pathname.rmtree if object_pathname.exist?
     puts "deleted #{object_pathname}"
     return true
-  rescue Exception => e
+  rescue StandardError => e
     if (attempts += 1) < sleep_time.size
       GC.start
       sleep sleep_time[attempts].to_i
