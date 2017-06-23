@@ -22,7 +22,7 @@ module Robots
           result = new_version.verify_version_storage
           if result.verified == false
             LyberCore::Log.info result.to_json(verbose=false)
-            raise ItemError.new("Failed validation", e)
+            raise ItemError.new("Failed validation")
           end
           bag_pathname = storage_object.deposit_bag_pathname
           cleanup_deposit_files(druid, bag_pathname)
@@ -37,13 +37,12 @@ module Robots
           attempts ||= 0
           bag_pathname.rmtree
           return true
-        rescue Exception => e
+        rescue StandardError => e
           if (attempts += 1) < sleep_time.size
-            GC.start
             sleep sleep_time[attempts].to_i
             retry
           else
-            raise ItemError.new("Failed cleanup deposit (#{attempts} attempts)", e)
+            raise ItemError.new("Failed cleanup deposit (#{attempts} attempts)")
           end
         end
 

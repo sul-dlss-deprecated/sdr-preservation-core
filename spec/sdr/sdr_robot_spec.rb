@@ -14,7 +14,7 @@ describe SdrRobot do
 
     specify "SdrRobot#transmit" do
       expect(@robot.transmit { "success" }).to eq "success"
-      expect{@robot.transmit({interval: 3}) { raise "failure" }}.to raise_exception(/failure/)
+      expect{@robot.transmit({interval: 3}) { raise "failure" }}.to raise_exception Robots::SdrRepo::FatalError
     end
 
     specify "SdrRobot#update_workflow_status success" do

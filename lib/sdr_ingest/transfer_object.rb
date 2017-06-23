@@ -44,8 +44,8 @@ module Robots
           deposit_home = get_deposit_home(druid)
           transfer_cmd = tarpipe_command(druid, deposit_home)
           Archive::OperatingSystem.execute(transfer_cmd)
-        rescue Exception => e
-          raise ItemError.new("Error transferring object", e)
+        rescue StandardError => e
+          raise ItemError.new("Error transferring object")
         end
 
         # @param druid [String] The object identifier
@@ -104,12 +104,11 @@ module Robots
           tries ||= 3
           bag_pathname.rmtree
           return true
-        rescue Exception => e
+        rescue StandardError => e
           if (tries -= 1) > 0
-            GC.start
             retry
           else
-            raise ItemError.new("Failed cleanup deposit (3 attempts)", e)
+            raise ItemError.new("Failed cleanup deposit (3 attempts)")
           end
         end
 

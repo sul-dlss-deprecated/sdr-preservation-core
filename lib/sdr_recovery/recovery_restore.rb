@@ -36,10 +36,10 @@ module Robots
           result = storage_object.verify_object_storage
           if result.verified == false
             LyberCore::Log.info result.to_json(verbose=false)
-            raise ItemError.new("Failed validation", e)
+            raise ItemError.new("Failed validation")
           end
-        rescue Exception => e
-          raise ItemError.new("Failed restore", e)
+        rescue StandardError => e
+          raise ItemError.new("Failed restore")
         end
 
         def verification_queries(druid)

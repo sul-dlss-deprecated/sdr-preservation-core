@@ -79,8 +79,8 @@ module Robots
           version_id = nodeset.last['versionId']
           raise "version_id is nil" if version_id.nil?
           version_id.to_i
-        rescue Exception => e
-          raise ItemError.new("Unable to find deposit version", e)
+        rescue StandardError => e
+          raise ItemError.new("Unable to find deposit version")
         end
 
         # Extract the APO id from the relationship metadata
@@ -102,8 +102,8 @@ module Robots
           else
             raise ItemError.new("Unable to find isGovernedBy node of relationshipMetadata")
           end
-        rescue Exception => e
-          raise ItemError.new("Unable to find APO id in relationshipMetadata", e)
+        rescue StandardError => e
+          raise ItemError.new("Unable to find APO id in relationshipMetadata")
         end
 
         # Confirm that the APO identifier for the object corresponds to an already ingested object
@@ -123,8 +123,8 @@ module Robots
               raise ItemError.new("APO object #{apo_druid} not found")
             end
           end
-        rescue Exception => e
-          raise ItemError.new("Unable to verify APO object #{apo_druid}", e)
+        rescue StandardError => e
+          raise ItemError.new("Unable to verify APO object #{apo_druid}")
         end
 
         def verification_queries(druid)
