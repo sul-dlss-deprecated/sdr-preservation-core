@@ -45,7 +45,6 @@ module Robots
           return true
         rescue Exception => e
           if (attempts += 1) < sleep_time.size
-            GC.start
             sleep sleep_time[attempts].to_i
             retry
           else

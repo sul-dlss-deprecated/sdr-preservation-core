@@ -43,7 +43,6 @@ module Robots
           return true
         rescue Exception => e
           if (tries -= 1) > 0
-            GC.start
             retry
           else
             raise ItemError.new("Failed rmtree #{recovery_path} (3 attempts)")
