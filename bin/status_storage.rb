@@ -41,7 +41,8 @@ class StatusStorage < Status
   end
 
   def storage_mounts()
-    Sys::Filesystem.mounts.select{|mount| mount.mount_type.upcase == 'NFS'}
+    sdr_mounts = Sys::Filesystem.mounts.select {|m| m.name.include? 'sdr_services' }
+    sdr_mounts.sort {|a,b| a.mount_point <=> b.mount_point } 
   end
 
   def gigabye_size
