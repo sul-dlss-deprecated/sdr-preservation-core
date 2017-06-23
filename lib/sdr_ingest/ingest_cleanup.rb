@@ -43,7 +43,7 @@ module Robots
           attempts ||= 0
           bag_pathname.rmtree
           return true
-        rescue Exception => e
+        rescue StandardError => e
           if (attempts += 1) < sleep_time.size
             GC.start
             sleep sleep_time[attempts].to_i

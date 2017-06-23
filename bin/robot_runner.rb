@@ -115,7 +115,7 @@ class RobotRunner
         sleep 10
       end
     end
-  rescue Exception => e
+  rescue StandardError => e
     @item_counts[:fatal] += 1
     @status_process.set_state("FATAL ERROR")
     email_log_file(druid, logfile, 'process_queue error') if logfile
@@ -196,7 +196,7 @@ class RobotRunner
           LyberCore::Log.error "#{druid} #{robot.name} unexpected status = #{robot_status}"
           return 'error'
       end
-    rescue Exception
+    rescue StandardError
       LyberCore::Log.fatal "#{$!.inspect}\n#{$@}"
       return 'fatal'
     end

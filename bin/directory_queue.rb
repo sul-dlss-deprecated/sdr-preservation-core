@@ -72,7 +72,7 @@ class DirectoryQueue
     existing.each { |qf| qf.delete if qfile_priority(qf) > priority }
     sleep 0.01
     qfile
-  rescue Exception => e
+  rescue StandardError => e
     puts "Item '#{item}' could not be added to the queue"
     puts e.message
   end
