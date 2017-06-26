@@ -61,7 +61,6 @@ GEM
       net-http-persistent (>= 2.9.4, < 4.a)
       nokogiri (~> 1.6)
       retries
-    dotenv (2.0.2)
     druid-tools (0.4.1)
     equivalent-xml (0.5.1)
       nokogiri (>= 1.4.3)
@@ -193,7 +192,6 @@ DEPENDENCIES
   coveralls
   dlss-capistrano (~> 3.0)
   dor-workflow-service (~> 2.0)
-  dotenv
   druid-tools
   equivalent-xml
   fakeweb

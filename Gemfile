@@ -1,7 +1,6 @@
 source 'https://rubygems.org'
 
 gem 'confstruct'
-gem 'dotenv'
 gem 'nokogiri'
 gem 'rake'
 gem 'rest-client'
