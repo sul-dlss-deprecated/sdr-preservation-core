@@ -32,11 +32,10 @@ GEM
       sshkit (~> 1.2)
     capistrano-one_time_key (0.0.1)
       capistrano (~> 3.0)
-    capistrano-releaseboard (0.0.1)
-      faraday
     capistrano-rvm (0.1.2)
       capistrano (~> 3.0)
       sshkit (~> 1.2)
+    capistrano-shared_configs (0.1.2)
     chronic (0.10.2)
     coderay (1.1.0)
     confstruct (1.0.2)
@@ -49,11 +48,11 @@ GEM
       thor (~> 0.19.4)
       tins (~> 1.6)
     diff-lcs (1.2.5)
-    dlss-capistrano (3.2.0)
+    dlss-capistrano (3.4.1)
       capistrano (~> 3.0)
-      capistrano-bundle_audit (>= 0.0.3)
+      capistrano-bundle_audit (>= 0.1.0)
       capistrano-one_time_key
-      capistrano-releaseboard
+      capistrano-shared_configs
     docile (1.1.5)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
