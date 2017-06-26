@@ -1,13 +1,13 @@
 class Status
 
   def report_context
-    environment = ENV["ROBOT_ENVIRONMENT"].capitalize
+    environment = ENV['ROBOT_ENVIRONMENT'].capitalize
     context = "\n#{environment} Status on #{`hostname -s`.chomp} as of #{Time.now.strftime('%Y-%m-%d')}\n"
     context
   end
 
   def environment_suffix
-    case ENV["ROBOT_ENVIRONMENT"].upcase
+    case ENV['ROBOT_ENVIRONMENT'].upcase
       when 'PRODUCTION'
         '-prod'
       when 'TEST'
@@ -47,5 +47,5 @@ class Status
     s
   end
 
-
 end
+
