@@ -11,9 +11,9 @@ gem 'pry'
 gem 'pry-doc'
 
 # DLSS gems
-gem 'dor-workflow-service', '~> 1.8'
+gem 'dor-workflow-service', '~> 2.0'
 gem 'druid-tools'
-gem 'lyber-core', '~> 3.3'
+gem 'lyber-core', '~> 4.0'
 gem 'moab-versioning', '~> 2.0'
 gem 'robot-controller', '~> 2.0'
 gem 'sdr-replication', '~> 1.0'
