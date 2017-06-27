@@ -9,4 +9,3 @@ echo
 bundle install --binstubs .binstubs --jobs=3 --retry=2
 echo
 bundle package --all --quiet
-

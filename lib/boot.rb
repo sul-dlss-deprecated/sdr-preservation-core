@@ -73,4 +73,3 @@ wfs_options = {
 Dor::WorkflowService.configure Dor::Config.workflow.url, wfs_options
 
 require 'sdr/sdr_robot'
-

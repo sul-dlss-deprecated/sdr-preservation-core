@@ -34,4 +34,3 @@ for f in ${LOG_FILES}; do
 done
 echo
 echo
-
