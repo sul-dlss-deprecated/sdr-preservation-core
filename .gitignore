@@ -3,7 +3,6 @@
 .bundle
 .capistrano/*
 .DS_Store
-.env
 .idea
 .rspec-local
 .ruby-gemset
