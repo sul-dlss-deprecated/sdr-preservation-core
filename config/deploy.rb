@@ -6,19 +6,12 @@ set :application, 'sdr-preservation-core'
 # Default value for :scm is :git
 # set :scm, :git
 
-# ssh access to github is restricted, using https instead (see config/deploy/github_repo.rb)
-#set :repo_url, 'git@github.com:sul-dlss/sdr-preservation-core.git'
-
-# Ensure config/deploy/github_repo.rb contains the following content, where
-# AuthUser:AuthToken is replaced with credentials for authorized access to the repository.
-# The personal access token should have at least the 'repo' scope.
-# https://help.github.com/articles/creating-an-access-token-for-command-line-use/
-# https://github.com/blog/1509-personal-api-tokens
-#set :repo_url, 'https://AuthUser:AuthToken@github.com/sul-dlss/sdr-preservation-core.git'
-require_relative 'deploy/github_repo'
+set :repo_url, 'https://github.com/sul-dlss/sdr-preservation-core.git'
 
 # Default branch is :master
 ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
+
+set :deploy_to, '/var/sdr2service/sdr-preservation-core'
 
 # Default value for :format is :pretty
 # set :format, :pretty

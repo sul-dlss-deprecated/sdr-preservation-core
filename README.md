@@ -45,7 +45,7 @@ See the [Wiki](https://github.com/sul-dlss/robot-master/wiki) for general docume
 
 ```bash
 alias sdr2='cd ~/sdr-preservation-core/current/bin'
-alias ingest='sdr2 ; ./bundle-exec.sh menu.rb sdrIngestWF; cd $OLDPWD'
+alias ingest='sdr2 ; bundle exec menu.rb sdrIngestWF; cd $OLDPWD'
 alias ingest-log='log sdrIngestWF'
 function log() { cd ~/sdr-preservation-core/current/log/$1/current; }
 ```
@@ -64,17 +64,9 @@ See `bin/cron_jobs.txt` or `ssh` onto a deploy system and run `crontab -e`.
     cd sdr-preservation-core
     bundle install
     ```
-* create or update `config/deploy/github_repo.rb`
-    ```ruby
-    # This is required when capistrano does a remote git operation with https authentication
-    # ensure config/deploy/github_repo.rb contains the following content:
-    set :repo_url, 'https://AuthUser:AuthToken@github.com/sul-dlss/sdr-preservation-core.git'
-    # AuthUser:AuthToken is replaced with credentials for authorized access to the 'repo' scope, see
-    # https://help.github.com/articles/creating-an-access-token-for-command-line-use/
-    ```
-* create or update `config/deploy/<deploy_server>.rb` to specify the server parameters, e.g.
+* create or update `config/deploy/{stage}.rb` to specify the server parameters, e.g.
     ```bash
-    cp config/deploy/localhost.rb config/deploy/staging1.rb
+    cp config/deploy/dev.rb config/deploy/{stage}.rb
     ```
     ```ruby
     # modify the defaults, e.g.
@@ -85,13 +77,8 @@ See `bin/cron_jobs.txt` or `ssh` onto a deploy system and run `crontab -e`.
     # config/environments/${ROBOT_ENVIRONMENT}.rb
     # config/environments/robots_${ROBOT_ENVIRONMENT}.yml
     ```
-    ```bash
-    cp config/deploy/staging1.rb config/deploy/staging2.rb
-    # modify ENV['SDR_HOST']; other settings are likely to be the same.
-    ```
-  * there is one `config/deploy/<deploy_server>.rb` file for every vm in the deployment system
-  * capistrano can deploy to multiple servers simultaneously, but that's not desired for this app
-  * the <deploy_server> file name can be any name, it doesn't have to be the same as a ROBOT_ENVIRONMENT
+  * capistrano can deploy to multiple servers simultaneously
+  * the `{stage}` file name can be any name, it doesn't have to be the same as a ROBOT_ENVIRONMENT
 * create or update `config/environments/<ROBOT_ENVIRONMENT>.rb`
   * see config/environments/development.rb
 * create or update `config/environments/robots_<ROBOT_ENVIRONMENT>.yml`
@@ -99,14 +86,17 @@ See `bin/cron_jobs.txt` or `ssh` onto a deploy system and run `crontab -e`.
   * See the extensive comments in the example file at `config/environments/robots_development.yml`
 * check and initialize the deployment directory structure on each <deploy_server>, e.g.
     ```bash
-    cap staging1 deploy:check
-    cap staging2 deploy:check
+    cap {stage} deploy:check
     #cap -T # this should display all the available capistrano tasks (and subtasks)
     ```
+* program puppet to manage the shared_configs for <deploy_server>
+  * ensure the configs are in https://github.com/sul-dlss/shared_configs/tree/sdr-preservation-core_{stage}
+    * e.g. https://github.com/sul-dlss/shared_configs/tree/sdr-preservation-core_dev
+    * e.g. https://github.com/sul-dlss/shared_configs/tree/sdr-preservation-core_stage
+    * e.g. https://github.com/sul-dlss/shared_configs/tree/sdr-preservation-core_prod
 * deploy and restart the robots, e.g.
     ```bash
-    cap staging1 deploy
-    cap staging2 deploy
+    cap {stage} deploy
     # to undo a deploy, use:
     #cap <deploy_server> deploy:rollback
     ```
@@ -123,7 +113,7 @@ cap <deploy_server> deploy:restart # restarts all the robots
 ```bash
 ssh <deploy_server>
 cd ~/sdr-preservation-core/current
-export ROBOT_ENVIRONMENT=<environment>
+export ROBOT_ENVIRONMENT={environment}
 bundle exec controller status  # shows the status of the robots
 bundle exec controller restart # to restart all of them
 bundle exec controller restart sdr_sdrIngestWF_register-sdr # to restart just this robot
@@ -133,7 +123,7 @@ bundle exec controller restart sdr_sdrIngestWF_register-sdr # to restart just th
 ```bash
 ssh <deploy_server>
 cd ~/sdr-preservation-core/current
-export ROBOT_ENVIRONMENT=<environment>
+export ROBOT_ENVIRONMENT={environment}
 bundle exec controller stop
 bundle exec controller quit
 bundle exec controller boot

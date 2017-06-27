@@ -4,11 +4,9 @@ set :default_env, {
   # ROBOT_ENVIRONMENT implies remote :deploy_to contains
   # config/environments/#{ROBOT_ENVIRONMENT}.rb
   # config/environments/robots_#{ROBOT_ENVIRONMENT}.rb
-  'ROBOT_ENVIRONMENT' => 'development'
+  'ROBOT_ENVIRONMENT' => 'integration'
 }
 
-set :deploy_to, '/tmp/sdr-preservation-core'
-
-server 'localhost', user: ENV['USER'], roles: %w{app}
+server 'sul-sdr-services-dev.stanford.edu', user: 'sdr2service', roles: %w{app}
 
 Capistrano::OneTimeKey.generate_one_time_key!
