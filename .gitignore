@@ -3,7 +3,6 @@
 .bundle
 .capistrano/*
 .DS_Store
-.env
 .idea
 .rspec-local
 .ruby-gemset
@@ -12,9 +11,6 @@
 .yardoc
 *~
 config/certs
-config/deploy/*
-!config/deploy/localhost.rb
-!config/deploy/server_settings.rb
 config/environments/*
 !config/environments/development.rb
 !config/environments/robots_development.yml
