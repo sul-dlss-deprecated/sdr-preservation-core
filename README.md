@@ -34,8 +34,8 @@ See the [Wiki](https://github.com/sul-dlss/robot-master/wiki) for general docume
   - config/workflows/sdrIngestWF/workflowDefinition.xml
 
 * Worflows must be updated in ARGO, e.g.
-  - https://argo-test.stanford.edu/catalog/druid:bb163sd6279
-  - https://argo-test.stanford.edu/view/druid:bb163sd6279/ds/workflowDefinition
+  - https://argo-stage.stanford.edu/catalog/druid:bb163sd6279
+  - https://argo-stage.stanford.edu/view/druid:bb163sd6279/ds/workflowDefinition
 
 * Workflow updates require restarting the robot master
   - https://github.com/sul-dlss/robot-master
