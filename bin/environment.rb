@@ -16,11 +16,11 @@ AppHome = BinHome.parent
 # Make sure a value is set for ROBOT_ENVIRONMENT
 ENV['ROBOT_ENVIRONMENT'] = (
   case `hostname -s`.chomp
-    when "sdr-services", "sul-sdr-services"
+    when 'sul-sdr-services'
       'production'
-    when "sdr-services-test"
-      'staging'
-    when "sul-sdr-services-dev"
+    when 'sdr-services-test', 'sdr-services-test2'
+      'stage'
+    when 'sul-sdr-services-dev'
       'integration'
     else
       'development'

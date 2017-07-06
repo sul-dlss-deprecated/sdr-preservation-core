@@ -4,7 +4,7 @@ set :default_env, {
   # ROBOT_ENVIRONMENT implies remote :deploy_to contains
   # config/environments/#{ROBOT_ENVIRONMENT}.rb
   # config/environments/robots_#{ROBOT_ENVIRONMENT}.rb
-  'ROBOT_ENVIRONMENT' => 'test'
+  'ROBOT_ENVIRONMENT' => 'stage'
 }
 
 server 'sdr-services-test.stanford.edu',  user: 'sdr2service', roles: %w{app}
