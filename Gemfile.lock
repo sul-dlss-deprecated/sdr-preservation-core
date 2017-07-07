@@ -35,7 +35,7 @@ GEM
     capistrano-rvm (0.1.2)
       capistrano (~> 3.0)
       sshkit (~> 1.2)
-    capistrano-shared_configs (0.1.2)
+    capistrano-shared_configs (0.2.2)
     chronic (0.10.2)
     coderay (1.1.1)
     confstruct (1.0.2)
