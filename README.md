@@ -16,7 +16,7 @@ See the [Wiki](https://github.com/sul-dlss/robot-master/wiki) for general docume
 - config
   - certs : authentication certificates for workflow service
   - deploy : host-level Capistrano configuration
-  - environments : configuration for dev,test,prod environments
+  - environments : configuration for dev,stage,prod environments
   - workflows : workflow specific configuration - steps, dependencies. One directory per workflow.
 - lib : ruby classes needed for your local robots
   - sdrIngest : all of the robots for a particular workflow. One directory per workflow
@@ -70,9 +70,9 @@ See `bin/cron_jobs.txt` or `ssh` onto a deploy system and run `crontab -e`.
     ```
     ```ruby
     # modify the defaults, e.g.
-    #ENV['SDR_HOST'] ||= 'sdr-staging1'
+    #ENV['SDR_HOST'] ||= 'sdr-stage1'
     #ENV['SDR_USER'] ||= 'sdr_user'
-    #ENV['ROBOT_ENVIRONMENT'] = 'staging'
+    #ENV['ROBOT_ENVIRONMENT'] = 'stage'
     # Note that the value of ROBOT_ENVIRONMENT entails the existence of two config files:
     # config/environments/${ROBOT_ENVIRONMENT}.rb
     # config/environments/robots_${ROBOT_ENVIRONMENT}.yml
