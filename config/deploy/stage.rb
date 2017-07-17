@@ -8,6 +8,5 @@ set :default_env, {
 }
 
 server 'sdr-services-test.stanford.edu',  user: 'sdr2service', roles: %w{app}
-server 'sdr-services-test2.stanford.edu', user: 'sdr2service', roles: %w{app}
 
 Capistrano::OneTimeKey.generate_one_time_key!

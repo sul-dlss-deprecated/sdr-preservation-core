@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'confstruct'
+gem 'honeybadger'
 gem 'nokogiri'
 gem 'rake'
 gem 'rest-client'

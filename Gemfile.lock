@@ -71,6 +71,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     ffi (1.9.6)
     hashie (3.5.5)
+    honeybadger (3.1.2)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     i18n (0.8.4)
@@ -197,6 +198,7 @@ DEPENDENCIES
   druid-tools
   equivalent-xml
   fakeweb
+  honeybadger
   lyber-core (~> 4.0)
   moab-versioning (~> 2.0)
   nokogiri
