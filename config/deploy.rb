@@ -56,6 +56,9 @@ end
 
 set :honeybadger_env, fetch(:stage)
 
+# update shared_configs before restarting app
+before 'deploy:restart', 'shared_configs:update'
+
 # capistrano next reads config/deploy/#{server}.rb, where #{server} is the first argument to cap; e.g.:
 # cap localhost deploy:check # invokes config/deploy/localhost.rb
 # cap test1 deploy:check # invokes config/deploy/test1.rb
