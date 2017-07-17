@@ -23,7 +23,7 @@ set :deploy_to, '/var/sdr2service/sdr-preservation-core'
 # set :pty, true
 
 # Default value for :linked_files is []
-# set :linked_files, %w{config/database.yml}
+set :linked_files, %w(config/honeybadger.yml)
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
@@ -53,6 +53,8 @@ namespace :deploy do
   # Capistrano 3 no longer runs deploy:restart by default.
   after :publishing, :restart
 end
+
+set :honeybadger_env, fetch(:stage)
 
 # capistrano next reads config/deploy/#{server}.rb, where #{server} is the first argument to cap; e.g.:
 # cap localhost deploy:check # invokes config/deploy/localhost.rb
