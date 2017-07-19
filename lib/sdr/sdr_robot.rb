@@ -32,6 +32,8 @@ module Robots
         LyberCore::Log.info "Completed #{druid} in #{elapsed} seconds"
         return 'completed'
       rescue StandardError => e
+        Honeybadger.notify(e)
+
         message = if e.cause
                     "#{e.message}; caused by #{e.cause.inspect}"
                   else
