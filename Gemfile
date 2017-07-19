@@ -13,6 +13,7 @@ gem 'pry-doc'
 
 # DLSS gems
 gem 'dor-workflow-service', '~> 2.0'
+gem 'net-http-persistent', '~> 2.0' # pin net-http-persistent; 3.x is incompatible with faraday 0.12
 gem 'druid-tools'
 gem 'lyber-core', '~> 4.0'
 gem 'moab-versioning', '~> 2.0'
@@ -42,4 +43,3 @@ group :deployment do
   gem 'capistrano-rvm', '~> 0.1'
   gem 'dlss-capistrano', '~> 3.0'
 end
-

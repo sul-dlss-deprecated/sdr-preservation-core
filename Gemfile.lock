@@ -40,7 +40,6 @@ GEM
     coderay (1.1.1)
     confstruct (1.0.2)
       hashie (~> 3.3)
-    connection_pool (2.2.1)
     coveralls (0.8.21)
       json (>= 1.8, < 3)
       simplecov (~> 0.14.1)
@@ -92,8 +91,7 @@ GEM
     mono_logger (1.1.0)
     multi_json (1.12.1)
     multipart-post (2.0.0)
-    net-http-persistent (3.0.0)
-      connection_pool (~> 2.2)
+    net-http-persistent (2.9.4)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (4.1.0)
@@ -201,6 +199,7 @@ DEPENDENCIES
   honeybadger
   lyber-core (~> 4.0)
   moab-versioning (~> 2.0)
+  net-http-persistent (~> 2.0)
   nokogiri
   pry
   pry-doc
