@@ -54,8 +54,7 @@ end
 
 
 require 'druid-tools'
-require 'lyber_core/robot'
-require 'lyber_core/log'
+require 'lyber_core'
 require 'moab/stanford'
 require 'sdr_replication'
 
