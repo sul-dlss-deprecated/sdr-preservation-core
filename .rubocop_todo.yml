@@ -23,12 +23,6 @@ Lint/Debugger:
   Exclude:
     - 'bin/console.rb'
 
-# Offense count: 1
-# Cop supports --auto-correct.
-Lint/DeprecatedClassMethods:
-  Exclude:
-    - 'lib/tasks/yard.rake'
-
 # Offense count: 3
 # Cop supports --auto-correct.
 # Configuration parameters: AlignWith, SupportedStyles, AutoCorrect.
@@ -624,7 +618,6 @@ Style/SpaceInsideBlockBraces:
 Style/SpaceInsideBrackets:
   Exclude:
     - 'config/deploy/server_settings.rb'
-    - 'lib/tasks/yard.rake'
 
 # Offense count: 20
 # Cop supports --auto-correct.
@@ -691,7 +684,6 @@ Style/TrailingWhitespace:
   Exclude:
     - 'Rakefile.rb'
     - 'bin/status_activity.rb'
-    - 'lib/tasks/yard.rake'
     - 'spec/sdr_migration/migration_transfer_spec.rb'
     - 'spec/sdr_recovery/recovery_verify_spec.rb'
 
