@@ -8,7 +8,6 @@
 .ruby-gemset
 .rvmrc
 .ruby-version
-.yardoc
 *~
 config/certs
 config/environments/*

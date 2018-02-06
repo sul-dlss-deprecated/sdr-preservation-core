@@ -30,7 +30,6 @@ group :test do
   gem 'rspec', '~> 3.0'
   gem 'simplecov', require: false
   gem 'coveralls', require: false
-  gem 'yard'
 end
 
 # Do not place the capistrano-related gems in the default or development bundle group

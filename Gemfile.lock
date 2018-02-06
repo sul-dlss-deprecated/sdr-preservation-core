@@ -210,7 +210,6 @@ DEPENDENCIES
   sdr-replication (~> 1.0)
   simplecov
   sys-filesystem
-  yard
 
 BUNDLED WITH
-   1.15.4
+   1.16.0
