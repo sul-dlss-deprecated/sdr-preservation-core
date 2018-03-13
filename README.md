@@ -2,6 +2,8 @@
 
 [![Build Status](https://travis-ci.org/sul-dlss/sdr-preservation-core.png?branch=master)](https://travis-ci.org/sul-dlss/sdr-preservation-core) [![Coverage Status](https://coveralls.io/repos/sul-dlss/sdr-preservation-core/badge.png?branch=master)](https://coveralls.io/r/sul-dlss/sdr-preservation-core) [![Dependency Status](https://gemnasium.com/sul-dlss/sdr-preservation-core.svg)](https://gemnasium.com/sul-dlss/sdr-preservation-core) 
 
+**Note** As of Q1 2018, this repository is being replaced by https://github.com/sul-dlss/preservation_robots
+
 ## Authors
 * Alpana Pande
 * Bess Sadler
