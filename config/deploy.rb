@@ -42,22 +42,34 @@ namespace :deploy do
   # http://vladigleba.com/blog/2014/04/10/deploying-rails-apps-part-6-writing-capistrano-tasks/
   desc 'Restart application'
   task :restart do
+    invoke 'deploy:stop'
+    invoke 'shared_configs:update'
+    invoke 'deploy:start'
+  end
+  # Capistrano 3 no longer runs deploy:restart by default.
+  after :publishing, :restart
+
+  desc 'Start the robots'
+  task :start do
     on roles(:app), in: :sequence, wait: 10 do
       within release_path do
-        test :bundle, :exec, :controller, :stop
-        test :bundle, :exec, :controller, :quit
         execute :bundle, :exec, :controller, :boot
       end
     end
   end
-  # Capistrano 3 no longer runs deploy:restart by default.
-  after :publishing, :restart
+
+  desc 'Stop the robots'
+  task :stop do
+    on roles(:app), in: :sequence, wait: 10 do
+      within release_path do
+        execute :bundle, :exec, :controller, :stop
+        execute :bundle, :exec, :controller, :quit
+      end
+    end
+  end
 end
 
 set :honeybadger_env, fetch(:stage)
-
-# update shared_configs before restarting app
-before 'deploy:restart', 'shared_configs:update'
 
 # capistrano next reads config/deploy/#{server}.rb, where #{server} is the first argument to cap; e.g.:
 # cap localhost deploy:check # invokes config/deploy/localhost.rb
