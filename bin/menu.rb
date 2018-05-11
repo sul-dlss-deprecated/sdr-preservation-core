@@ -4,17 +4,15 @@ require_relative 'environment'
 require_relative 'status_activity'
 require_relative 'status_storage'
 require_relative 'status_workflow'
-require_relative 'status_monitor'
 
 class Menu
 
   def self.syntax()
     puts <<-EOF
 
-    Syntax: bundle-exec.sh menu.rb  {#{WorkflowNames.join('|')}}
+Syntax: bundle exec menu.rb  {#{WorkflowNames.join('|')}}
 
-    EOF
-
+EOF
   end
 
   def initialize(workflow)
@@ -107,7 +105,9 @@ class Menu
 end
 
 # This is the equivalent of a java main method
-if __FILE__ == $0
+FILE=`basename #{__FILE__}`
+SCRIPT=`basename #{$0}`
+if FILE == SCRIPT
   workflow = ARGV.shift.to_s
   if WorkflowNames.include?(workflow)
     menu = Menu.new(workflow)
